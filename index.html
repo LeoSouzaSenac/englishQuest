@@ -1,0 +1,1278 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TenseLab</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0e0e12;
+      --surface: #17171e;
+      --surface2: #1f1f28;
+      --border: #2a2a36;
+      --text: #f0f0f5;
+      --muted: #7a7a8c;
+      --accent-past: #ff6b35;
+      --accent-present: #00d4aa;
+      --accent-cont: #7c6ffd;
+      --accent-future: #ffd166;
+      --green: #22c55e;
+      --red: #ef4444;
+      --radius: 16px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── NAV ── */
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 40px;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      background: rgba(14,14,18,0.9);
+      backdrop-filter: blur(12px);
+      z-index: 100;
+    }
+    .logo {
+      font-family: 'Syne', sans-serif;
+      font-weight: 900;
+      font-size: 1.6rem;
+      background: linear-gradient(135deg, var(--accent-present), var(--accent-cont));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .nav-xp {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 50px;
+      padding: 8px 20px;
+      font-size: .9rem;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .xp-val { font-family: 'Syne', sans-serif; font-weight: 800; color: var(--accent-future); }
+
+    /* ── TABS ── */
+    .tabs {
+      display: flex;
+      gap: 8px;
+      padding: 24px 40px 0;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .tabs::-webkit-scrollbar { display: none; }
+    .tab {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: .85rem;
+      padding: 10px 22px;
+      border-radius: 50px;
+      border: 1.5px solid var(--border);
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all .2s;
+    }
+    .tab:hover { border-color: var(--accent-present); color: var(--text); }
+    .tab.active {
+      background: var(--accent-present);
+      border-color: var(--accent-present);
+      color: #000;
+    }
+
+    /* ── PAGES ── */
+    .page { display: none; padding: 32px 40px 60px; }
+    .page.active { display: block; }
+
+    /* ── HERO ── */
+    .hero {
+      text-align: center;
+      padding: 48px 0 40px;
+    }
+    .hero h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(3rem, 8vw, 6rem);
+      font-weight: 900;
+      line-height: 1;
+      margin-bottom: 16px;
+    }
+    .hero h1 span { background: linear-gradient(135deg, var(--accent-present), var(--accent-cont)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .hero p { color: var(--muted); font-size: 1.1rem; max-width: 480px; margin: 0 auto 36px; }
+
+    .tense-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-top: 32px;
+    }
+    .tense-card {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      transition: transform .2s, border-color .2s;
+    }
+    .tense-card:hover { transform: translateY(-4px); }
+    .tense-card.past { border-top: 3px solid var(--accent-past); }
+    .tense-card.present { border-top: 3px solid var(--accent-present); }
+    .tense-card.cont { border-top: 3px solid var(--accent-cont); }
+    .tense-card.future { border-top: 3px solid var(--accent-future); }
+    .tense-card h3 { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.05rem; margin-bottom: 8px; }
+    .tense-card .badge {
+      display: inline-block;
+      font-size: .7rem;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 20px;
+      margin-bottom: 12px;
+    }
+    .past .badge { background: rgba(255,107,53,.15); color: var(--accent-past); }
+    .present .badge { background: rgba(0,212,170,.15); color: var(--accent-present); }
+    .cont .badge { background: rgba(124,111,253,.15); color: var(--accent-cont); }
+    .future .badge { background: rgba(255,209,102,.15); color: var(--accent-future); }
+    .tense-card p { color: var(--muted); font-size: .85rem; margin-bottom: 12px; }
+    .tense-card ul { list-style: none; }
+    .tense-card li { font-size: .85rem; padding: 5px 0; border-bottom: 1px solid var(--border); color: var(--text); }
+    .tense-card li:last-child { border: none; }
+    .formula {
+      margin-top: 12px;
+      background: var(--surface2);
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: .78rem;
+      color: var(--muted);
+      font-family: monospace;
+    }
+
+    /* ── GAME GRID ── */
+    .game-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+    }
+    .game-card {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+    }
+    .game-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.2rem;
+      margin-bottom: 6px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .game-icon { font-size: 1.4rem; }
+    .game-desc { color: var(--muted); font-size: .85rem; margin-bottom: 20px; }
+
+    /* Buttons */
+    .btn {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: .9rem;
+      padding: 12px 24px;
+      border-radius: 50px;
+      border: 1.5px solid transparent;
+      cursor: pointer;
+      transition: all .15s;
+    }
+    .btn-primary { background: var(--accent-present); color: #000; }
+    .btn-primary:hover { opacity: .85; transform: scale(1.03); }
+    .btn-outline { background: transparent; border-color: var(--border); color: var(--text); }
+    .btn-outline:hover { border-color: var(--accent-present); color: var(--accent-present); }
+    .btn-sm { padding: 8px 18px; font-size: .8rem; }
+    .btn-full { width: 100%; }
+
+    /* ── QUIZ ── */
+    .quiz-question {
+      background: var(--surface2);
+      border-radius: 12px;
+      padding: 20px;
+      font-size: 1.1rem;
+      font-weight: 500;
+      margin-bottom: 16px;
+      line-height: 1.5;
+    }
+    .quiz-options { display: flex; flex-direction: column; gap: 10px; }
+    .quiz-opt {
+      background: var(--surface2);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 18px;
+      text-align: left;
+      color: var(--text);
+      cursor: pointer;
+      font-size: .95rem;
+      transition: all .15s;
+    }
+    .quiz-opt:hover:not(:disabled) { border-color: var(--accent-present); background: rgba(0,212,170,.06); }
+    .quiz-opt.correct { border-color: var(--green); background: rgba(34,197,94,.12); color: var(--green); }
+    .quiz-opt.wrong { border-color: var(--red); background: rgba(239,68,68,.12); color: var(--red); }
+    .quiz-opt:disabled { cursor: default; }
+    .quiz-feedback {
+      margin-top: 14px;
+      padding: 14px 18px;
+      border-radius: 12px;
+      font-size: .9rem;
+      font-weight: 500;
+      display: none;
+    }
+    .quiz-feedback.correct { background: rgba(34,197,94,.12); color: var(--green); border: 1px solid rgba(34,197,94,.3); }
+    .quiz-feedback.wrong { background: rgba(239,68,68,.12); color: var(--red); border: 1px solid rgba(239,68,68,.3); }
+    .quiz-stats {
+      display: flex; gap: 12px; margin-bottom: 16px; font-size: .85rem; color: var(--muted);
+    }
+    .quiz-stats span { font-weight: 700; color: var(--text); }
+
+    /* ── ERROR DETECTOR ── */
+    .error-sentence {
+      background: var(--surface2);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      font-size: 1.1rem;
+      margin-bottom: 14px;
+    }
+    .error-sentence .wrong-word {
+      color: var(--red);
+      text-decoration: underline wavy var(--red);
+    }
+    .error-input {
+      width: 100%;
+      background: var(--surface2);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 18px;
+      color: var(--text);
+      font-size: 1rem;
+      font-family: 'DM Sans', sans-serif;
+      outline: none;
+      transition: border-color .15s;
+      margin-bottom: 12px;
+    }
+    .error-input:focus { border-color: var(--accent-present); }
+    .error-input.correct-input { border-color: var(--green); }
+    .error-input.wrong-input { border-color: var(--red); }
+
+    /* ── DRAG & DROP ── */
+    .drag-words {
+      display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; min-height: 44px;
+      background: var(--surface2); border-radius: 12px; padding: 12px;
+      border: 1.5px dashed var(--border);
+    }
+    .drag-word {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      padding: 6px 14px;
+      font-size: .9rem;
+      cursor: grab;
+      user-select: none;
+      transition: all .15s;
+      touch-action: none;
+    }
+    .drag-word:hover { border-color: var(--accent-present); background: rgba(0,212,170,.06); }
+    .drag-word.dragging { opacity: .4; }
+    .drag-word.placed { background: rgba(124,111,253,.15); border-color: var(--accent-cont); }
+    .sentence-slots {
+      display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+      background: var(--surface2); border-radius: 12px; padding: 16px;
+      min-height: 56px; border: 1.5px solid var(--border);
+      margin-bottom: 14px;
+    }
+    .slot-word {
+      background: var(--accent-cont);
+      color: #fff;
+      border-radius: 8px;
+      padding: 6px 14px;
+      font-size: .9rem;
+      cursor: pointer;
+    }
+    .slot-placeholder {
+      color: var(--muted);
+      font-size: .9rem;
+      font-style: italic;
+    }
+
+    /* ── TIMELINE GAME ── */
+    .timeline-bar {
+      position: relative;
+      height: 6px;
+      background: var(--border);
+      border-radius: 3px;
+      margin: 60px 0 40px;
+    }
+    .timeline-bar::before, .timeline-bar::after, .timeline-center {
+      position: absolute;
+      top: -28px;
+      font-size: .8rem;
+      font-weight: 700;
+      font-family: 'Syne', sans-serif;
+      color: var(--muted);
+    }
+    .timeline-bar::before { content: 'PAST'; left: 0; }
+    .timeline-bar::after { content: 'FUTURE'; right: 0; }
+    .timeline-center { left: 50%; transform: translateX(-50%); }
+    .timeline-dots { position: absolute; top: -8px; width: 100%; display: flex; justify-content: space-between; }
+    .t-dot {
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 2px solid var(--bg);
+      transition: transform .2s;
+    }
+    .t-dot:hover { transform: scale(1.3); }
+    .timeline-cards { display: flex; flex-direction: column; gap: 10px; }
+    .timeline-drop-zone {
+      border: 2px dashed var(--border);
+      border-radius: 12px;
+      padding: 14px 18px;
+      display: flex; align-items: center; gap: 12px;
+      font-size: .9rem;
+      color: var(--muted);
+      transition: border-color .15s;
+      cursor: pointer;
+      min-height: 52px;
+    }
+    .timeline-drop-zone:hover { border-color: var(--accent-cont); }
+    .timeline-drop-zone.filled { border-color: var(--border); color: var(--text); }
+    .tl-label { font-weight: 700; font-size: .75rem; padding: 2px 8px; border-radius: 6px; }
+
+    /* ── STORY MODE ── */
+    .story-scene {
+      background: var(--surface2);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+    .story-scene::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 3px;
+      background: var(--accent-cont);
+    }
+    .story-scene p { font-size: 1rem; line-height: 1.6; }
+    .story-blank {
+      display: inline-block;
+      min-width: 100px;
+      border-bottom: 2px solid var(--accent-cont);
+      padding: 0 4px;
+      margin: 0 4px;
+    }
+    .story-choices { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .story-choice {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      padding: 6px 16px;
+      cursor: pointer;
+      font-size: .85rem;
+      transition: all .15s;
+    }
+    .story-choice:hover { border-color: var(--accent-cont); color: var(--accent-cont); }
+    .story-choice.correct { border-color: var(--green); background: rgba(34,197,94,.1); color: var(--green); }
+    .story-choice.wrong { border-color: var(--red); background: rgba(239,68,68,.1); color: var(--red); }
+
+    /* ── WORDLE-STYLE ── */
+    .wordle-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 6px;
+      max-width: 300px;
+      margin: 0 auto 20px;
+    }
+    .wordle-cell {
+      aspect-ratio: 1;
+      background: var(--surface2);
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.4rem;
+      text-transform: uppercase;
+      transition: all .1s;
+    }
+    .wordle-cell.correct { background: var(--green); border-color: var(--green); color: #fff; }
+    .wordle-cell.present { background: var(--accent-future); border-color: var(--accent-future); color: #000; }
+    .wordle-cell.absent { background: var(--border); border-color: var(--border); color: var(--muted); }
+    .wordle-cell.active { border-color: var(--accent-present); }
+    .wordle-keyboard {
+      display: flex; flex-direction: column; align-items: center; gap: 6px;
+      margin-bottom: 16px;
+    }
+    .wordle-row { display: flex; gap: 5px; }
+    .wkey {
+      background: var(--surface2);
+      border: 1.5px solid var(--border);
+      border-radius: 6px;
+      padding: 10px 8px;
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: .8rem;
+      min-width: 32px;
+      text-align: center;
+      cursor: pointer;
+      color: var(--text);
+      transition: all .1s;
+    }
+    .wkey:hover { border-color: var(--accent-present); }
+    .wkey.wide { min-width: 52px; font-size: .7rem; }
+    .wkey.correct { background: var(--green); border-color: var(--green); color: #fff; }
+    .wkey.present { background: var(--accent-future); border-color: var(--accent-future); color: #000; }
+    .wkey.absent { background: var(--border); border-color: var(--border); color: var(--muted); }
+
+    /* ── SPEED ROUND ── */
+    .speed-prompt {
+      text-align: center;
+      background: var(--surface2);
+      border-radius: 12px;
+      padding: 28px;
+      margin-bottom: 16px;
+    }
+    .speed-prompt .tense-label {
+      font-size: .8rem;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .speed-prompt .verb { font-family: 'Syne', sans-serif; font-size: 2.5rem; font-weight: 900; }
+    .speed-prompt .subject { color: var(--muted); font-size: 1rem; margin-top: 6px; }
+    .speed-timer { height: 6px; background: var(--border); border-radius: 3px; margin-bottom: 16px; overflow: hidden; }
+    .speed-timer-bar { height: 100%; background: var(--accent-present); border-radius: 3px; transition: width .1s linear; }
+    .speed-input {
+      width: 100%;
+      background: var(--surface2);
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      padding: 16px 20px;
+      font-size: 1.1rem;
+      font-family: 'DM Sans', sans-serif;
+      color: var(--text);
+      outline: none;
+      text-align: center;
+    }
+    .speed-input:focus { border-color: var(--accent-present); }
+    .speed-score-row {
+      display: flex; justify-content: space-between; margin-bottom: 12px;
+      font-size: .85rem; color: var(--muted);
+    }
+    .speed-score-row span { font-weight: 700; color: var(--text); }
+
+    /* ── PROGRESS ── */
+    .progress-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 32px; }
+    .progress-stat { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius); padding: 24px; }
+    .progress-stat .label { font-size: .8rem; color: var(--muted); margin-bottom: 6px; }
+    .progress-stat .value { font-family: 'Syne', sans-serif; font-size: 2.8rem; font-weight: 900; }
+    .progress-bar-wrap { margin-bottom: 16px; }
+    .progress-bar-label { display: flex; justify-content: space-between; font-size: .85rem; margin-bottom: 6px; }
+    .progress-bar { height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
+    .progress-bar-fill { height: 100%; border-radius: 4px; transition: width 1s ease; }
+
+    /* ── TABLE ── */
+    table { width: 100%; border-collapse: collapse; }
+    thead tr { border-bottom: 1.5px solid var(--border); }
+    th, td { padding: 14px 16px; text-align: left; font-size: .9rem; }
+    th { color: var(--muted); font-weight: 500; font-size: .8rem; text-transform: uppercase; letter-spacing: .05em; }
+    tbody tr { border-bottom: 1px solid var(--border); }
+    tbody tr:last-child { border: none; }
+    .score-pill {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: .8rem;
+      font-weight: 700;
+    }
+    .score-high { background: rgba(34,197,94,.15); color: var(--green); }
+    .score-mid { background: rgba(255,209,102,.15); color: var(--accent-future); }
+    .score-low { background: rgba(239,68,68,.15); color: var(--red); }
+
+    /* ── TOAST ── */
+    .toast {
+      position: fixed;
+      bottom: 30px; left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: var(--surface2);
+      border: 1.5px solid var(--border);
+      border-radius: 50px;
+      padding: 12px 28px;
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: .95rem;
+      z-index: 999;
+      transition: transform .3s cubic-bezier(.34,1.56,.64,1);
+      pointer-events: none;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+    .toast.xp { color: var(--accent-future); border-color: var(--accent-future); }
+
+    /* ── SECTION TITLE ── */
+    .section-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 900;
+      font-size: 1.6rem;
+      margin-bottom: 20px;
+    }
+    .section-title span { color: var(--muted); font-weight: 400; font-size: 1rem; margin-left: 12px; }
+
+    @media (max-width: 600px) {
+      nav, .tabs, .page { padding-left: 16px; padding-right: 16px; }
+      .hero h1 { font-size: 2.8rem; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">English<span style="color: white;">Quest</span></div>
+  <div class="nav-xp">⚡ <span class="xp-val" id="xpDisplay">0</span> XP</div>
+</nav>
+
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('home')">🏠 Home</button>
+  <button class="tab" onclick="switchTab('quiz')">🎯 Quiz Game</button>
+  <button class="tab" onclick="switchTab('error')">🔍 Error Detector</button>
+  <button class="tab" onclick="switchTab('build')">🧩 Build Sentence</button>
+  <button class="tab" onclick="switchTab('story')">📖 Story Mode</button>
+  <button class="tab" onclick="switchTab('speed')">⚡ Speed Round</button>
+  <button class="tab" onclick="switchTab('progress')">📊 Progress</button>
+</div>
+
+<!-- ══════════ HOME ══════════ -->
+<div class="page active" id="page-home">
+  <div class="hero">
+    <h1>Master<br><span>Verb Tenses</span></h1>
+    <p>6 jogos interativos para dominar os tempos verbais em inglês. Aprenda brincando!</p>
+  </div>
+
+  <div class="tense-cards">
+    <div class="tense-card present">
+      <div class="badge">Simple Present</div>
+      <h3>I work every day</h3>
+      <p>Rotina, hábitos e fatos gerais</p>
+      <ul>
+        <li>She studies math</li>
+        <li>They play soccer</li>
+        <li>It rains a lot here</li>
+      </ul>
+      <div class="formula">Subject + V(s/es) + complement</div>
+    </div>
+    <div class="tense-card cont">
+      <div class="badge">Present Continuous</div>
+      <h3>I am working now</h3>
+      <p>Ações acontecendo agora mesmo</p>
+      <ul>
+        <li>She is studying now</li>
+        <li>They are playing</li>
+        <li>It is raining</li>
+      </ul>
+      <div class="formula">Subject + am/is/are + V-ing</div>
+    </div>
+    <div class="tense-card past">
+      <div class="badge">Simple Past</div>
+      <h3>I worked yesterday</h3>
+      <p>Ações finalizadas no passado</p>
+      <ul>
+        <li>She studied last night</li>
+        <li>They played yesterday</li>
+        <li>It rained all day</li>
+      </ul>
+      <div class="formula">Subject + V(ed/irreg) + complement</div>
+    </div>
+    <div class="tense-card future">
+      <div class="badge">Future (will)</div>
+      <h3>I will work tomorrow</h3>
+      <p>Ações e planos futuros</p>
+      <ul>
+        <li>She will study later</li>
+        <li>They will play tonight</li>
+        <li>It will rain tomorrow</li>
+      </ul>
+      <div class="formula">Subject + will + V (base form)</div>
+    </div>
+  </div>
+
+  <div style="margin-top:40px;">
+    <div class="section-title">Mini Games <span>Escolha um jogo para começar</span></div>
+    <div class="game-grid">
+      <div class="game-card">
+        <div class="game-title"><span class="game-icon">🎯</span>Quiz Game</div>
+        <p class="game-desc">Escolha a opção correta para completar a frase. 20 questões com explicações!</p>
+        <button class="btn btn-primary" onclick="switchTab('quiz')">Jogar →</button>
+      </div>
+      <div class="game-card">
+        <div class="game-title"><span class="game-icon">🔍</span>Error Detector</div>
+        <p class="game-desc">Encontre e corrija o erro gramatical em cada frase.</p>
+        <button class="btn btn-primary" onclick="switchTab('error')">Jogar →</button>
+      </div>
+      <div class="game-card">
+        <div class="game-title"><span class="game-icon">🧩</span>Build Sentence</div>
+        <p class="game-desc">Arraste as palavras para montar frases corretas.</p>
+        <button class="btn btn-primary" onclick="switchTab('build')">Jogar →</button>
+      </div>
+      <div class="game-card">
+        <div class="game-title"><span class="game-icon">📖</span>Story Mode</div>
+        <p class="game-desc">Complete a história escolhendo o tempo verbal certo em cada situação.</p>
+        <button class="btn btn-primary" onclick="switchTab('story')">Jogar →</button>
+      </div>
+      <div class="game-card">
+        <div class="game-title"><span class="game-icon">⚡</span>Speed Round</div>
+        <p class="game-desc">Conjugue verbos contra o relógio! Quantos você acerta em 60 segundos?</p>
+        <button class="btn btn-primary" onclick="switchTab('speed')">Jogar →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ QUIZ ══════════ -->
+<div class="page" id="page-quiz">
+  <div class="section-title">🎯 Quiz Game</div>
+  <div class="game-card" style="max-width:600px;">
+    <div class="quiz-stats">
+      Pergunta <span id="qNum">1</span>/20 &nbsp;|&nbsp; Acertos: <span id="qScore">0</span> &nbsp;|&nbsp; 🔥 Streak: <span id="qStreak">0</span>
+    </div>
+    <div class="quiz-question" id="quizQuestion">Loading...</div>
+    <div class="quiz-options" id="quizOptions"></div>
+    <div class="quiz-feedback" id="quizFeedback"></div>
+    <div style="margin-top:16px; display:flex; gap:10px; flex-wrap:wrap;" id="quizControls">
+      <button class="btn btn-primary" id="nextBtn" onclick="nextQuestion()" style="display:none;">Próxima →</button>
+      <button class="btn btn-outline btn-sm" onclick="resetQuiz()">Reiniciar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ ERROR DETECTOR ══════════ -->
+<div class="page" id="page-error">
+  <div class="section-title">🔍 Error Detector</div>
+  <div class="game-card" style="max-width:600px;">
+    <div class="quiz-stats">
+      Frase <span id="errNum">1</span>/10 &nbsp;|&nbsp; Acertos: <span id="errScore">0</span>
+    </div>
+    <p class="game-desc">Reescreva a frase corrigindo o erro gramatical.</p>
+    <div class="error-sentence" id="errSentence"></div>
+    <input type="text" class="error-input" id="errInput" placeholder="Digite a frase corrigida..." />
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      <button class="btn btn-primary" onclick="checkError()">Verificar</button>
+      <button class="btn btn-outline btn-sm" onclick="skipError()">Pular →</button>
+      <button class="btn btn-outline btn-sm" onclick="resetError()">Reiniciar</button>
+    </div>
+    <div class="quiz-feedback" id="errFeedback" style="margin-top:14px;"></div>
+  </div>
+</div>
+
+<!-- ══════════ BUILD SENTENCE ══════════ -->
+<div class="page" id="page-build">
+  <div class="section-title">🧩 Build Sentence</div>
+  <div class="game-card" style="max-width:620px;">
+    <div class="quiz-stats">
+      Frase <span id="buildNum">1</span>/8 &nbsp;|&nbsp; Acertos: <span id="buildScore">0</span>
+    </div>
+    <p class="game-desc" id="buildHint"></p>
+    <div class="sentence-slots" id="buildSlots"><span class="slot-placeholder">Arraste as palavras aqui em ordem...</span></div>
+    <div class="drag-words" id="buildWords"></div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px;">
+      <button class="btn btn-primary" onclick="checkBuild()">Verificar ✓</button>
+      <button class="btn btn-outline btn-sm" onclick="clearBuild()">Limpar</button>
+      <button class="btn btn-outline btn-sm" onclick="resetBuild()">Reiniciar</button>
+    </div>
+    <div class="quiz-feedback" id="buildFeedback" style="margin-top:14px;"></div>
+  </div>
+</div>
+
+<!-- ══════════ STORY MODE ══════════ -->
+<div class="page" id="page-story">
+  <div class="section-title">📖 Story Mode</div>
+  <div class="game-card" style="max-width:620px;">
+    <div class="quiz-stats">
+      Cena <span id="storyNum">1</span>/6 &nbsp;|&nbsp; Acertos: <span id="storyScore">0</span>
+    </div>
+    <div id="storyContent"></div>
+    <div class="quiz-feedback" id="storyFeedback" style="margin-top:14px;"></div>
+    <button class="btn btn-outline btn-sm" onclick="resetStory()" style="margin-top:12px;">Reiniciar</button>
+  </div>
+</div>
+
+<!-- ══════════ SPEED ROUND ══════════ -->
+<div class="page" id="page-speed">
+  <div class="section-title">⚡ Speed Round</div>
+  <div class="game-card" style="max-width:520px;">
+    <div class="speed-score-row">
+      <div>Pontos: <span id="speedScore">0</span></div>
+      <div>Tempo: <span id="speedTime">60</span>s</div>
+    </div>
+    <div class="speed-timer"><div class="speed-timer-bar" id="speedBar" style="width:100%"></div></div>
+    <div class="speed-prompt" id="speedPrompt">
+      <div class="tense-label" id="speedTenseLabel" style="color:var(--accent-present)">Simple Present</div>
+      <div class="verb" id="speedVerb">work</div>
+      <div class="subject" id="speedSubject">She ___</div>
+    </div>
+    <input type="text" class="speed-input" id="speedInput" placeholder="Type your answer..." autocomplete="off" />
+    <div style="display:flex;gap:10px;margin-top:14px;justify-content:center;flex-wrap:wrap;" id="speedControls">
+      <button class="btn btn-primary" id="speedStartBtn" onclick="startSpeed()">▶ Iniciar</button>
+    </div>
+    <div style="margin-top:16px;font-size:.85rem;color:var(--muted)">
+      <strong style="color:var(--text)">Como jogar:</strong> Conjugue o verbo para o sujeito e tempo indicados. Pressione Enter para confirmar.
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ PROGRESS ══════════ -->
+<div class="page" id="page-progress">
+  <div class="section-title">📊 Progress</div>
+  <div class="progress-grid">
+    <div class="progress-stat">
+      <div class="label">Total XP</div>
+      <div class="value" id="statXP" style="color:var(--accent-future)">0</div>
+    </div>
+    <div class="progress-stat">
+      <div class="label">Questões Respondidas</div>
+      <div class="value" id="statQ">0</div>
+    </div>
+    <div class="progress-stat">
+      <div class="label">Taxa de Acerto</div>
+      <div class="value" id="statAcc">—</div>
+    </div>
+    <div class="progress-stat">
+      <div class="label">Maior Streak</div>
+      <div class="value" id="statStreak" style="color:var(--accent-past)">0</div>
+    </div>
+  </div>
+
+  <div class="section-title" style="font-size:1.2rem;">Desempenho por Tempo Verbal</div>
+  <div id="progressBars" style="max-width:500px; margin-bottom:36px;"></div>
+
+  <div class="section-title" style="font-size:1.2rem;">Teacher Dashboard</div>
+  <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);overflow:auto;">
+    <table>
+      <thead><tr><th>Aluno</th><th>Simple Present</th><th>Present Cont.</th><th>Simple Past</th><th>Future</th></tr></thead>
+      <tbody>
+        <tr><td>Lucas</td><td><span class="score-pill score-high">90%</span></td><td><span class="score-pill score-mid">82%</span></td><td><span class="score-pill score-high">95%</span></td><td><span class="score-pill score-mid">88%</span></td></tr>
+        <tr><td>Ana</td><td><span class="score-pill score-high">98%</span></td><td><span class="score-pill score-high">91%</span></td><td><span class="score-pill score-mid">85%</span></td><td><span class="score-pill score-high">93%</span></td></tr>
+        <tr><td>Carlos</td><td><span class="score-pill score-mid">70%</span></td><td><span class="score-pill score-low">66%</span></td><td><span class="score-pill score-mid">80%</span></td><td><span class="score-pill score-mid">72%</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════
+//  STATE
+// ══════════════════════════════
+let xp = 0;
+let totalQ = 0, totalCorrect = 0, bestStreak = 0;
+const tenseStats = { 'Simple Present': [0,0], 'Present Continuous': [0,0], 'Simple Past': [0,0], 'Future': [0,0] };
+
+function addXP(n) {
+  xp += n;
+  document.getElementById('xpDisplay').textContent = xp;
+  showToast(`+${n} XP ⚡`, 'xp');
+  updateProgress();
+}
+
+function showToast(msg, cls='') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast ' + cls + ' show';
+  setTimeout(() => t.classList.remove('show'), 1800);
+}
+
+function switchTab(id) {
+  document.querySelectorAll('.tab').forEach((t,i) => {
+    const ids = ['home','quiz','error','build','story','speed','progress'];
+    t.classList.toggle('active', ids[i] === id);
+  });
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  if (id === 'progress') updateProgress();
+}
+
+function recordAnswer(tense, correct) {
+  totalQ++;
+  if (correct) totalCorrect++;
+  if (tenseStats[tense]) {
+    tenseStats[tense][1]++;
+    if (correct) tenseStats[tense][0]++;
+  }
+}
+
+// ══════════════════════════════
+//  QUIZ GAME
+// ══════════════════════════════
+const quizData = [
+  { q:"She ____ to school every day.", opts:["go","goes","is going","went"], ans:1, tense:"Simple Present", exp:"Simple Present: she/he/it + verbo com -s/es" },
+  { q:"Right now, they ____ football in the park.", opts:["play","played","are playing","will play"], ans:2, tense:"Present Continuous", exp:"Present Continuous: am/is/are + V-ing para ações acontecendo agora" },
+  { q:"I ____ a great movie last night.", opts:["watch","watches","watched","am watching"], ans:2, tense:"Simple Past", exp:"Simple Past: usamos o passado do verbo (watched)" },
+  { q:"Tomorrow, we ____ visit our grandparents.", opts:["are","do","will","was"], ans:2, tense:"Future", exp:"Future com will: will + verbo na forma base" },
+  { q:"He ____ coffee every morning.", opts:["drink","drinks","is drinking","drank"], ans:1, tense:"Simple Present", exp:"Simple Present: he/she/it → drinks (acrescenta -s)" },
+  { q:"Look! The baby ____!", opts:["walks","walk","is walking","walked"], ans:2, tense:"Present Continuous", exp:"'Look!' indica ação acontecendo agora → Present Continuous" },
+  { q:"My parents ____ married in 1990.", opts:["get","gets","are getting","got"], ans:3, tense:"Simple Past", exp:"1990 é passado → Simple Past (got - irregular)" },
+  { q:"I think it ____ rain this afternoon.", opts:["is","will","does","was"], ans:1, tense:"Future", exp:"'I think' + previsão futura → will" },
+  { q:"The sun ____ in the east.", opts:["rise","rises","is rising","rose"], ans:1, tense:"Simple Present", exp:"Fato científico → Simple Present (rises)" },
+  { q:"We ____ dinner when you called.", opts:["have","had","are having","were having"], ans:3, tense:"Present Continuous", exp:"Ação em progresso interrompida → Past Continuous (were having)" },
+  { q:"She ____ her homework an hour ago.", opts:["finish","finishes","is finishing","finished"], ans:3, tense:"Simple Past", exp:"'an hour ago' indica passado → Simple Past (finished)" },
+  { q:"I promise I ____ be late.", opts:["am not","don't","won't","wasn't"], ans:2, tense:"Future", exp:"Promessa futura → won't (will not)" },
+  { q:"They ____ English at this school.", opts:["teach","teaches","teaching","taught"], ans:0, tense:"Simple Present", exp:"They (plural) → teach, sem -s" },
+  { q:"Be quiet! The baby ____.", opts:["sleep","sleeps","is sleeping","slept"], ans:2, tense:"Present Continuous", exp:"'Be quiet!' → ação em andamento → is sleeping" },
+  { q:"We ____ to Paris last summer.", opts:["go","goes","went","will go"], ans:2, tense:"Simple Past", exp:"'last summer' → Simple Past (went - irregular)" },
+  { q:"She ____ call you later.", opts:["is","does","will","was"], ans:2, tense:"Future", exp:"Ação futura simples → will" },
+  { q:"Dogs ____ meat.", opts:["eats","eat","are eating","ate"], ans:1, tense:"Simple Present", exp:"Hábito geral, sujeito plural → eat" },
+  { q:"I ____ a shower right now — call back later!", opts:["take","takes","am taking","took"], ans:2, tense:"Present Continuous", exp:"'right now' → ação em andamento → am taking" },
+  { q:"He ____ his keys yesterday.", opts:["lose","loses","is losing","lost"], ans:3, tense:"Simple Past", exp:"'yesterday' + irregular verb → lost" },
+  { q:"We ____ graduate next year.", opts:["are","do","will","were"], ans:2, tense:"Future", exp:"Plano futuro → will graduate" },
+];
+
+let quizIdx = 0, quizScore = 0, quizStreak = 0, quizAnswered = false;
+
+function loadQuiz() {
+  if (quizIdx >= quizData.length) {
+    document.getElementById('quizQuestion').innerHTML = `<strong>🎉 Fim do Quiz!</strong><br>Você acertou ${quizScore} de ${quizData.length} perguntas!`;
+    document.getElementById('quizOptions').innerHTML = '';
+    document.getElementById('quizFeedback').style.display = 'none';
+    document.getElementById('nextBtn').style.display = 'none';
+    addXP(quizScore * 5);
+    return;
+  }
+  const d = quizData[quizIdx];
+  document.getElementById('qNum').textContent = quizIdx + 1;
+  document.getElementById('qScore').textContent = quizScore;
+  document.getElementById('qStreak').textContent = quizStreak;
+  document.getElementById('quizQuestion').textContent = d.q;
+  document.getElementById('quizFeedback').style.display = 'none';
+  document.getElementById('nextBtn').style.display = 'none';
+  quizAnswered = false;
+
+  const opts = document.getElementById('quizOptions');
+  opts.innerHTML = '';
+  d.opts.forEach((o, i) => {
+    const b = document.createElement('button');
+    b.className = 'quiz-opt';
+    b.textContent = o;
+    b.onclick = () => answerQuiz(i);
+    opts.appendChild(b);
+  });
+}
+
+function answerQuiz(i) {
+  if (quizAnswered) return;
+  quizAnswered = true;
+  const d = quizData[quizIdx];
+  const opts = document.querySelectorAll('.quiz-opt');
+  const fb = document.getElementById('quizFeedback');
+  opts.forEach(b => b.disabled = true);
+  opts[d.ans].classList.add('correct');
+
+  if (i === d.ans) {
+    quizScore++; quizStreak++;
+    if (quizStreak > bestStreak) bestStreak = quizStreak;
+    fb.className = 'quiz-feedback correct';
+    fb.textContent = '✅ Correto! ' + d.exp;
+    addXP(quizStreak >= 3 ? 15 : 10);
+  } else {
+    opts[i].classList.add('wrong');
+    quizStreak = 0;
+    fb.className = 'quiz-feedback wrong';
+    fb.textContent = '❌ Incorreto. ' + d.exp;
+  }
+  recordAnswer(d.tense, i === d.ans);
+  fb.style.display = 'block';
+  document.getElementById('nextBtn').style.display = 'inline-block';
+}
+
+function nextQuestion() { quizIdx++; loadQuiz(); }
+function resetQuiz() { quizIdx = 0; quizScore = 0; quizStreak = 0; loadQuiz(); }
+
+// ══════════════════════════════
+//  ERROR DETECTOR
+// ══════════════════════════════
+const errorData = [
+  { wrong:"She don't like coffee.", correct:"She doesn't like coffee.", err:"don't","fix":"doesn't", tense:"Simple Present", exp:"He/She/It → doesn't (not don't)" },
+  { wrong:"They is playing soccer now.", correct:"They are playing soccer now.", err:"is","fix":"are", tense:"Present Continuous", exp:"They → are (not is)" },
+  { wrong:"He goed to work yesterday.", correct:"He went to work yesterday.", err:"goed","fix":"went", tense:"Simple Past", exp:"go é irregular → went (não goed)" },
+  { wrong:"I will to call you later.", correct:"I will call you later.", err:"to call","fix":"call", tense:"Future", exp:"After 'will' → base form, no 'to'" },
+  { wrong:"She study English every night.", correct:"She studies English every night.", err:"study","fix":"studies", tense:"Simple Present", exp:"She → studies (acrescenta -es)" },
+  { wrong:"He is eat lunch right now.", correct:"He is eating lunch right now.", err:"eat","fix":"eating", tense:"Present Continuous", exp:"Present Continuous → is + V-ing (eating)" },
+  { wrong:"We buyed a new car last week.", correct:"We bought a new car last week.", err:"buyed","fix":"bought", tense:"Simple Past", exp:"buy é irregular → bought (não buyed)" },
+  { wrong:"They will going to the party.", correct:"They will go to the party.", err:"going","fix":"go", tense:"Future", exp:"will + base form (not going)" },
+  { wrong:"He don't works here anymore.", correct:"He doesn't work here anymore.", err:"don't works","fix":"doesn't work", tense:"Simple Present", exp:"He → doesn't + base form (not don't works)" },
+  { wrong:"She was walking when she heared a noise.", correct:"She was walking when she heard a noise.", err:"heared","fix":"heard", tense:"Simple Past", exp:"hear é irregular → heard (não heared)" },
+];
+
+let errIdx = 0, errScore = 0;
+
+function loadError() {
+  if (errIdx >= errorData.length) {
+    document.getElementById('errSentence').innerHTML = `<strong>🎉 Parabéns!</strong> Você acertou ${errScore} de ${errorData.length}!`;
+    document.getElementById('errInput').style.display = 'none';
+    addXP(errScore * 8);
+    return;
+  }
+  const d = errorData[errIdx];
+  document.getElementById('errNum').textContent = errIdx + 1;
+  document.getElementById('errScore').textContent = errScore;
+  document.getElementById('errInput').value = '';
+  document.getElementById('errInput').className = 'error-input';
+  document.getElementById('errFeedback').style.display = 'none';
+
+  const wrongIdx = d.wrong.indexOf(d.err);
+  const before = d.wrong.substring(0, wrongIdx);
+  const after = d.wrong.substring(wrongIdx + d.err.length);
+  document.getElementById('errSentence').innerHTML =
+    before + `<span class="wrong-word">${d.err}</span>` + after;
+}
+
+function checkError() {
+  if (errIdx >= errorData.length) return;
+  const d = errorData[errIdx];
+  const val = document.getElementById('errInput').value.trim().toLowerCase();
+  const correct = d.correct.toLowerCase();
+  const fb = document.getElementById('errFeedback');
+
+  if (val === correct) {
+    errScore++;
+    fb.className = 'quiz-feedback correct';
+    fb.textContent = `✅ Perfeito! "${d.correct}"`;
+    document.getElementById('errInput').className = 'error-input correct-input';
+    addXP(12);
+    recordAnswer(d.tense, true);
+    setTimeout(() => { errIdx++; loadError(); }, 1500);
+  } else {
+    fb.className = 'quiz-feedback wrong';
+    fb.textContent = `❌ Tente novamente. Dica: corrija "${d.err}" → "${d.fix}"`;
+    document.getElementById('errInput').className = 'error-input wrong-input';
+    recordAnswer(d.tense, false);
+  }
+  fb.style.display = 'block';
+}
+
+function skipError() { errIdx++; loadError(); }
+function resetError() { errIdx = 0; errScore = 0; document.getElementById('errInput').style.display = ''; loadError(); }
+
+document.getElementById('errInput').addEventListener('keydown', e => { if (e.key === 'Enter') checkError(); });
+
+// ══════════════════════════════
+//  BUILD SENTENCE (Drag words)
+// ══════════════════════════════
+const buildData = [
+  { words:["every","She","day","English","studies"], answer:["She","studies","English","every","day"], hint:"Simple Present — ela estuda inglês todo dia", tense:"Simple Present" },
+  { words:["now","They","football","playing","are"], answer:["They","are","playing","football","now"], hint:"Present Continuous — eles estão jogando futebol agora", tense:"Present Continuous" },
+  { words:["visited","museum","last","We","week","the"], answer:["We","visited","the","museum","last","week"], hint:"Simple Past — nós visitamos o museu semana passada", tense:"Simple Past" },
+  { words:["tomorrow","will","I","you","call"], answer:["I","will","call","you","tomorrow"], hint:"Future — eu vou te ligar amanhã", tense:"Future" },
+  { words:["her","is","homework","She","doing"], answer:["She","is","doing","her","homework"], hint:"Present Continuous — ela está fazendo o dever de casa", tense:"Present Continuous" },
+  { words:["bought","dress","new","She","a","yesterday"], answer:["She","bought","a","new","dress","yesterday"], hint:"Simple Past — ela comprou um vestido novo ontem", tense:"Simple Past" },
+  { words:["rain","It","tomorrow","will"], answer:["It","will","rain","tomorrow"], hint:"Future — vai chover amanhã", tense:"Future" },
+  { words:["works","hospital","He","in","a"], answer:["He","works","in","a","hospital"], hint:"Simple Present — ele trabalha em um hospital", tense:"Simple Present" },
+];
+
+let buildIdx = 0, buildScore = 0;
+let buildPlaced = [];
+
+function loadBuild() {
+  if (buildIdx >= buildData.length) {
+    document.getElementById('buildFeedback').className = 'quiz-feedback correct';
+    document.getElementById('buildFeedback').style.display = 'block';
+    document.getElementById('buildFeedback').textContent = `🎉 Fim! Você acertou ${buildScore} de ${buildData.length}!`;
+    document.getElementById('buildWords').innerHTML = '';
+    document.getElementById('buildSlots').innerHTML = '';
+    addXP(buildScore * 10);
+    return;
+  }
+  const d = buildData[buildIdx];
+  buildPlaced = [];
+  document.getElementById('buildNum').textContent = buildIdx + 1;
+  document.getElementById('buildScore').textContent = buildScore;
+  document.getElementById('buildHint').textContent = '💡 ' + d.hint;
+  document.getElementById('buildFeedback').style.display = 'none';
+  renderBuildSlots();
+  renderBuildWords();
+}
+
+function renderBuildSlots() {
+  const s = document.getElementById('buildSlots');
+  if (buildPlaced.length === 0) {
+    s.innerHTML = '<span class="slot-placeholder">Arraste as palavras aqui em ordem...</span>';
+  } else {
+    s.innerHTML = buildPlaced.map((w,i) =>
+      `<span class="slot-word" onclick="removeFromSlot(${i})">${w} ✕</span>`
+    ).join('');
+  }
+}
+
+function renderBuildWords() {
+  const d = buildData[buildIdx];
+  const shuffled = [...d.words].sort(() => Math.random() - .5);
+  const w = document.getElementById('buildWords');
+  w.innerHTML = shuffled.filter(ww => !buildPlaced.includes(ww)).map(ww =>
+    `<span class="drag-word" onclick="placeWord('${ww}')">${ww}</span>`
+  ).join('');
+}
+
+function placeWord(w) {
+  buildPlaced.push(w);
+  renderBuildSlots();
+  renderBuildWords();
+}
+
+function removeFromSlot(i) {
+  buildPlaced.splice(i, 1);
+  renderBuildSlots();
+  renderBuildWords();
+}
+
+function clearBuild() { buildPlaced = []; renderBuildSlots(); renderBuildWords(); }
+
+function checkBuild() {
+  const d = buildData[buildIdx];
+  const fb = document.getElementById('buildFeedback');
+  if (buildPlaced.length < d.answer.length) {
+    fb.className = 'quiz-feedback wrong';
+    fb.style.display = 'block';
+    fb.textContent = '⚠️ Coloque todas as palavras antes de verificar!';
+    return;
+  }
+  const correct = buildPlaced.join(' ') === d.answer.join(' ');
+  recordAnswer(d.tense, correct);
+  if (correct) {
+    buildScore++;
+    fb.className = 'quiz-feedback correct';
+    fb.textContent = `✅ Perfeito! "${d.answer.join(' ')}"`;
+    addXP(15);
+    setTimeout(() => { buildIdx++; loadBuild(); }, 1600);
+  } else {
+    fb.className = 'quiz-feedback wrong';
+    fb.textContent = `❌ Incorreto. Tente reordenar as palavras!`;
+  }
+  fb.style.display = 'block';
+}
+
+function resetBuild() { buildIdx = 0; buildScore = 0; loadBuild(); }
+
+// ══════════════════════════════
+//  STORY MODE
+// ══════════════════════════════
+const storyData = [
+  {
+    scene: "Yesterday, Maria ___ (wake) up early.",
+    context: "Ontem — ação passada e concluída",
+    choices: [{ w:"wakes", correct:false }, { w:"is waking", correct:false }, { w:"woke", correct:true }, { w:"will wake", correct:false }],
+    tense: "Simple Past",
+    exp: "Simple Past: wake → woke (irregular). 'Yesterday' indica passado."
+  },
+  {
+    scene: "Every morning, she ___ (drink) a cup of coffee before work.",
+    context: "Rotina diária",
+    choices: [{ w:"drank", correct:false }, { w:"drinks", correct:true }, { w:"is drinking", correct:false }, { w:"will drink", correct:false }],
+    tense: "Simple Present",
+    exp: "Simple Present: hábito diário. She + drinks (-s)."
+  },
+  {
+    scene: "Right now, she ___ (read) the news on her phone.",
+    context: "Ação acontecendo neste momento",
+    choices: [{ w:"reads", correct:false }, { w:"read", correct:false }, { w:"is reading", correct:true }, { w:"was reading", correct:false }],
+    tense: "Present Continuous",
+    exp: "Present Continuous: 'right now' → is reading."
+  },
+  {
+    scene: "Last night, she ___ (meet) her old friend at the restaurant.",
+    context: "Ontem à noite — evento passado",
+    choices: [{ w:"meets", correct:false }, { w:"met", correct:true }, { w:"is meeting", correct:false }, { w:"will meet", correct:false }],
+    tense: "Simple Past",
+    exp: "Simple Past: meet → met (irregular). 'last night' indica passado."
+  },
+  {
+    scene: "Tomorrow, Maria ___ (start) a new project at work.",
+    context: "Plano para amanhã",
+    choices: [{ w:"starts", correct:false }, { w:"started", correct:false }, { w:"is starting", correct:false }, { w:"will start", correct:true }],
+    tense: "Future",
+    exp: "Future: will + base form. 'Tomorrow' indica futuro."
+  },
+  {
+    scene: "Look at the sky — it ___ (get) dark. It will rain soon.",
+    context: "Observação no momento atual",
+    choices: [{ w:"gets", correct:false }, { w:"got", correct:false }, { w:"is getting", correct:true }, { w:"will get", correct:false }],
+    tense: "Present Continuous",
+    exp: "Present Continuous: mudança progressiva observada agora → is getting."
+  }
+];
+
+let storyIdx = 0, storyScore = 0;
+
+function loadStory() {
+  if (storyIdx >= storyData.length) {
+    document.getElementById('storyContent').innerHTML = `<div style="text-align:center;padding:32px;"><div style="font-size:3rem">🎉</div><div style="font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:900;margin-top:12px;">Fim da história!</div><p style="color:var(--muted);margin-top:8px;">Você acertou ${storyScore} de ${storyData.length}!</p></div>`;
+    addXP(storyScore * 12);
+    return;
+  }
+  const d = storyData[storyIdx];
+  document.getElementById('storyNum').textContent = storyIdx + 1;
+  document.getElementById('storyScore').textContent = storyScore;
+  document.getElementById('storyFeedback').style.display = 'none';
+
+  const parts = d.scene.split('___');
+  document.getElementById('storyContent').innerHTML = `
+    <div style="font-size:.75rem;font-weight:700;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;">${d.context}</div>
+    <div class="story-scene">
+      <p style="font-size:1.15rem;">${parts[0]}<span class="story-blank">_______</span>${parts[1]}</p>
+    </div>
+    <div class="story-choices" id="storyChoices"></div>
+  `;
+  const sc = document.getElementById('storyChoices');
+  d.choices.sort(() => Math.random() - .5).forEach(c => {
+    const btn = document.createElement('button');
+    btn.className = 'story-choice';
+    btn.textContent = c.w;
+    btn.onclick = () => answerStory(c, btn, d);
+    sc.appendChild(btn);
+  });
+}
+
+function answerStory(c, btn, d) {
+  document.querySelectorAll('.story-choice').forEach(b => { b.onclick = null; });
+  const fb = document.getElementById('storyFeedback');
+  if (c.correct) {
+    btn.classList.add('correct');
+    storyScore++;
+    fb.className = 'quiz-feedback correct';
+    fb.textContent = '✅ ' + d.exp;
+    addXP(12);
+  } else {
+    btn.classList.add('wrong');
+    document.querySelectorAll('.story-choice').forEach(b => { if (d.choices.find(cc => cc.w===b.textContent && cc.correct)) b.classList.add('correct'); });
+    fb.className = 'quiz-feedback wrong';
+    fb.textContent = '❌ ' + d.exp;
+  }
+  recordAnswer(d.tense, c.correct);
+  fb.style.display = 'block';
+  setTimeout(() => { storyIdx++; loadStory(); }, 2200);
+}
+
+function resetStory() { storyIdx = 0; storyScore = 0; loadStory(); }
+
+// ══════════════════════════════
+//  SPEED ROUND
+// ══════════════════════════════
+const speedPrompts = [
+  { tense:"Simple Present", subject:"She", verb:"go", answer:"goes", label:"Simple Present", color:"var(--accent-present)" },
+  { tense:"Present Continuous", subject:"He", verb:"eat", answer:"is eating", label:"Present Continuous", color:"var(--accent-cont)" },
+  { tense:"Simple Past", subject:"They", verb:"buy", answer:"bought", label:"Simple Past", color:"var(--accent-past)" },
+  { tense:"Future", subject:"I", verb:"travel", answer:"will travel", label:"Future", color:"var(--accent-future)" },
+  { tense:"Simple Present", subject:"He", verb:"study", answer:"studies", label:"Simple Present", color:"var(--accent-present)" },
+  { tense:"Present Continuous", subject:"We", verb:"run", answer:"are running", label:"Present Continuous", color:"var(--accent-cont)" },
+  { tense:"Simple Past", subject:"She", verb:"see", answer:"saw", label:"Simple Past", color:"var(--accent-past)" },
+  { tense:"Future", subject:"We", verb:"start", answer:"will start", label:"Future", color:"var(--accent-future)" },
+  { tense:"Simple Present", subject:"They", verb:"teach", answer:"teach", label:"Simple Present", color:"var(--accent-present)" },
+  { tense:"Present Continuous", subject:"She", verb:"write", answer:"is writing", label:"Present Continuous", color:"var(--accent-cont)" },
+  { tense:"Simple Past", subject:"I", verb:"make", answer:"made", label:"Simple Past", color:"var(--accent-past)" },
+  { tense:"Future", subject:"She", verb:"fly", answer:"will fly", label:"Future", color:"var(--accent-future)" },
+  { tense:"Simple Present", subject:"It", verb:"snow", answer:"snows", label:"Simple Present", color:"var(--accent-present)" },
+  { tense:"Present Continuous", subject:"He", verb:"sleep", answer:"is sleeping", label:"Present Continuous", color:"var(--accent-cont)" },
+  { tense:"Simple Past", subject:"We", verb:"win", answer:"won", label:"Simple Past", color:"var(--accent-past)" },
+];
+
+let speedInterval, speedTimeLeft = 60, speedScoreVal = 0, speedRunning = false, speedCurrent = 0;
+
+function startSpeed() {
+  speedScoreVal = 0; speedTimeLeft = 60; speedRunning = true;
+  speedCurrent = Math.floor(Math.random() * speedPrompts.length);
+  document.getElementById('speedScore').textContent = 0;
+  document.getElementById('speedTime').textContent = 60;
+  document.getElementById('speedBar').style.width = '100%';
+  document.getElementById('speedStartBtn').style.display = 'none';
+  document.getElementById('speedInput').value = '';
+  document.getElementById('speedInput').focus();
+  showSpeedPrompt();
+
+  speedInterval = setInterval(() => {
+    speedTimeLeft--;
+    document.getElementById('speedTime').textContent = speedTimeLeft;
+    document.getElementById('speedBar').style.width = (speedTimeLeft/60*100) + '%';
+    if (speedTimeLeft <= 0) endSpeed();
+  }, 1000);
+}
+
+function showSpeedPrompt() {
+  const p = speedPrompts[speedCurrent];
+  document.getElementById('speedTenseLabel').textContent = p.label;
+  document.getElementById('speedTenseLabel').style.color = p.color;
+  document.getElementById('speedVerb').textContent = p.verb;
+  document.getElementById('speedSubject').textContent = p.subject + ' ___';
+}
+
+document.getElementById('speedInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && speedRunning) {
+    const val = e.target.value.trim().toLowerCase();
+    const p = speedPrompts[speedCurrent];
+    if (val === p.answer.toLowerCase()) {
+      speedScoreVal++;
+      document.getElementById('speedScore').textContent = speedScoreVal;
+      addXP(8);
+      recordAnswer(p.tense, true);
+      showToast('✅ Correct!');
+    } else {
+      recordAnswer(p.tense, false);
+      showToast(`❌ "${p.answer}"`);
+    }
+    e.target.value = '';
+    speedCurrent = (speedCurrent + 1) % speedPrompts.length;
+    showSpeedPrompt();
+  }
+});
+
+function endSpeed() {
+  clearInterval(speedInterval);
+  speedRunning = false;
+  document.getElementById('speedStartBtn').style.display = 'inline-block';
+  document.getElementById('speedStartBtn').textContent = '▶ Jogar Novamente';
+  showToast(`Fim! ${speedScoreVal} acertos 🏆`, 'xp');
+}
+
+// ══════════════════════════════
+//  PROGRESS
+// ══════════════════════════════
+function updateProgress() {
+  document.getElementById('statXP').textContent = xp;
+  document.getElementById('statQ').textContent = totalQ;
+  document.getElementById('statAcc').textContent = totalQ > 0 ? Math.round(totalCorrect/totalQ*100) + '%' : '—';
+  document.getElementById('statStreak').textContent = bestStreak;
+
+  const colors = { 'Simple Present': 'var(--accent-present)', 'Present Continuous': 'var(--accent-cont)', 'Simple Past': 'var(--accent-past)', 'Future': 'var(--accent-future)' };
+  const cont = document.getElementById('progressBars');
+  cont.innerHTML = Object.entries(tenseStats).map(([name, [c,t]]) => {
+    const pct = t > 0 ? Math.round(c/t*100) : 0;
+    return `
+      <div class="progress-bar-wrap">
+        <div class="progress-bar-label"><span>${name}</span><span style="color:${colors[name]}">${t > 0 ? pct + '%' : '—'} (${c}/${t})</span></div>
+        <div class="progress-bar"><div class="progress-bar-fill" style="width:${pct}%;background:${colors[name]}"></div></div>
+      </div>`;
+  }).join('');
+}
+
+// ══════════════════════════════
+//  INIT
+// ══════════════════════════════
+loadQuiz();
+loadError();
+loadBuild();
+loadStory();
+updateProgress();
+</script>
+</body>
+</html>
