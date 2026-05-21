@@ -537,12 +537,362 @@
       nav, .tabs, .page { padding-left: 16px; padding-right: 16px; }
       .hero h1 { font-size: 2.8rem; }
     }
+
+    /* ══ SHOW DO MILHÃO ══ */
+    #page-milhao {
+      min-height: 100vh;
+      background: radial-gradient(ellipse at 50% 0%, rgba(255,209,102,0.08) 0%, transparent 65%);
+    }
+    .milhao-stage {
+      max-width: 780px;
+      margin: 0 auto;
+    }
+    .milhao-header {
+      text-align: center;
+      padding: 20px 0 28px;
+    }
+    .milhao-logo {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(1.8rem, 5vw, 3rem);
+      font-weight: 900;
+      background: linear-gradient(135deg, #ffd166, #ffaa00, #ff8800);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -.02em;
+      text-shadow: none;
+    }
+    .milhao-subtitle { color: var(--muted); font-size: .9rem; margin-top: 4px; }
+
+    /* Prize ladder */
+    .prize-ladder {
+      position: fixed;
+      right: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column-reverse;
+      gap: 4px;
+      z-index: 50;
+    }
+    .prize-rung {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 4px 12px;
+      font-size: .72rem;
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      color: var(--muted);
+      text-align: right;
+      min-width: 110px;
+      transition: all .3s;
+    }
+    .prize-rung.current {
+      background: var(--accent-future);
+      color: #000;
+      border-color: var(--accent-future);
+      transform: scale(1.08);
+    }
+    .prize-rung.safe {
+      border-color: var(--accent-present);
+      color: var(--accent-present);
+    }
+    .prize-rung.won {
+      background: rgba(34,197,94,.15);
+      color: var(--green);
+      border-color: var(--green);
+    }
+    .prize-rung.million {
+      background: linear-gradient(135deg, rgba(255,209,102,.2), rgba(255,136,0,.15));
+      border-color: #ffaa00;
+      color: #ffd166;
+    }
+    .prize-rung.million.current {
+      background: linear-gradient(135deg, #ffd166, #ff8800);
+      color: #000;
+    }
+
+    /* Question area */
+    .milhao-question-box {
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: 20px;
+      padding: 28px 32px;
+      margin-bottom: 20px;
+      position: relative;
+      overflow: hidden;
+      transition: border-color .4s;
+    }
+    .milhao-question-box::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% -20%, rgba(255,209,102,0.06) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .milhao-question-box.correct-anim { border-color: var(--green); }
+    .milhao-question-box.wrong-anim { border-color: var(--red); animation: shake .4s ease; }
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      20% { transform: translateX(-8px); }
+      40% { transform: translateX(8px); }
+      60% { transform: translateX(-5px); }
+      80% { transform: translateX(5px); }
+    }
+    .milhao-q-num {
+      font-size: .75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      color: var(--accent-future);
+      margin-bottom: 10px;
+    }
+    .milhao-q-text {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(1rem, 2.5vw, 1.3rem);
+      font-weight: 700;
+      line-height: 1.4;
+      margin-bottom: 0;
+    }
+
+    /* Answer options */
+    .milhao-options {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .milhao-opt {
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: 14px;
+      padding: 16px 20px;
+      text-align: left;
+      color: var(--text);
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      font-size: .95rem;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: all .18s;
+      position: relative;
+      overflow: hidden;
+    }
+    .milhao-opt::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(255,209,102,0);
+      transition: background .18s;
+    }
+    .milhao-opt:hover:not(:disabled)::before { background: rgba(255,209,102,0.04); }
+    .milhao-opt:hover:not(:disabled) {
+      border-color: var(--accent-future);
+      transform: translateY(-2px);
+    }
+    .opt-letter {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--surface2);
+      border: 1.5px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: .8rem;
+      flex-shrink: 0;
+      transition: all .18s;
+      color: var(--accent-future);
+    }
+    .milhao-opt:hover:not(:disabled) .opt-letter {
+      background: var(--accent-future);
+      color: #000;
+      border-color: var(--accent-future);
+    }
+    .milhao-opt.selected { border-color: var(--accent-future); background: rgba(255,209,102,0.06); }
+    .milhao-opt.selected .opt-letter { background: var(--accent-future); color: #000; border-color: var(--accent-future); }
+    .milhao-opt.correct-opt { border-color: var(--green); background: rgba(34,197,94,.12); }
+    .milhao-opt.correct-opt .opt-letter { background: var(--green); color: #fff; border-color: var(--green); }
+    .milhao-opt.wrong-opt { border-color: var(--red); background: rgba(239,68,68,.12); }
+    .milhao-opt.wrong-opt .opt-letter { background: var(--red); color: #fff; border-color: var(--red); }
+    .milhao-opt.eliminated { opacity: .25; pointer-events: none; }
+    .milhao-opt:disabled { cursor: default; }
+
+    /* Controls row */
+    .milhao-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .lifeline-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      background: var(--surface2);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      padding: 10px 16px;
+      cursor: pointer;
+      color: var(--text);
+      font-size: .7rem;
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      transition: all .2s;
+      min-width: 70px;
+    }
+    .lifeline-btn:hover:not(:disabled) { border-color: var(--accent-future); color: var(--accent-future); }
+    .lifeline-btn:disabled { opacity: .3; cursor: not-allowed; }
+    .lifeline-btn .ll-icon { font-size: 1.4rem; }
+    .lifeline-btn.used { opacity: .25; cursor: not-allowed; }
+
+    .btn-confirm {
+      margin-left: auto;
+      background: var(--accent-future);
+      color: #000;
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1rem;
+      padding: 14px 32px;
+      border-radius: 50px;
+      border: none;
+      cursor: pointer;
+      transition: all .18s;
+    }
+    .btn-confirm:hover { opacity: .85; transform: scale(1.04); }
+    .btn-confirm:disabled { opacity: .35; cursor: not-allowed; transform: none; }
+
+    /* Audience poll bar */
+    .audience-chart {
+      display: flex;
+      align-items: flex-end;
+      gap: 8px;
+      height: 100px;
+      padding: 10px 0 0;
+    }
+    .audience-bar-wrap {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      height: 100%;
+      justify-content: flex-end;
+    }
+    .audience-bar {
+      width: 100%;
+      background: var(--accent-future);
+      border-radius: 6px 6px 0 0;
+      opacity: .85;
+      transition: height .8s cubic-bezier(.34,1.2,.64,1);
+    }
+    .audience-bar-pct { font-size: .75rem; font-weight: 700; color: var(--accent-future); }
+    .audience-bar-label { font-size: .8rem; color: var(--muted); }
+
+    /* Overlay screens */
+    .milhao-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(10,10,14,.92);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(8px);
+    }
+    .milhao-overlay.active { display: flex; }
+    .overlay-box {
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: 24px;
+      padding: 48px 40px;
+      text-align: center;
+      max-width: 480px;
+      width: 90%;
+      animation: popIn .4s cubic-bezier(.34,1.56,.64,1);
+    }
+    @keyframes popIn {
+      from { transform: scale(.7); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    .overlay-box.win { border-color: var(--accent-future); }
+    .overlay-box.lose { border-color: var(--red); }
+    .overlay-emoji { font-size: 4rem; margin-bottom: 16px; }
+    .overlay-title { font-family: 'Syne', sans-serif; font-size: 2rem; font-weight: 900; margin-bottom: 8px; }
+    .overlay-prize { font-size: 1.4rem; color: var(--accent-future); font-family: 'Syne', sans-serif; font-weight: 800; margin-bottom: 16px; }
+    .overlay-msg { color: var(--muted); margin-bottom: 28px; line-height: 1.5; }
+
+    /* Phone a friend popup */
+    .phone-popup {
+      background: var(--surface2);
+      border: 1.5px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      margin-top: 16px;
+      font-size: .9rem;
+      line-height: 1.6;
+      text-align: left;
+      display: none;
+    }
+    .phone-popup .friend-name {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      color: var(--accent-present);
+      margin-bottom: 6px;
+    }
+
+    /* Stop button */
+    .btn-stop {
+      background: transparent;
+      border: 1.5px solid var(--red);
+      color: var(--red);
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: .85rem;
+      padding: 10px 18px;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all .18s;
+    }
+    .btn-stop:hover { background: rgba(239,68,68,.1); }
+
+    /* sparkles */
+    .sparkle-container {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 300;
+      overflow: hidden;
+    }
+    .sparkle {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      animation: sparkleAnim 1.2s ease-out forwards;
+    }
+    @keyframes sparkleAnim {
+      0% { transform: translateY(0) scale(1); opacity: 1; }
+      100% { transform: translateY(-120px) scale(0); opacity: 0; }
+    }
+
+    @media (max-width: 900px) {
+      .prize-ladder { display: none; }
+    }
+    @media (max-width: 500px) {
+      .milhao-options { grid-template-columns: 1fr; }
+      .overlay-box { padding: 32px 24px; }
+    }
   </style>
 </head>
 <body>
 
 <nav>
-  <div class="logo">English<span style="color: white;">Quest</span></div>
+  <div class="logo">EnglishQuest</div>
   <div class="nav-xp">⚡ <span class="xp-val" id="xpDisplay">0</span> XP</div>
 </nav>
 
@@ -553,6 +903,7 @@
   <button class="tab" onclick="switchTab('build')">🧩 Build Sentence</button>
   <button class="tab" onclick="switchTab('story')">📖 Story Mode</button>
   <button class="tab" onclick="switchTab('speed')">⚡ Speed Round</button>
+  <button class="tab" onclick="switchTab('milhao')">💰 Who wants to be a millionaire?</button>
   <button class="tab" onclick="switchTab('progress')">📊 Progress</button>
 </div>
 
@@ -633,10 +984,10 @@
         <p class="game-desc">Complete a história escolhendo o tempo verbal certo em cada situação.</p>
         <button class="btn btn-primary" onclick="switchTab('story')">Jogar →</button>
       </div>
-      <div class="game-card">
-        <div class="game-title"><span class="game-icon">⚡</span>Speed Round</div>
-        <p class="game-desc">Conjugue verbos contra o relógio! Quantos você acerta em 60 segundos?</p>
-        <button class="btn btn-primary" onclick="switchTab('speed')">Jogar →</button>
+      <div class="game-card" style="border-color: #c8930a; background: linear-gradient(135deg, rgba(255,209,102,0.07), var(--surface));">
+        <div class="game-title"><span class="game-icon">💰</span>Who wants to be a millionaire?</div>
+        <p class="game-desc">15 perguntas, 3 ajudas, prêmios até R$ 1.000.000! Responda certo e vá longe.</p>
+        <button class="btn" style="background:var(--accent-future);color:#000;font-family:'Syne',sans-serif;font-weight:700;padding:12px 24px;border-radius:50px;border:none;cursor:pointer;" onclick="switchTab('milhao')">Jogar →</button>
       </div>
     </div>
   </div>
@@ -774,6 +1125,102 @@
 
 <div class="toast" id="toast"></div>
 
+<!-- ══════════ SHOW DO MILHÃO ══════════ -->
+<div class="page" id="page-milhao">
+  <div class="milhao-stage">
+    <div class="milhao-header">
+      <div class="milhao-logo">💰 Who wants to be a millionaire?</div>
+      <div class="milhao-subtitle">Tempos Verbais em Inglês • 15 perguntas • 3 ajudas</div>
+    </div>
+
+    <!-- Start screen -->
+    <div id="milhaoStart" style="text-align:center;padding:40px 20px;">
+      <div style="font-size:5rem;margin-bottom:20px;">🎬</div>
+      <h2 style="font-family:'Syne',sans-serif;font-size:1.8rem;font-weight:900;margin-bottom:12px;">Você está pronto?</h2>
+      <p style="color:var(--muted);margin-bottom:32px;max-width:400px;margin-left:auto;margin-right:auto;">Responda 15 perguntas sobre tempos verbais em inglês. Use as 3 ajudas com sabedoria. Boa sorte!</p>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:24px;">
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:14px 20px;font-size:.85rem;">
+          <div style="font-size:1.5rem;">📞</div><div style="font-family:'Syne',sans-serif;font-weight:700;margin-top:4px;">Ligar para um amigo</div>
+        </div>
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:14px 20px;font-size:.85rem;">
+          <div style="font-size:1.5rem;">👥</div><div style="font-family:'Syne',sans-serif;font-weight:700;margin-top:4px;">Ajuda da plateia</div>
+        </div>
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:14px 20px;font-size:.85rem;">
+          <div style="font-size:1.5rem;">✂️</div><div style="font-family:'Syne',sans-serif;font-weight:700;margin-top:4px;">Eliminar 2 respostas</div>
+        </div>
+      </div>
+      <button class="btn-confirm" onclick="startMilhao()">▶ Começar o Jogo</button>
+    </div>
+
+    <!-- Game area (hidden initially) -->
+    <div id="milhaoGame" style="display:none;">
+      <div class="milhao-question-box" id="mQBox">
+        <div class="milhao-q-num" id="mQNum">Pergunta 1 de 15</div>
+        <div class="milhao-q-text" id="mQText"></div>
+      </div>
+
+      <div class="milhao-options" id="mOptions"></div>
+
+      <div id="phonePopup" class="phone-popup">
+        <div class="friend-name" id="friendName"></div>
+        <div id="friendSpeech"></div>
+      </div>
+
+      <div id="audienceResult" style="display:none;background:var(--surface);border:1.5px solid var(--border);border-radius:14px;padding:16px 20px;margin-bottom:16px;">
+        <div style="font-size:.8rem;font-weight:700;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:.08em;">Resultado da Plateia</div>
+        <div class="audience-chart" id="audienceChart"></div>
+      </div>
+
+      <div class="milhao-controls">
+        <button class="lifeline-btn" id="llPhone" onclick="usePhone()">
+          <span class="ll-icon">📞</span>
+          <span>Amigo</span>
+        </button>
+        <button class="lifeline-btn" id="llAudience" onclick="useAudience()">
+          <span class="ll-icon">👥</span>
+          <span>Plateia</span>
+        </button>
+        <button class="lifeline-btn" id="llFifty" onclick="useFifty()">
+          <span class="ll-icon">✂️</span>
+          <span>50/50</span>
+        </button>
+        <button class="btn-stop" onclick="stopGame()">🚪 Parar e Guardar</button>
+        <button class="btn-confirm" id="mConfirmBtn" onclick="confirmAnswer()" disabled>Confirmar ✓</button>
+      </div>
+
+      <div style="margin-top:14px;" id="mFeedback"></div>
+    </div>
+  </div>
+
+  <!-- Prize ladder (sidebar) -->
+  <div class="prize-ladder" id="prizeLadder"></div>
+</div>
+
+<!-- WIN OVERLAY -->
+<div class="milhao-overlay" id="winOverlay">
+  <div class="overlay-box win">
+    <div class="overlay-emoji" id="winEmoji">🏆</div>
+    <div class="overlay-title" id="winTitle">Parabéns!</div>
+    <div class="overlay-prize" id="winPrize"></div>
+    <div class="overlay-msg" id="winMsg"></div>
+    <button class="btn-confirm" onclick="resetMilhao()">🔄 Jogar Novamente</button>
+  </div>
+</div>
+
+<!-- LOSE OVERLAY -->
+<div class="milhao-overlay" id="loseOverlay">
+  <div class="overlay-box lose">
+    <div class="overlay-emoji">😬</div>
+    <div class="overlay-title">Resposta Errada!</div>
+    <div class="overlay-prize" id="losePrize" style="color:var(--muted);font-size:1rem;"></div>
+    <div class="overlay-msg" id="loseMsg"></div>
+    <button class="btn-confirm" onclick="resetMilhao()">🔄 Jogar Novamente</button>
+  </div>
+</div>
+
+<!-- Sparkle container -->
+<div class="sparkle-container" id="sparkles"></div>
+
 <script>
 // ══════════════════════════════
 //  STATE
@@ -798,7 +1245,7 @@ function showToast(msg, cls='') {
 
 function switchTab(id) {
   document.querySelectorAll('.tab').forEach((t,i) => {
-    const ids = ['home','quiz','error','build','story','speed','progress'];
+    const ids = ['home','quiz','error','build','story','speed','milhao','progress'];
     t.classList.toggle('active', ids[i] === id);
   });
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -1267,6 +1714,315 @@ function updateProgress() {
 }
 
 // ══════════════════════════════
+//  SHOW DO MILHÃO
+// ══════════════════════════════
+
+const PRIZES = [
+  "R$ 1.000", "R$ 2.000", "R$ 3.000", "R$ 5.000", "R$ 10.000",
+  "R$ 20.000", "R$ 50.000", "R$ 100.000", "R$ 150.000", "R$ 200.000",
+  "R$ 300.000", "R$ 400.000", "R$ 500.000", "R$ 750.000", "R$ 1.000.000"
+];
+const SAFE_RUNGS = [4, 9]; // índices 0-based (R$10k e R$200k)
+
+const milhaoQuestions = [
+  // Q1 – easiest
+  { q:"Which sentence is in the Simple Present?", opts:["She is studying now.","She studied yesterday.","She studies every day.","She will study tomorrow."], ans:2, tense:"Simple Present", exp:"Simple Present descreve hábitos e rotinas. 'She studies every day' usa a forma correta." },
+  // Q2
+  { q:"Choose the correct sentence in the Present Continuous.", opts:["He walk to school.","He is walk to school.","He is walking to school.","He was walked to school."], ans:2, tense:"Present Continuous", exp:"Present Continuous: is/am/are + V-ing. Correto: 'He is walking'." },
+  // Q3
+  { q:"'They ____ a movie last night.' Which word completes the Simple Past?", opts:["watch","watches","are watching","watched"], ans:3, tense:"Simple Past", exp:"'Last night' indica passado. Simple Past: watched." },
+  // Q4
+  { q:"'I ____ you tomorrow.' Correct Future form:", opts:["calls","called","am calling","will call"], ans:3, tense:"Future", exp:"Future simples: will + base form → will call." },
+  // Q5
+  { q:"Which sentence uses the WRONG verb form?", opts:["She doesn't work on Sundays.","He don't like coffee.","They don't play soccer.","I don't speak French."], ans:1, tense:"Simple Present", exp:"He/She/It: 'doesn't' (not 'don't'). 'He doesn't like coffee' is correct." },
+  // Q6
+  { q:"'Look! It ____!' — Which tense is needed?", opts:["rains","rained","is raining","will rain"], ans:2, tense:"Present Continuous", exp:"'Look!' indica ação acontecendo agora → Present Continuous: is raining." },
+  // Q7
+  { q:"The past of 'go' is:", opts:["goed","gone","went","goes"], ans:2, tense:"Simple Past", exp:"go → went (verbo irregular). 'Gone' é particípio passado, não Simple Past." },
+  // Q8
+  { q:"Which time expression goes with Simple Present?", opts:["yesterday","right now","every week","last year"], ans:2, tense:"Simple Present", exp:"'Every week' expressa frequência/hábito → Simple Present." },
+  // Q9
+  { q:"'She ____ her keys yesterday.' Choose the correct option:", opts:["lose","looses","lost","is losing"], ans:2, tense:"Simple Past", exp:"lose → lost (irregular). 'Yesterday' confirma Simple Past." },
+  // Q10
+  { q:"'By next year, she ____ graduate.' Correct form:", opts:["is","does","will","was"], ans:2, tense:"Future", exp:"'By next year' indica futuro → will graduate." },
+  // Q11 – harder
+  { q:"Which sentence is grammatically CORRECT?", opts:["He is go to work now.","She are playing tennis.","We is watching TV.","They are having lunch right now."], ans:3, tense:"Present Continuous", exp:"'They are having lunch' está correto. are + V-ing com sujeito plural." },
+  // Q12
+  { q:"'When I was a child, I ____ to school by bike.' Correct form:", opts:["ride","rides","rode","am riding"], ans:2, tense:"Simple Past", exp:"Ação habitual no passado → Simple Past. ride → rode (irregular)." },
+  // Q13
+  { q:"'She studies' can be correctly transformed into the negative as:", opts:["She don't studies.","She doesn't study.","She not studies.","She isn't study."], ans:1, tense:"Simple Present", exp:"Simple Present negativo: She doesn't + base form (study, sem -s)." },
+  // Q14
+  { q:"Which sentence correctly uses Present Continuous for a FUTURE PLAN?", opts:["I will meeting him tomorrow.","I am meeting him tomorrow.","I meet him tomorrow.","I met him tomorrow."], ans:1, tense:"Present Continuous", exp:"Present Continuous pode expressar plano futuro agendado: 'I am meeting him tomorrow.'" },
+  // Q15 – hardest / million
+  { q:"'By the time you arrive, I ____ finished dinner.' Which form of 'will' fits this future perfect idea?", opts:["will have","will be","will had","will has"], ans:0, tense:"Future", exp:"Future Perfect: will have + particípio. 'I will have finished' indica ação concluída antes de outra no futuro." },
+];
+
+let mCurrent = 0;
+let mSelected = null;
+let mLifelines = { phone: false, audience: false, fifty: false };
+let mEliminatedOpts = [];
+let mRunning = false;
+
+function buildPrizeLadder() {
+  const ladder = document.getElementById('prizeLadder');
+  ladder.innerHTML = '';
+  for (let i = PRIZES.length - 1; i >= 0; i--) {
+    const div = document.createElement('div');
+    div.className = 'prize-rung' +
+      (i === PRIZES.length - 1 ? ' million' : '') +
+      (SAFE_RUNGS.includes(i) ? ' safe' : '');
+    div.id = 'rung-' + i;
+    div.textContent = (i + 1) + '. ' + PRIZES[i];
+    ladder.appendChild(div);
+  }
+  updateLadder();
+}
+
+function updateLadder() {
+  PRIZES.forEach((_, i) => {
+    const el = document.getElementById('rung-' + i);
+    if (!el) return;
+    el.classList.remove('current', 'won');
+    if (i < mCurrent) el.classList.add('won');
+    else if (i === mCurrent) el.classList.add('current');
+  });
+}
+
+function startMilhao() {
+  mCurrent = 0; mSelected = null;
+  mLifelines = { phone: false, audience: false, fifty: false };
+  mEliminatedOpts = []; mRunning = true;
+  document.getElementById('milhaoStart').style.display = 'none';
+  document.getElementById('milhaoGame').style.display = 'block';
+  document.getElementById('llPhone').classList.remove('used');
+  document.getElementById('llAudience').classList.remove('used');
+  document.getElementById('llFifty').classList.remove('used');
+  buildPrizeLadder();
+  loadMilhaoQ();
+}
+
+function loadMilhaoQ() {
+  if (mCurrent >= milhaoQuestions.length) { triggerWin(); return; }
+  const q = milhaoQuestions[mCurrent];
+  mSelected = null;
+  mEliminatedOpts = [];
+  document.getElementById('mQNum').textContent = `Pergunta ${mCurrent + 1} de ${milhaoQuestions.length} — ${PRIZES[mCurrent]}`;
+  document.getElementById('mQText').textContent = q.q;
+  document.getElementById('mConfirmBtn').disabled = true;
+  document.getElementById('mFeedback').innerHTML = '';
+  document.getElementById('phonePopup').style.display = 'none';
+  document.getElementById('audienceResult').style.display = 'none';
+  const qbox = document.getElementById('mQBox');
+  qbox.className = 'milhao-question-box';
+
+  const opts = document.getElementById('mOptions');
+  opts.innerHTML = '';
+  const letters = ['A', 'B', 'C', 'D'];
+  q.opts.forEach((o, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'milhao-opt';
+    btn.id = 'mOpt-' + i;
+    btn.innerHTML = `<span class="opt-letter">${letters[i]}</span><span>${o}</span>`;
+    btn.onclick = () => selectMilhaoOpt(i);
+    opts.appendChild(btn);
+  });
+  updateLadder();
+}
+
+function selectMilhaoOpt(i) {
+  if (mEliminatedOpts.includes(i)) return;
+  mSelected = i;
+  document.querySelectorAll('.milhao-opt').forEach((b, idx) => {
+    b.classList.toggle('selected', idx === i);
+  });
+  document.getElementById('mConfirmBtn').disabled = false;
+}
+
+function confirmAnswer() {
+  if (mSelected === null) return;
+  const q = milhaoQuestions[mCurrent];
+  document.querySelectorAll('.milhao-opt').forEach(b => { b.disabled = true; b.onclick = null; });
+  document.getElementById('mConfirmBtn').disabled = true;
+
+  const correct = mSelected === q.ans;
+  const box = document.getElementById('mQBox');
+
+  document.getElementById('mOpt-' + q.ans).classList.add('correct-opt');
+  if (!correct) document.getElementById('mOpt-' + mSelected).classList.add('wrong-opt');
+
+  box.className = 'milhao-question-box ' + (correct ? 'correct-anim' : 'wrong-anim');
+
+  const fb = document.getElementById('mFeedback');
+  fb.innerHTML = correct
+    ? `<div style="background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);border-radius:12px;padding:14px 18px;color:var(--green);font-weight:500;">✅ ${q.exp}</div>`
+    : `<div style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:12px;padding:14px 18px;color:var(--red);font-weight:500;">❌ ${q.exp}</div>`;
+
+  recordAnswer(q.tense, correct);
+
+  if (correct) {
+    triggerSparkles();
+    addXP(mCurrent < 5 ? 10 : mCurrent < 10 ? 20 : 35);
+    setTimeout(() => {
+      mCurrent++;
+      if (mCurrent >= milhaoQuestions.length) { triggerWin(); return; }
+      loadMilhaoQ();
+    }, 2400);
+  } else {
+    setTimeout(() => triggerLose(), 2000);
+  }
+}
+
+function stopGame() {
+  if (!mRunning) return;
+  mRunning = false;
+  const safe = getSafeAmount();
+  document.getElementById('winEmoji').textContent = '💼';
+  document.getElementById('winTitle').textContent = 'Você parou!';
+  document.getElementById('winPrize').textContent = safe || 'R$ 0';
+  document.getElementById('winMsg').textContent = safe
+    ? `Você garantiu ${safe} e sai sem correr mais riscos. Boa decisão?`
+    : 'Você saiu antes de chegar em um prêmio seguro.';
+  document.getElementById('winOverlay').classList.add('active');
+  if (safe) addXP(50);
+}
+
+function getSafeAmount() {
+  for (let i = SAFE_RUNGS.length - 1; i >= 0; i--) {
+    if (mCurrent > SAFE_RUNGS[i]) return PRIZES[SAFE_RUNGS[i]];
+  }
+  return null;
+}
+
+function triggerWin() {
+  mRunning = false;
+  const prize = PRIZES[Math.min(mCurrent, PRIZES.length - 1)];
+  document.getElementById('winEmoji').textContent = '🏆';
+  document.getElementById('winTitle').textContent = 'VOCÊ GANHOU!';
+  document.getElementById('winPrize').textContent = prize;
+  document.getElementById('winMsg').textContent = 'Incrível! Você respondeu todas as 15 perguntas corretamente. Você é um mestre dos tempos verbais!';
+  document.getElementById('winOverlay').classList.add('active');
+  triggerSparkles(true);
+  addXP(200);
+}
+
+function triggerLose() {
+  mRunning = false;
+  const safe = getSafeAmount();
+  document.getElementById('losePrize').textContent = safe ? `Você leva: ${safe} (último prêmio seguro)` : 'Você não tinha chegado em um valor seguro ainda.';
+  document.getElementById('loseMsg').textContent = `A resposta certa era: "${milhaoQuestions[mCurrent].opts[milhaoQuestions[mCurrent].ans]}". ${milhaoQuestions[mCurrent].exp}`;
+  document.getElementById('loseOverlay').classList.add('active');
+}
+
+function resetMilhao() {
+  document.getElementById('winOverlay').classList.remove('active');
+  document.getElementById('loseOverlay').classList.remove('active');
+  document.getElementById('milhaoStart').style.display = 'block';
+  document.getElementById('milhaoGame').style.display = 'none';
+  mRunning = false;
+}
+
+// ── LIFELINES ──
+function usePhone() {
+  if (mLifelines.phone || mSelected === null && false) return;
+  mLifelines.phone = true;
+  document.getElementById('llPhone').classList.add('used');
+  document.getElementById('llPhone').disabled = true;
+
+  const q = milhaoQuestions[mCurrent];
+  const friends = ["Prof. Maria","Dev Lucas","Mestra Ana","Dr. Carlos"];
+  const friend = friends[Math.floor(Math.random() * friends.length)];
+  const correct = Math.random() < (mCurrent < 8 ? 0.92 : 0.72); // less reliable on harder Qs
+  const answerIdx = correct ? q.ans : (q.ans + 1 + Math.floor(Math.random()*3)) % 4;
+  const letters = ['A','B','C','D'];
+  const hints = [
+    `Hmm... eu tenho quase certeza que é a alternativa ${letters[answerIdx]}. Parece ser "${q.opts[answerIdx]}".`,
+    `Olha, não tenho 100% de certeza, mas eu apostaria na ${letters[answerIdx]}: "${q.opts[answerIdx]}".`,
+    `Eu estudei isso! Acho que é ${letters[answerIdx]}, "${q.opts[answerIdx]}". Confia em mim!`,
+  ];
+  const popup = document.getElementById('phonePopup');
+  document.getElementById('friendName').textContent = '📞 ' + friend + ' diz:';
+  document.getElementById('friendSpeech').textContent = hints[Math.floor(Math.random()*hints.length)];
+  popup.style.display = 'block';
+}
+
+function useAudience() {
+  if (mLifelines.audience) return;
+  mLifelines.audience = true;
+  document.getElementById('llAudience').classList.add('used');
+  document.getElementById('llAudience').disabled = true;
+
+  const q = milhaoQuestions[mCurrent];
+  // Generate poll: correct answer gets majority, harder Qs get less
+  const correctWeight = mCurrent < 7 ? 65 : mCurrent < 12 ? 50 : 38;
+  const remaining = 100 - correctWeight;
+  let pcts = [0,0,0,0];
+  pcts[q.ans] = correctWeight;
+  let left = remaining;
+  const others = [0,1,2,3].filter(i => i !== q.ans && !mEliminatedOpts.includes(i));
+  others.forEach((idx, i) => {
+    const share = i === others.length - 1 ? left : Math.floor(Math.random() * left * .7);
+    pcts[idx] = share; left -= share;
+  });
+
+  const chart = document.getElementById('audienceChart');
+  const letters = ['A','B','C','D'];
+  chart.innerHTML = pcts.map((p, i) => `
+    <div class="audience-bar-wrap">
+      <div class="audience-bar-pct">${p}%</div>
+      <div class="audience-bar" style="height:${p}%"></div>
+      <div class="audience-bar-label">${letters[i]}</div>
+    </div>
+  `).join('');
+  document.getElementById('audienceResult').style.display = 'block';
+}
+
+function useFifty() {
+  if (mLifelines.fifty) return;
+  mLifelines.fifty = true;
+  document.getElementById('llFifty').classList.add('used');
+  document.getElementById('llFifty').disabled = true;
+
+  const q = milhaoQuestions[mCurrent];
+  const wrong = [0,1,2,3].filter(i => i !== q.ans);
+  // remove 2 wrong answers
+  for (let k = wrong.length - 1; k > 0; k--) {
+    const j = Math.floor(Math.random() * (k+1));
+    [wrong[k], wrong[j]] = [wrong[j], wrong[k]];
+  }
+  mEliminatedOpts = wrong.slice(0, 2);
+  mEliminatedOpts.forEach(idx => {
+    const btn = document.getElementById('mOpt-' + idx);
+    if (btn) btn.classList.add('eliminated');
+  });
+  // deselect if current selection was eliminated
+  if (mSelected !== null && mEliminatedOpts.includes(mSelected)) {
+    mSelected = null;
+    document.querySelectorAll('.milhao-opt').forEach(b => b.classList.remove('selected'));
+    document.getElementById('mConfirmBtn').disabled = true;
+  }
+}
+
+// ── SPARKLES ──
+function triggerSparkles(big = false) {
+  const container = document.getElementById('sparkles');
+  const colors = ['#ffd166','#00d4aa','#7c6ffd','#ff6b35','#ffffff'];
+  const count = big ? 60 : 20;
+  for (let i = 0; i < count; i++) {
+    setTimeout(() => {
+      const s = document.createElement('div');
+      s.className = 'sparkle';
+      s.style.left = (20 + Math.random() * 60) + 'vw';
+      s.style.top = (40 + Math.random() * 40) + 'vh';
+      s.style.background = colors[Math.floor(Math.random() * colors.length)];
+      s.style.width = s.style.height = (4 + Math.random() * 8) + 'px';
+      s.style.animationDuration = (.6 + Math.random() * .8) + 's';
+      container.appendChild(s);
+      setTimeout(() => s.remove(), 1400);
+    }, i * (big ? 40 : 60));
+  }
+}
+
+// ══════════════════════════════
 //  INIT
 // ══════════════════════════════
 loadQuiz();
@@ -1274,6 +2030,7 @@ loadError();
 loadBuild();
 loadStory();
 updateProgress();
+buildPrizeLadder();
 </script>
 </body>
 </html>
