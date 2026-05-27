@@ -1,14 +1,14 @@
 const hangmanWords = [
-  { word: "elephant", category: "🐘 Animals" },
-  { word: "computer", category: "💻 Technology" },
-  { word: "mountain", category: "⛰️ Nature" },
-  { word: "chocolate", category: "🍫 Food" },
-  { word: "airplane", category: "✈️ Transport" },
-  { word: "adventure", category: "🗺️ Travel" },
-  { word: "football", category: "⚽ Sports" },
-  { word: "language", category: "📚 Education" },
-  { word: "astronaut", category: "🚀 Space" },
-  { word: "diamond", category: "💎 Objects" },
+  { word: "elephant", category: "Animals" },
+  { word: "computer", category: "Technology" },
+  { word: "mountain", category: "Nature" },
+  { word: "chocolate", category: "Food" },
+  { word: "airplane", category: "Transport" },
+  { word: "adventure", category: "Travel" },
+  { word: "football", category: "Sports" },
+  { word: "language", category: "Education" },
+  { word: "astronaut", category: "Space" },
+  { word: "diamond", category: "Objects" },
 ];
 
 let hangmanIndex = 0;
