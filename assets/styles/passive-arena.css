@@ -1,0 +1,76 @@
+/* ══════════════════════════════════════════════════
+   PASSIVE VOICE ARENA — hub + iframe wrapper
+   (reaproveita .game-grid, .game-card, .btn, .section-title
+   que já existem em main.css — só o necessário aqui)
+══════════════════════════════════════════════════ */
+
+.pv-iframe-wrap {
+  width: 100%;
+  margin-top: 4px;
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 1.5px solid var(--border);
+  background: #0b0e14;
+}
+
+.pv-iframe-wrap iframe {
+  width: 100%;
+  height: 820px;
+  border: none;
+  display: block;
+}
+
+.pv-back-btn {
+  margin-bottom: 14px;
+}
+
+@media (max-width: 760px) {
+  .pv-iframe-wrap iframe {
+    height: 680px;
+  }
+}
+
+/* ══════════════════════════════════════════════════
+   RESPONSIVE NAV FIX
+   O menu de abas agora virou uma faixa rolável na
+   horizontal em vez de quebrar/empilhar de forma feia.
+   Funciona com qualquer quantidade de abas.
+══════════════════════════════════════════════════ */
+
+.tabs {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  gap: 8px;
+  padding-bottom: 10px;
+}
+
+.tabs::-webkit-scrollbar {
+  height: 6px;
+}
+
+.tabs::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
+
+.tab {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+@media (max-width: 760px) {
+  .tab {
+    font-size: 0.8rem;
+    padding: 8px 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .tab {
+    font-size: 0.74rem;
+    padding: 7px 11px;
+  }
+}

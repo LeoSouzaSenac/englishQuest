@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mystery Feature</title>
+<style>
+  :root{
+    --bg:#0a0c10;--panel:#12151c;--panel-2:#171b24;--border:#272c38;
+    --text:#e9edf4;--muted:#8a93a3;--accent:#5eead4;--amber:#f5b349;
+    --success:#56e08a;--error:#ff6b6b;--purple:#b794f6;
+    --mono:'JetBrains Mono','Fira Code',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    --sans:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;min-height:100vh;background:radial-gradient(circle at 90% 10%, #211a2750 0%, transparent 55%), var(--bg);color:var(--text);font-family:var(--sans);display:flex;align-items:center;justify-content:center;padding:20px;}
+  .card{width:100%;max-width:700px;background:var(--panel);border:1px solid var(--border);border-radius:10px;box-shadow:0 30px 80px -30px rgba(0,0,0,.75);overflow:hidden;}
+  .header{padding:20px 26px;border-bottom:1px solid var(--border);background:linear-gradient(135deg,#171425,#101319);}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--purple);margin:0 0 4px;}
+  h1{margin:0;font-size:21px;font-weight:700;}
+  .tabs{display:flex;border-bottom:1px solid var(--border);background:var(--panel-2);}
+  .tab{flex:1;text-align:center;padding:14px 10px;font-family:var(--mono);font-size:12.5px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;}
+  .tab.active{color:var(--text);border-bottom-color:var(--purple);}
+  .body{padding:24px 26px 26px;}
+  .panel{display:none;}
+  .panel.active{display:block;}
+  .redacted-box{background:#000;border:1px solid var(--border);border-radius:8px;padding:20px;margin-bottom:18px;position:relative;}
+  .redacted-box .stamp{position:absolute;top:10px;right:14px;font-family:var(--mono);font-size:10px;color:var(--error);border:1px solid var(--error);padding:2px 6px;border-radius:3px;letter-spacing:.08em;}
+  .redacted-line{font-family:var(--mono);font-size:14.5px;line-height:1.9;color:#d7f7f1;}
+  .progress-label{font-family:var(--mono);font-size:11.5px;color:var(--muted);margin-bottom:8px;}
+  .badge-row{display:flex;justify-content:flex-end;margin-bottom:8px;}
+  .badge{font-family:var(--mono);font-size:10.5px;font-weight:700;letter-spacing:.06em;padding:3px 9px;border-radius:20px;text-transform:uppercase;}
+  .badge.easy{background:rgba(86,224,138,.12);color:var(--success);border:1px solid rgba(86,224,138,.4);}
+  .badge.medium{background:rgba(245,179,73,.12);color:var(--amber);border:1px solid rgba(245,179,73,.4);}
+  .badge.hard{background:rgba(255,107,107,.12);color:var(--error);border:1px solid rgba(255,107,107,.4);}
+  .option{display:block;width:100%;text-align:left;background:var(--panel-2);border:1px solid var(--border);color:var(--text);font-family:var(--sans);font-size:14.5px;padding:13px 16px;border-radius:8px;margin-bottom:10px;cursor:pointer;}
+  .option:hover{border-color:var(--purple);}
+  .option.correct{border-color:var(--success);background:rgba(86,224,138,.1);color:var(--success);}
+  .option.wrong{border-color:var(--error);background:rgba(255,107,107,.1);color:var(--error);}
+  .option:disabled{cursor:default;}
+  .nav-row{display:flex;justify-content:space-between;align-items:center;margin-top:16px;}
+  button{font-family:var(--mono);font-weight:600;font-size:13px;border:none;border-radius:6px;padding:12px 20px;cursor:pointer;}
+  .btn-primary{background:var(--purple);color:#1a0f2e;}
+  .btn-primary:disabled{opacity:.35;cursor:not-allowed;}
+  .end-screen{display:none;text-align:center;}
+  .end-screen.show{display:block;}
+  .score-big{font-family:var(--mono);font-size:46px;font-weight:700;color:var(--purple);margin:6px 0 2px;}
+  .score-label{font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;}
+  .verdict{margin:16px 0 22px;font-size:14.5px;}
+  textarea{width:100%;min-height:140px;background:var(--panel-2);border:1px solid var(--border);color:var(--text);font-family:var(--sans);font-size:14.5px;line-height:1.6;border-radius:8px;padding:14px 16px;resize:vertical;outline:none;margin-bottom:14px;}
+  textarea:focus{border-color:var(--purple);box-shadow:0 0 0 3px rgba(183,148,246,.15);}
+  .preview{background:var(--panel-2);border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin-bottom:16px;font-size:14px;line-height:1.7;min-height:40px;color:#cdd5e0;}
+  .preview mark{background:rgba(183,148,246,.28);color:var(--purple);border-radius:3px;padding:0 2px;}
+  .detect-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;font-family:var(--mono);font-size:12.5px;color:var(--muted);}
+  .detect-row .hi{color:var(--purple);font-weight:700;}
+  .write-feedback{border-radius:8px;padding:14px 16px;font-size:13.5px;line-height:1.6;border:1px solid var(--border);background:var(--panel-2);}
+  .write-feedback.good{border-color:var(--success);color:var(--success);background:rgba(86,224,138,.08);}
+  .write-feedback.meh{border-color:var(--amber);color:var(--amber);background:rgba(245,179,73,.08);}
+  .rules{font-family:var(--mono);font-size:12.5px;color:var(--muted);margin:0 0 16px;line-height:1.6;}
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="header">
+    <p class="eyebrow">Aula 8 · Passive Voice</p>
+    <h1>🕶️ Mystery Feature</h1>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" id="tabGuess">🎯 Guess the Feature</div>
+    <div class="tab" id="tabWrite">✍️ Write Your Own</div>
+  </div>
+
+  <div class="body">
+    <div class="panel active" id="panelGuess">
+      <div id="guessGame">
+        <p class="progress-label" id="progressLabel">Round 1 of 8</p>
+        <div class="badge-row"><span class="badge" id="diffBadge">easy</span></div>
+        <div class="redacted-box">
+          <span class="stamp">CLASSIFIED</span>
+          <div class="redacted-line" id="cluesText"></div>
+        </div>
+        <p class="progress-label">What feature is this?</p>
+        <div id="optionsContainer"></div>
+        <div class="nav-row">
+          <span></span>
+          <button class="btn-primary" id="nextRoundBtn" disabled>next round →</button>
+        </div>
+      </div>
+
+      <div class="end-screen" id="guessEnd">
+        <p class="eyebrow">investigation closed</p>
+        <p class="score-label">features identified</p>
+        <div class="score-big" id="guessFinalScore">0/8</div>
+        <p class="verdict" id="guessVerdict"></p>
+        <button class="btn-primary" id="guessRestartBtn">↻ new mystery set</button>
+      </div>
+    </div>
+
+    <div class="panel" id="panelWrite">
+      <p class="rules">
+        Invente uma funcionalidade nova para um app — mas não diga qual é!<br>
+        Escreva 4-5 frases em <strong>passive voice</strong> descrevendo o que ela faz, no estilo de release notes.
+      </p>
+      <textarea id="mysteryInput" placeholder="Example: Photos can now be shared with friends. New filters were added..."></textarea>
+      <div class="detect-row">
+        <span>Passive constructions detected: <span class="hi" id="detectCount">0</span></span>
+        <span id="detectGoal">goal: 3+</span>
+      </div>
+      <div class="preview" id="previewBox">Sua frase com destaque para a voz passiva aparece aqui...</div>
+      <button class="btn-primary" id="checkWriteBtn" style="width:100%;margin-bottom:14px;">🔍 check my mystery</button>
+      <div class="write-feedback" id="writeFeedback" style="display:none;"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ---------- GUESS THE FEATURE: pool of 20 mysteries ---------- */
+const pool = [
+  { difficulty:"easy", clues:["Photos can now be shared with friends.","New filters were added.","The image quality was improved.","Comments can be added below each post."], options:["A music streaming app","A photo-sharing social feature","A weather widget","A calculator tool"], correct:1 },
+  { difficulty:"easy", clues:["Messages are now encrypted automatically.","Read receipts were added.","Voice notes can be sent.","Group chats were redesigned."], options:["A messaging feature","A spreadsheet tool","A map navigation feature","A photo editor"], correct:0 },
+  { difficulty:"easy", clues:["Items can be added to a list.","Prices are updated in real time.","Orders are confirmed by email.","Payments are processed securely."], options:["A shopping cart feature","A music playlist","A video call feature","A fitness tracker"], correct:0 },
+  { difficulty:"medium", clues:["Routes are calculated automatically.","Traffic is shown in real time.","Directions are updated every few seconds.","Alternative roads are suggested."], options:["A navigation feature","A drawing app","A chat bot","A photo filter"], correct:0 },
+  { difficulty:"easy", clues:["Songs can be added to a playlist.","Volume is adjusted automatically.","Lyrics are displayed on screen.","New albums are recommended weekly."], options:["A music streaming feature","A clock app","A budgeting tool","A video editor"], correct:0 },
+  { difficulty:"medium", clues:["Calls can be recorded for later.","Backgrounds can be blurred automatically.","Screens can be shared with everyone.","Up to 50 people can be added to one call."], options:["A video calling feature","A photo gallery","A music player","A calendar app"], correct:0 },
+  { difficulty:"medium", clues:["Steps are counted automatically.","Heart rate is monitored during exercise.","Calories burned are calculated in real time.","Weekly goals are tracked and displayed."], options:["A fitness tracking feature","A recipe app","A chat bot","A music app"], correct:0 },
+  { difficulty:"easy", clues:["Alarms can be set for any time.","Snooze can be activated for 10 minutes.","Different sounds can be chosen.","Multiple alarms are listed in order."], options:["An alarm clock feature","A photo editor","A map app","A shopping list"], correct:0 },
+  { difficulty:"medium", clues:["Meetings can be scheduled in advance.","Reminders are sent before each event.","Events can be shared with the team.","Conflicts are highlighted automatically."], options:["A calendar feature","A music playlist","A video editor","A weather app"], correct:0 },
+  { difficulty:"easy", clues:["Notes can be organized into folders.","Text can be highlighted in different colors.","Checklists can be added to any note.","Notes are synced across devices."], options:["A note-taking feature","A banking app","A navigation tool","A video call app"], correct:0 },
+  { difficulty:"medium", clues:["Spam is filtered automatically.","Important emails are highlighted.","Attachments can be previewed without downloading.","Messages can be scheduled to be sent later."], options:["An email feature","A music app","A fitness tracker","A photo editor"], correct:0 },
+  { difficulty:"easy", clues:["Temperature is updated every hour.","Rain alerts are sent in advance.","A 7-day forecast is displayed.","Wind speed is shown in real time."], options:["A weather feature","A shopping cart","A chat app","A calendar tool"], correct:0 },
+  { difficulty:"hard", clues:["Content disappears after 24 hours.","Reactions can be sent instantly.","Stickers can be added to any post.","Views are counted and shown to the creator."], options:["A disappearing-content social feature","A budgeting tool","A navigation app","A music player"], correct:0 },
+  { difficulty:"medium", clues:["A driver is assigned automatically.","The price is calculated before the trip.","The route is shown in real time.","The trip can be shared with a friend for safety."], options:["A ride-sharing feature","A photo app","A note-taking tool","A weather widget"], correct:0 },
+  { difficulty:"easy", clues:["Restaurants are listed by distance.","Orders are tracked in real time.","Payments are processed securely.","Delivery time is estimated automatically."], options:["A food delivery feature","A fitness tracker","A music app","A calendar tool"], correct:0 },
+  { difficulty:"hard", clues:["Passwords are generated automatically.","Logins are filled in instantly.","Data is encrypted before being stored.","Breached passwords are flagged immediately."], options:["A password management feature","A weather app","A video call tool","A shopping cart"], correct:0 },
+  { difficulty:"medium", clues:["Files are backed up automatically.","Storage space can be upgraded anytime.","Old versions of files are kept for 30 days.","Files can be shared with a link."], options:["A cloud storage feature","A fitness tracker","A music player","A ride-sharing app"], correct:0 },
+  { difficulty:"hard", clues:["Lessons are unlocked progressively.","Pronunciation is checked by the microphone.","Streaks are rewarded with points.","Mistakes are reviewed at the end of each lesson."], options:["A language-learning feature","A banking app","A navigation tool","A photo editor"], correct:0 },
+  { difficulty:"hard", clues:["Lights can be controlled remotely.","Temperature is adjusted automatically.","Doors can be locked from anywhere.","Energy usage is monitored every day."], options:["A smart home feature","A music streaming app","A note-taking tool","A food delivery app"], correct:0 },
+  { difficulty:"hard", clues:["Balances are updated in real time.","Transfers can be made instantly.","Suspicious activity is flagged automatically.","Statements are generated every month."], options:["An online banking feature","A fitness tracker","A video call app","A weather widget"], correct:0 }
+];
+
+const SET_SIZE_COUNTS = { easy:3, medium:3, hard:2 };
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let k=a.length-1;k>0;k--){ const j=Math.floor(Math.random()*(k+1)); [a[k],a[j]]=[a[j],a[k]]; }
+  return a;
+}
+
+function drawMixedSet(){
+  const buckets = { easy:[], medium:[], hard:[] };
+  pool.forEach(item => buckets[item.difficulty].push(item));
+  let result = [];
+  Object.keys(SET_SIZE_COUNTS).forEach(diff=>{
+    result = result.concat(shuffle(buckets[diff]).slice(0, SET_SIZE_COUNTS[diff]));
+  });
+  return shuffle(result).map(round=>{
+    // shuffle options and recompute correct index
+    const withFlag = round.options.map((opt,idx)=>({opt, isCorrect: idx===round.correct}));
+    const shuffledOpts = shuffle(withFlag);
+    return {
+      difficulty: round.difficulty,
+      clues: round.clues,
+      options: shuffledOpts.map(o=>o.opt),
+      correct: shuffledOpts.findIndex(o=>o.isCorrect)
+    };
+  });
+}
+
+let rounds = [], r = 0, guessScore = 0, guessAnswered = false;
+
+const elCluesText = document.getElementById('cluesText');
+const elOptionsContainer = document.getElementById('optionsContainer');
+const elProgressLabel = document.getElementById('progressLabel');
+const elNextRoundBtn = document.getElementById('nextRoundBtn');
+const elGuessGame = document.getElementById('guessGame');
+const elGuessEnd = document.getElementById('guessEnd');
+const elGuessFinalScore = document.getElementById('guessFinalScore');
+const elGuessVerdict = document.getElementById('guessVerdict');
+const elDiffBadge = document.getElementById('diffBadge');
+
+function renderRound(){
+  guessAnswered = false;
+  elNextRoundBtn.disabled = true;
+  elProgressLabel.textContent = 'Round '+(r+1)+' of '+rounds.length;
+  const round = rounds[r];
+  elDiffBadge.textContent = round.difficulty;
+  elDiffBadge.className = 'badge '+round.difficulty;
+  elCluesText.innerHTML = round.clues.join('<br>');
+  let html = '';
+  round.options.forEach((opt,idx)=>{ html += '<button class="option" data-idx="'+idx+'">'+opt+'</button>'; });
+  elOptionsContainer.innerHTML = html;
+  document.querySelectorAll('#optionsContainer .option').forEach(btn=>{
+    btn.addEventListener('click', ()=>selectGuess(btn, parseInt(btn.dataset.idx)));
+  });
+}
+
+function selectGuess(btn, idx){
+  if(guessAnswered) return;
+  guessAnswered = true;
+  const round = rounds[r];
+  document.querySelectorAll('#optionsContainer .option').forEach(b=>b.disabled=true);
+  if(idx === round.correct){ btn.classList.add('correct'); guessScore++; }
+  else {
+    btn.classList.add('wrong');
+    document.querySelectorAll('#optionsContainer .option')[round.correct].classList.add('correct');
+  }
+  elNextRoundBtn.disabled = false;
+}
+
+function nextRound(){
+  r++;
+  if(r >= rounds.length){ showGuessEnd(); } else { renderRound(); }
+}
+
+function showGuessEnd(){
+  elGuessGame.style.display = 'none';
+  elGuessEnd.classList.add('show');
+  elGuessFinalScore.textContent = guessScore+'/'+rounds.length;
+  let msg = '';
+  const pct = guessScore/rounds.length;
+  if(pct === 1) msg = "Perfect deduction! You cracked every mystery feature. 🕶️";
+  else if(pct >= 0.6) msg = "Solid detective work — most clues were correctly decoded.";
+  else msg = "Some mysteries got away. Read the clues again — they're all in passive voice!";
+  elGuessVerdict.textContent = msg;
+}
+
+function restartGuess(){
+  rounds = drawMixedSet();
+  r = 0; guessScore = 0;
+  elGuessGame.style.display = 'block';
+  elGuessEnd.classList.remove('show');
+  renderRound();
+}
+
+elNextRoundBtn.addEventListener('click', nextRound);
+document.getElementById('guessRestartBtn').addEventListener('click', restartGuess);
+restartGuess();
+
+/* ---------- WRITE YOUR OWN ---------- */
+const elMysteryInput = document.getElementById('mysteryInput');
+const elDetectCount = document.getElementById('detectCount');
+const elPreviewBox = document.getElementById('previewBox');
+const elWriteFeedback = document.getElementById('writeFeedback');
+
+function escapeHtml(str){ return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function detectPassive(text){
+  const regex = /\b(is|are|was|were|been|being|be)\s+(?:\w+\s+){0,2}(\w+ed|\w+en|done|made|sent|seen|known|written|given|taken|found|built|sold|told|shown|brought|kept|left|set|put|broken|chosen|spoken|stolen)\b/gi;
+  return text.match(regex) || [];
+}
+
+function updatePreview(){
+  const text = elMysteryInput.value;
+  if(!text.trim()){
+    elPreviewBox.textContent = 'Sua frase com destaque para a voz passiva aparece aqui...';
+    elDetectCount.textContent = '0';
+    return;
+  }
+  const matches = detectPassive(text);
+  elDetectCount.textContent = matches.length;
+  let highlighted = escapeHtml(text);
+  matches.forEach(m=>{
+    const escaped = escapeHtml(m);
+    highlighted = highlighted.replace(escaped, '<mark>'+escaped+'</mark>');
+  });
+  elPreviewBox.innerHTML = highlighted;
+}
+
+function checkWrite(){
+  const matches = detectPassive(elMysteryInput.value);
+  elWriteFeedback.style.display = 'block';
+  if(matches.length >= 3){
+    elWriteFeedback.className = 'write-feedback good';
+    elWriteFeedback.innerHTML = '✓ Great! '+matches.length+' passive construction(s) detected. Your mystery feature sounds like a real release note. Now read it to a classmate and see if they can guess what it is!';
+  } else if(matches.length > 0){
+    elWriteFeedback.className = 'write-feedback meh';
+    elWriteFeedback.innerHTML = '⚠ Only '+matches.length+' passive construction(s) found. Try adding more sentences with "is/are/was/were + participle" or "can be + participle".';
+  } else {
+    elWriteFeedback.className = 'write-feedback meh';
+    elWriteFeedback.innerHTML = '⚠ No passive voice detected yet. Try rewriting using be + participle, like "New filters were added."';
+  }
+}
+
+elMysteryInput.addEventListener('input', updatePreview);
+document.getElementById('checkWriteBtn').addEventListener('click', checkWrite);
+
+/* ---------- TABS ---------- */
+const elTabGuess = document.getElementById('tabGuess');
+const elTabWrite = document.getElementById('tabWrite');
+const elPanelGuess = document.getElementById('panelGuess');
+const elPanelWrite = document.getElementById('panelWrite');
+
+elTabGuess.addEventListener('click', ()=>{
+  elTabGuess.classList.add('active'); elTabWrite.classList.remove('active');
+  elPanelGuess.classList.add('active'); elPanelWrite.classList.remove('active');
+});
+elTabWrite.addEventListener('click', ()=>{
+  elTabWrite.classList.add('active'); elTabGuess.classList.remove('active');
+  elPanelWrite.classList.add('active'); elPanelGuess.classList.remove('active');
+});
+</script>
+</body>
+</html>

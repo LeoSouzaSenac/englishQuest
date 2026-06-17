@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Changelog Race</title>
+<style>
+  :root{
+    --bg:#0b0e14;--panel:#11151c;--panel-2:#161b24;--border:#252c38;
+    --text:#e7ecf3;--muted:#828ea0;--accent:#5eead4;--amber:#f5b349;
+    --success:#56e08a;--error:#ff6b6b;
+    --mono:'JetBrains Mono','Fira Code',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    --sans:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;min-height:100vh;
+    background:radial-gradient(circle at 80% 0%, #1d2a2750 0%, transparent 55%), var(--bg);
+    color:var(--text);font-family:var(--sans);
+    display:flex;align-items:center;justify-content:center;padding:20px;
+  }
+  .card{width:100%;max-width:680px;background:var(--panel);border:1px solid var(--border);border-radius:10px;box-shadow:0 30px 80px -30px rgba(0,0,0,.7);padding:26px 26px 22px;}
+  .top-row{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin:0 0 4px;}
+  h1{margin:0;font-size:21px;font-weight:700;letter-spacing:-.01em;}
+  .timer{font-family:var(--mono);font-size:26px;font-weight:700;color:var(--accent);padding:4px 12px;border:1px solid var(--border);border-radius:8px;background:var(--panel-2);}
+  .timer.urgent{color:var(--error);border-color:var(--error);animation:pulse 1s infinite;}
+  @keyframes pulse{50%{opacity:.55;}}
+  .track-wrap{margin-bottom:16px;}
+  .track{position:relative;height:34px;background:var(--panel-2);border:1px solid var(--border);border-radius:17px;overflow:hidden;}
+  .track-fill{position:absolute;left:0;top:0;bottom:0;width:0%;background:linear-gradient(90deg,#1d3b38,var(--accent));transition:width .4s ease;}
+  .car{position:absolute;top:50%;left:0%;transform:translate(-50%,-50%);font-size:20px;transition:left .4s ease;}
+  .flag{position:absolute;right:6px;top:50%;transform:translateY(-50%);font-size:16px;opacity:.6;}
+  .track-labels{display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:6px;}
+  .stat-row{display:flex;gap:16px;flex-wrap:wrap;font-family:var(--mono);font-size:12.5px;color:var(--muted);margin-bottom:14px;}
+  .stat-row .hi{color:var(--text);font-weight:600;}
+  .badge-row{display:flex;justify-content:flex-end;margin-bottom:8px;}
+  .badge{font-family:var(--mono);font-size:10.5px;font-weight:700;letter-spacing:.06em;padding:3px 9px;border-radius:20px;text-transform:uppercase;}
+  .badge.easy{background:rgba(86,224,138,.12);color:var(--success);border:1px solid rgba(86,224,138,.4);}
+  .badge.medium{background:rgba(245,179,73,.12);color:var(--amber);border:1px solid rgba(245,179,73,.4);}
+  .badge.hard{background:rgba(255,107,107,.12);color:var(--error);border:1px solid rgba(255,107,107,.4);}
+  .prompt-line{font-family:var(--mono);font-size:13px;color:var(--muted);margin-bottom:8px;}
+  .prompt-line .tag{color:var(--amber);}
+  .active-box{background:var(--panel-2);border:1px solid var(--border);border-left:3px solid var(--amber);border-radius:6px;padding:14px 16px;font-family:var(--mono);font-size:15px;line-height:1.5;margin-bottom:18px;min-height:48px;}
+  .input-row{display:flex;gap:10px;margin-bottom:14px;}
+  input[type=text]{flex:1;background:var(--panel-2);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:15px;padding:12px 14px;border-radius:6px;outline:none;}
+  input[type=text]:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(94,234,212,.15);}
+  button{font-family:var(--mono);font-weight:600;font-size:13px;border:none;border-radius:6px;padding:12px 18px;cursor:pointer;transition:transform .12s ease, opacity .12s ease;}
+  button:active{transform:scale(.97);}
+  .btn-primary{background:var(--accent);color:#06231f;}
+  .btn-primary:hover{opacity:.9;}
+  .btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border);}
+  .btn-ghost:hover{color:var(--text);border-color:var(--accent);}
+  .row-buttons{display:flex;gap:10px;}
+  .row-buttons .btn-primary{flex:2;}
+  .row-buttons .btn-ghost{flex:1;}
+  .feedback{margin-top:14px;border-radius:6px;padding:12px 14px;font-size:13.5px;line-height:1.5;display:none;}
+  .feedback.show{display:block;}
+  .feedback.correct{background:rgba(86,224,138,.08);border:1px solid rgba(86,224,138,.35);color:var(--success);}
+  .feedback.wrong{background:rgba(255,107,107,.08);border:1px solid rgba(255,107,107,.35);color:var(--error);}
+  .feedback .answer{font-family:var(--mono);color:var(--text);display:block;margin-top:4px;}
+  .start-screen, .end-screen{display:none;text-align:center;}
+  .start-screen.show, .end-screen.show{display:block;}
+  .score-big{font-family:var(--mono);font-size:46px;font-weight:700;color:var(--accent);margin:6px 0 2px;}
+  .score-label{font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;}
+  .verdict{margin:16px 0 22px;font-size:14.5px;}
+  .rules{text-align:left;font-size:13.5px;color:var(--muted);background:var(--panel-2);border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin:18px 0 22px;line-height:1.6;}
+  @media (prefers-reduced-motion: reduce){.track-fill,.car{transition:none;}.timer.urgent{animation:none;}}
+</style>
+</head>
+<body>
+
+<div class="card">
+
+  <div class="start-screen show" id="startScreen">
+    <p class="eyebrow">Aula 8 · Passive Voice</p>
+    <h1 style="margin-bottom:14px;">🏁 Changelog Race</h1>
+    <div class="rules">
+      Você tem <strong>3 minutos</strong> para transformar o maior número possível de frases para a <strong>voz passiva</strong>.<br><br>
+      • 16 frases sorteadas de um banco de 20, com dificuldades misturadas<br>
+      • Frase correta = carro avança<br>
+      • Pode pular uma frase difícil (sem pontuar)<br>
+      • Cada corrida é diferente — a ordem e as frases mudam!
+    </div>
+    <button class="btn-primary" id="startBtn" style="width:100%;">▶ START RACE</button>
+  </div>
+
+  <div id="game" style="display:none;">
+    <div class="top-row">
+      <div>
+        <p class="eyebrow">Changelog Race</p>
+        <h1>Active → Passive</h1>
+      </div>
+      <div class="timer" id="timer">3:00</div>
+    </div>
+
+    <div class="track-wrap">
+      <div class="track">
+        <div class="track-fill" id="trackFill"></div>
+        <div class="car" id="car">🏎️</div>
+        <div class="flag">🏁</div>
+      </div>
+      <div class="track-labels"><span>START</span><span>FINISH</span></div>
+    </div>
+
+    <div class="stat-row">
+      <span>Sentence <span class="hi" id="qIndex">1</span>/<span id="qTotalLabel">16</span></span>
+      <span>Correct: <span class="hi" id="scoreLabel">0</span></span>
+      <span>Skipped: <span class="hi" id="skipLabel">0</span></span>
+    </div>
+    <div class="badge-row"><span class="badge" id="diffBadge">easy</span></div>
+
+    <div class="prompt-line"><span class="tag">$</span> active voice:</div>
+    <div class="active-box" id="activeSentence"></div>
+
+    <div class="input-row">
+      <input type="text" id="answerInput" placeholder="type the passive version..." autocomplete="off" />
+    </div>
+
+    <div class="row-buttons">
+      <button class="btn-primary" id="checkBtn">RUN ▶ check</button>
+      <button class="btn-ghost" id="skipBtn">skip →</button>
+    </div>
+
+    <div class="feedback" id="feedback"></div>
+  </div>
+
+  <div class="end-screen" id="endScreen">
+    <p class="eyebrow" id="endEyebrow">race finished</p>
+    <p class="score-label">your result</p>
+    <div class="score-big" id="finalScore">0/16</div>
+    <p class="verdict" id="verdictText"></p>
+    <button class="btn-primary" id="restartBtn" style="width:100%;">↻ race again (new mix)</button>
+  </div>
+
+</div>
+
+<script>
+const pool = [
+  // EASY
+  { active:"The team launched a new version.", accepted:["a new version was launched","a new version was launched by the team"], difficulty:"easy" },
+  { active:"Developers fixed the login error.", accepted:["the login error was fixed","the login error was fixed by developers"], difficulty:"easy" },
+  { active:"The designer improved the interface.", accepted:["the interface was improved","the interface was improved by the designer"], difficulty:"easy" },
+  { active:"The QA team tested all features.", accepted:["all features were tested","all features were tested by the qa team"], difficulty:"easy" },
+  { active:"The company removed the old database.", accepted:["the old database was removed","the old database was removed by the company"], difficulty:"easy" },
+  { active:"The support team solved the ticket.", accepted:["the ticket was solved","the ticket was solved by the support team"], difficulty:"easy" },
+  { active:"The manager approved the new design.", accepted:["the new design was approved","the new design was approved by the manager"], difficulty:"easy" },
+  // MEDIUM
+  { active:"Engineers deployed the update on Friday.", accepted:["the update was deployed on friday","the update was deployed on friday by engineers"], difficulty:"medium" },
+  { active:"The team must review this code today.", accepted:["this code must be reviewed today","this code must be reviewed today by the team"], difficulty:"medium" },
+  { active:"We will release the app next week.", accepted:["the app will be released next week","the app will be released next week by us"], difficulty:"medium" },
+  { active:"The admin can reset the password.", accepted:["the password can be reset","the password can be reset by the admin"], difficulty:"medium" },
+  { active:"Users should report bugs immediately.", accepted:["bugs should be reported immediately","bugs should be reported immediately by users"], difficulty:"medium" },
+  { active:"The company didn't update the server.", accepted:["the server wasn't updated","the server was not updated","the server wasn't updated by the company"], difficulty:"medium" },
+  { active:"Will the team finish the project today?", accepted:["will the project be finished today"], difficulty:"medium" },
+  // HARD
+  { active:"The developers have fixed the security issue.", accepted:["the security issue has been fixed","the security issue has been fixed by the developers"], difficulty:"hard" },
+  { active:"Someone broke the build last night.", accepted:["the build was broken last night","the build was broken last night by someone"], difficulty:"hard" },
+  { active:"The team has not deployed the new feature yet.", accepted:["the new feature has not been deployed yet","the new feature hasn't been deployed yet"], difficulty:"hard" },
+  { active:"The committee chose the winning project.", accepted:["the winning project was chosen","the winning project was chosen by the committee"], difficulty:"hard" },
+  { active:"Hackers stole sensitive data from the server.", accepted:["sensitive data was stolen from the server","sensitive data was stolen from the server by hackers"], difficulty:"hard" },
+  { active:"The company has built three new products this year.", accepted:["three new products have been built this year","three new products have been built this year by the company"], difficulty:"hard" }
+];
+
+const SET_SIZE_COUNTS = { easy:7, medium:6, hard:3 };
+const TOTAL_TIME = 180;
+let order = [], i = 0, score = 0, skipped = 0, timeLeft = TOTAL_TIME, timerId = null, finished = false;
+
+function normalize(s){ return s.toLowerCase().replace(/[.!?]+$/,'').replace(/\s+/g,' ').trim(); }
+function shuffle(arr){
+  const a = arr.slice();
+  for(let k=a.length-1;k>0;k--){ const j=Math.floor(Math.random()*(k+1)); [a[k],a[j]]=[a[j],a[k]]; }
+  return a;
+}
+function drawMixedSet(){
+  const buckets = { easy:[], medium:[], hard:[] };
+  pool.forEach(item => buckets[item.difficulty].push(item));
+  let result = [];
+  Object.keys(SET_SIZE_COUNTS).forEach(diff=>{
+    result = result.concat(shuffle(buckets[diff]).slice(0, SET_SIZE_COUNTS[diff]));
+  });
+  return shuffle(result);
+}
+
+const elStart = document.getElementById('startScreen');
+const elGame = document.getElementById('game');
+const elEnd = document.getElementById('endScreen');
+const elTimer = document.getElementById('timer');
+const elTrackFill = document.getElementById('trackFill');
+const elCar = document.getElementById('car');
+const elQIndex = document.getElementById('qIndex');
+const elQTotalLabel = document.getElementById('qTotalLabel');
+const elScoreLabel = document.getElementById('scoreLabel');
+const elSkipLabel = document.getElementById('skipLabel');
+const elActive = document.getElementById('activeSentence');
+const elInput = document.getElementById('answerInput');
+const elFeedback = document.getElementById('feedback');
+const elFinalScore = document.getElementById('finalScore');
+const elVerdict = document.getElementById('verdictText');
+const elEndEyebrow = document.getElementById('endEyebrow');
+const elDiffBadge = document.getElementById('diffBadge');
+
+function formatTime(t){ const m=Math.floor(t/60), s=t%60; return m+':'+String(s).padStart(2,'0'); }
+
+function updateTrack(){
+  const pct = Math.min(100, (i/order.length)*100);
+  elTrackFill.style.width = pct+'%';
+  elCar.style.left = pct+'%';
+}
+
+function loadQuestion(){
+  elInput.value = '';
+  elInput.disabled = false;
+  elFeedback.className = 'feedback';
+  elFeedback.innerHTML = '';
+  elQIndex.textContent = Math.min(i+1, order.length);
+  elQTotalLabel.textContent = order.length;
+  elScoreLabel.textContent = score;
+  elSkipLabel.textContent = skipped;
+  elActive.textContent = order[i].active;
+  elDiffBadge.textContent = order[i].difficulty;
+  elDiffBadge.className = 'badge '+order[i].difficulty;
+  updateTrack();
+  elInput.focus();
+}
+
+function answerHandler(isSkip){
+  if(finished) return;
+  if(isSkip){ skipped++; }
+  else {
+    const val = elInput.value.trim();
+    if(!val) return;
+    const correct = order[i].accepted.some(a => normalize(a) === normalize(val));
+    if(correct){
+      score++;
+      elFeedback.className = 'feedback correct show';
+      elFeedback.innerHTML = '✓ Correct!';
+    } else {
+      elFeedback.className = 'feedback wrong show';
+      elFeedback.innerHTML = '✗ Expected:<span class="answer">'+order[i].accepted[0]+'</span>';
+    }
+  }
+  i++;
+  elScoreLabel.textContent = score;
+  elSkipLabel.textContent = skipped;
+  if(i >= order.length){
+    setTimeout(()=>endRace('finished'), isSkip ? 0 : 500);
+  } else {
+    setTimeout(loadQuestion, isSkip ? 0 : 500);
+  }
+}
+
+function tick(){
+  timeLeft--;
+  elTimer.textContent = formatTime(timeLeft);
+  if(timeLeft <= 30) elTimer.classList.add('urgent');
+  if(timeLeft <= 0){ endRace('timeout'); }
+}
+
+function endRace(reason){
+  if(finished) return;
+  finished = true;
+  clearInterval(timerId);
+  elGame.style.display = 'none';
+  elEnd.classList.add('show');
+  elFinalScore.textContent = score+'/'+order.length;
+  elEndEyebrow.textContent = reason === 'timeout' ? "time's up!" : 'race finished';
+  let msg = '';
+  const pct = score/order.length;
+  if(pct === 1) msg = "Perfect race! All sentences correct. You could ship this changelog today. 🚀";
+  else if(pct >= 0.7) msg = "Great speed and accuracy! Review the ones you missed and you're set.";
+  else if(pct >= 0.4) msg = "Good pace — a bit more practice with was/were + participle and you'll fly.";
+  else msg = "Tough race. Try again, focus on the structure: subject + was/were + participle.";
+  elVerdict.textContent = msg;
+}
+
+function startRace(){
+  order = drawMixedSet();
+  i = 0; score = 0; skipped = 0; timeLeft = TOTAL_TIME; finished = false;
+  elStart.classList.remove('show');
+  elEnd.classList.remove('show');
+  elGame.style.display = 'block';
+  elTimer.classList.remove('urgent');
+  elTimer.textContent = formatTime(timeLeft);
+  loadQuestion();
+  clearInterval(timerId);
+  timerId = setInterval(tick, 1000);
+}
+
+document.getElementById('startBtn').addEventListener('click', startRace);
+document.getElementById('checkBtn').addEventListener('click', ()=>answerHandler(false));
+document.getElementById('skipBtn').addEventListener('click', ()=>answerHandler(true));
+document.getElementById('restartBtn').addEventListener('click', startRace);
+elInput.addEventListener('keydown', e => { if(e.key === 'Enter') answerHandler(false); });
+</script>
+</body>
+</html>

@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Release Notes Quiz</title>
+<style>
+  :root{
+    --bg:#0b0e14;--panel:#11151c;--panel-2:#161b24;--border:#252c38;
+    --text:#e7ecf3;--muted:#828ea0;--accent:#5eead4;--amber:#f5b349;
+    --success:#56e08a;--error:#ff6b6b;
+    --mono:'JetBrains Mono','Fira Code',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    --sans:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;min-height:100vh;background:radial-gradient(circle at 15% 100%, #1d242750 0%, transparent 55%), var(--bg);color:var(--text);font-family:var(--sans);display:flex;align-items:center;justify-content:center;padding:20px;}
+  .card{width:100%;max-width:680px;background:var(--panel);border:1px solid var(--border);border-radius:10px;box-shadow:0 30px 80px -30px rgba(0,0,0,.7);overflow:hidden;}
+  .release-header{background:linear-gradient(135deg,#13241f,#101820);border-bottom:1px solid var(--border);padding:22px 26px;}
+  .release-tag{display:inline-block;font-family:var(--mono);font-size:11px;letter-spacing:.08em;color:#06231f;background:var(--accent);padding:3px 10px;border-radius:20px;margin-bottom:10px;font-weight:700;}
+  h1{margin:0 0 4px;font-size:21px;font-weight:700;}
+  .release-sub{font-family:var(--mono);font-size:12px;color:var(--muted);}
+  .body{padding:24px 26px 26px;}
+  .notes-box{background:var(--panel-2);border:1px solid var(--border);border-radius:8px;padding:18px 18px;margin-bottom:20px;font-size:14.5px;line-height:1.75;color:#cdd5e0;}
+  .notes-box .changed{color:var(--text);font-weight:600;border-bottom:1px dashed var(--accent);}
+  .badge-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+  .badge{font-family:var(--mono);font-size:10.5px;font-weight:700;letter-spacing:.06em;padding:3px 9px;border-radius:20px;text-transform:uppercase;}
+  .badge.easy{background:rgba(86,224,138,.12);color:var(--success);border:1px solid rgba(86,224,138,.4);}
+  .badge.medium{background:rgba(245,179,73,.12);color:var(--amber);border:1px solid rgba(245,179,73,.4);}
+  .badge.hard{background:rgba(255,107,107,.12);color:var(--error);border:1px solid rgba(255,107,107,.4);}
+  .qcard{display:none;}
+  .qcard.active{display:block;}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin:0 0 6px;}
+  .qtext{font-size:16px;font-weight:600;margin:0 0 16px;}
+  .option{display:block;width:100%;text-align:left;background:var(--panel-2);border:1px solid var(--border);color:var(--text);font-family:var(--sans);font-size:14.5px;padding:13px 16px;border-radius:8px;margin-bottom:10px;cursor:pointer;transition:border-color .15s ease, background .15s ease;}
+  .option:hover{border-color:var(--accent);}
+  .option.correct{border-color:var(--success);background:rgba(86,224,138,.1);color:var(--success);}
+  .option.wrong{border-color:var(--error);background:rgba(255,107,107,.1);color:var(--error);}
+  .option:disabled{cursor:default;}
+  .explain{margin-top:14px;font-size:13.5px;color:var(--muted);border-left:3px solid var(--accent);padding-left:12px;display:none;}
+  .explain.show{display:block;}
+  .nav-row{display:flex;justify-content:space-between;align-items:center;margin-top:20px;}
+  .progress{font-family:var(--mono);font-size:12px;color:var(--muted);}
+  button{font-family:var(--mono);font-weight:600;font-size:13px;border:none;border-radius:6px;padding:12px 20px;cursor:pointer;}
+  .btn-primary{background:var(--accent);color:#06231f;}
+  .btn-primary:disabled{opacity:.35;cursor:not-allowed;}
+  .end-screen{display:none;text-align:center;}
+  .end-screen.show{display:block;}
+  .score-big{font-family:var(--mono);font-size:46px;font-weight:700;color:var(--accent);margin:6px 0 2px;}
+  .score-label{font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;}
+  .verdict{margin:16px 0 22px;font-size:14.5px;}
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="release-header">
+    <span class="release-tag">RELEASE NOTES</span>
+    <h1 id="passageTitle">App Update</h1>
+    <p class="release-sub">Aula 8 · Reading + Passive Voice</p>
+  </div>
+
+  <div class="body" id="quizBody">
+    <div class="notes-box" id="notesText"></div>
+    <div id="questions"></div>
+    <div class="nav-row">
+      <span class="progress" id="progressLabel">Question 1/8</span>
+      <button class="btn-primary" id="nextBtn" disabled>next →</button>
+    </div>
+  </div>
+
+  <div class="body end-screen" id="endScreen">
+    <p class="eyebrow">quiz complete</p>
+    <p class="score-label">your score</p>
+    <div class="score-big" id="finalScore">0/8</div>
+    <p class="verdict" id="verdictText"></p>
+    <button class="btn-primary" id="restartBtn">↻ new passages</button>
+  </div>
+</div>
+
+<script>
+// 5 passages x 4 questions = 20 questions total. Each playthrough draws 2 random passages (8 questions).
+const passages = [
+  {
+    title: "App Update — Version 3.0",
+    text: "Version 3.0 of the app was released last week. Several bugs were fixed, including the login error reported by many users. The dashboard was redesigned to be more intuitive, and a new dark mode feature was added. All user data is now encrypted before being stored. The update will be installed automatically on all devices.",
+    highlight: ["was released","were fixed","was redesigned","was added","is now encrypted","being stored","will be installed"],
+    questions: [
+      { q:"What was fixed in this version?", options:["The dark mode feature","The login error","The database structure","The dashboard colors"], correct:1, difficulty:"easy", explain:"\"Several bugs were fixed, including the login error reported by many users.\"" },
+      { q:"What new feature was added?", options:["A payment system","A chat feature","A dark mode feature","A search bar"], correct:2, difficulty:"easy", explain:"\"a new dark mode feature was added.\"" },
+      { q:"How is user data protected now?", options:["It's deleted automatically","It's shared publicly","It's printed on paper","It's encrypted before being stored"], correct:3, difficulty:"medium", explain:"\"All user data is now encrypted before being stored.\" — Present Simple Passive." },
+      { q:"Does the update need to be installed manually?", options:["Yes, the user must click install","No, it installs automatically","Only on weekends","Only if requested by email"], correct:1, difficulty:"hard", explain:"\"The update will be installed automatically on all devices.\" — Future Passive." }
+    ]
+  },
+  {
+    title: "Security Update",
+    text: "A critical vulnerability was discovered in the payment system. It was patched within 24 hours. Two-factor authentication was added for all accounts. Old API keys were revoked, and new keys will be issued by the end of the week.",
+    highlight: ["was discovered","was patched","was added","were revoked","will be issued"],
+    questions: [
+      { q:"What was discovered in the payment system?", options:["A new feature","A critical vulnerability","A design flaw","A slow server"], correct:1, difficulty:"easy", explain:"\"A critical vulnerability was discovered in the payment system.\"" },
+      { q:"How quickly was the issue patched?", options:["Within 24 hours","Within a month","It wasn't patched","Within a year"], correct:0, difficulty:"medium", explain:"\"It was patched within 24 hours.\"" },
+      { q:"What new security feature was added?", options:["Face recognition","Two-factor authentication","A new password rule","A captcha"], correct:1, difficulty:"easy", explain:"\"Two-factor authentication was added for all accounts.\"" },
+      { q:"What will happen to old API keys?", options:["They were revoked and new ones will be issued","They will stay active forever","They were upgraded automatically","Nothing changes"], correct:0, difficulty:"hard", explain:"\"Old API keys were revoked, and new keys will be issued by the end of the week.\"" }
+    ]
+  },
+  {
+    title: "Mobile App Redesign",
+    text: "The app icon was changed to a new design. The settings menu was reorganized for easier navigation. A search bar was added to the home screen. Performance issues were fixed, and load times were reduced by 40%.",
+    highlight: ["was changed","was reorganized","was added","were fixed","were reduced"],
+    questions: [
+      { q:"What was changed in this redesign?", options:["The app name","The app icon","The company logo","The app price"], correct:1, difficulty:"easy", explain:"\"The app icon was changed to a new design.\"" },
+      { q:"What was added to the home screen?", options:["A chat button","A search bar","A new menu","An ad banner"], correct:1, difficulty:"easy", explain:"\"A search bar was added to the home screen.\"" },
+      { q:"What was reorganized for easier navigation?", options:["The settings menu","The home screen","The login page","The notifications"], correct:0, difficulty:"medium", explain:"\"The settings menu was reorganized for easier navigation.\"" },
+      { q:"By how much were load times reduced?", options:["10%","25%","40%","100%"], correct:2, difficulty:"hard", explain:"\"load times were reduced by 40%.\"" }
+    ]
+  },
+  {
+    title: "Bug Report Summary",
+    text: "Three bugs were reported by users this week. The login bug was fixed first because it affected the most people. The payment bug is still being investigated. A temporary workaround was suggested by the support team.",
+    highlight: ["were reported","was fixed","is still being investigated","was suggested"],
+    questions: [
+      { q:"How many bugs were reported this week?", options:["One","Two","Three","Four"], correct:2, difficulty:"easy", explain:"\"Three bugs were reported by users this week.\"" },
+      { q:"Why was the login bug fixed first?", options:["It was the easiest to fix","It affected the most people","It was reported first","It was the cheapest to fix"], correct:1, difficulty:"medium", explain:"\"The login bug was fixed first because it affected the most people.\"" },
+      { q:"What is the status of the payment bug?", options:["It was fixed yesterday","It is still being investigated","It was ignored","It was closed without a fix"], correct:1, difficulty:"hard", explain:"\"The payment bug is still being investigated.\" — Passive Continuous." },
+      { q:"What was suggested by the support team?", options:["A full refund","A temporary workaround","A new app version","A price discount"], correct:1, difficulty:"medium", explain:"\"A temporary workaround was suggested by the support team.\"" }
+    ]
+  },
+  {
+    title: "Server Migration",
+    text: "The old servers were shut down last weekend. All data was backed up before the migration. The new servers were configured with better security. No downtime was reported during the process.",
+    highlight: ["were shut down","was backed up","were configured","was reported"],
+    questions: [
+      { q:"What happened to the old servers?", options:["They were upgraded","They were shut down","They were sold","They were renamed"], correct:1, difficulty:"easy", explain:"\"The old servers were shut down last weekend.\"" },
+      { q:"What was done before the migration?", options:["All data was backed up","All accounts were deleted","All passwords were reset","Nothing was done"], correct:0, difficulty:"easy", explain:"\"All data was backed up before the migration.\"" },
+      { q:"How were the new servers configured?", options:["With a simpler design","With better security","With less storage","With an older system"], correct:1, difficulty:"medium", explain:"\"The new servers were configured with better security.\"" },
+      { q:"Was any downtime reported during the process?", options:["Yes, two hours","Yes, a full day","No downtime was reported","Only on mobile devices"], correct:2, difficulty:"hard", explain:"\"No downtime was reported during the process.\"" }
+    ]
+  }
+];
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let k=a.length-1;k>0;k--){ const j=Math.floor(Math.random()*(k+1)); [a[k],a[j]]=[a[j],a[k]]; }
+  return a;
+}
+
+let activeQuestions = []; // flattened {passageIndex, q...}
+let current = 0, score = 0, answered = false;
+
+const elNotesText = document.getElementById('notesText');
+const elPassageTitle = document.getElementById('passageTitle');
+const elQuestions = document.getElementById('questions');
+const elProgress = document.getElementById('progressLabel');
+const elNextBtn = document.getElementById('nextBtn');
+const elQuizBody = document.getElementById('quizBody');
+const elEnd = document.getElementById('endScreen');
+const elFinalScore = document.getElementById('finalScore');
+const elVerdict = document.getElementById('verdictText');
+
+function buildSession(){
+  const chosenPassages = shuffle(passages).slice(0, 2);
+  let flat = [];
+  chosenPassages.forEach((p)=>{
+    p.questions.forEach(q=>{
+      // shuffle options, recompute correct index
+      const optionsWithFlag = q.options.map((opt,idx)=>({opt, isCorrect: idx===q.correct}));
+      const shuffledOpts = shuffle(optionsWithFlag);
+      flat.push({
+        passage: p,
+        q: q.q,
+        options: shuffledOpts.map(o=>o.opt),
+        correct: shuffledOpts.findIndex(o=>o.isCorrect),
+        difficulty: q.difficulty,
+        explain: q.explain
+      });
+    });
+  });
+  return shuffle(flat);
+}
+
+function renderPassageFor(item){
+  elPassageTitle.textContent = item.passage.title;
+  let html = item.passage.text;
+  item.passage.highlight.forEach(h=>{
+    html = html.replace(h, '<span class="changed">'+h+'</span>');
+  });
+  elNotesText.innerHTML = html;
+}
+
+function renderQuestion(){
+  answered = false;
+  elNextBtn.disabled = true;
+  elProgress.textContent = 'Question '+(current+1)+'/'+activeQuestions.length;
+  const item = activeQuestions[current];
+  renderPassageFor(item);
+  let html = '<div class="badge-row"><p class="eyebrow" style="margin:0;">Q'+(current+1)+'</p><span class="badge '+item.difficulty+'">'+item.difficulty+'</span></div>';
+  html += '<p class="qtext">'+item.q+'</p>';
+  item.options.forEach((opt,idx)=>{
+    html += '<button class="option" data-idx="'+idx+'">'+opt+'</button>';
+  });
+  html += '<p class="explain" id="explainBox">'+item.explain+'</p>';
+  elQuestions.innerHTML = html;
+
+  document.querySelectorAll('.option').forEach(btn=>{
+    btn.addEventListener('click', ()=>selectOption(btn, parseInt(btn.dataset.idx)));
+  });
+}
+
+function selectOption(btn, idx){
+  if(answered) return;
+  answered = true;
+  const item = activeQuestions[current];
+  document.querySelectorAll('.option').forEach(b=>b.disabled=true);
+  if(idx === item.correct){
+    btn.classList.add('correct');
+    score++;
+  } else {
+    btn.classList.add('wrong');
+    document.querySelectorAll('.option')[item.correct].classList.add('correct');
+  }
+  document.getElementById('explainBox').classList.add('show');
+  elNextBtn.disabled = false;
+}
+
+function nextQuestion(){
+  current++;
+  if(current >= activeQuestions.length){ showEnd(); } else { renderQuestion(); }
+}
+
+function showEnd(){
+  elQuizBody.style.display = 'none';
+  elEnd.classList.add('show');
+  elFinalScore.textContent = score+'/'+activeQuestions.length;
+  let msg = '';
+  const pct = score/activeQuestions.length;
+  if(pct === 1) msg = "Perfect reading! You found every detail in the passive voice release notes. 🎯";
+  else if(pct >= 0.75) msg = "Almost perfect — great attention to detail.";
+  else msg = "Good try — read the release notes again and look for the passive voice clues.";
+  elVerdict.textContent = msg;
+}
+
+function restart(){
+  activeQuestions = buildSession();
+  current = 0; score = 0;
+  elQuizBody.style.display = 'block';
+  elEnd.classList.remove('show');
+  renderQuestion();
+}
+
+elNextBtn.addEventListener('click', nextQuestion);
+document.getElementById('restartBtn').addEventListener('click', restart);
+
+restart();
+</script>
+</body>
+</html>
