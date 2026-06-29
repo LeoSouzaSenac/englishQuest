@@ -209,3 +209,9 @@ a { text-decoration: none; color: inherit; }
   .track-card { padding: 24px 20px; }
   .portal-logo { font-size: 2rem; }
 }
+
+/* JS card hover */
+.track-card.active[data-color="js"]:hover {
+  border-color: var(--clr-js);
+  box-shadow: 0 14px 40px rgba(255,209,102,.1);
+}

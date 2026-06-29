@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>JSQuest — Aprenda JavaScript</title>
+<link rel="shortcut icon" href="https://cdn-icons-png.flaticon.com/128/5968/5968292.png" type="image/x-icon"/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800;900&family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg: #0a0a0f;
+  --surface: #13131a;
+  --surface2: #1a1a24;
+  --surface3: #21212e;
+  --border: #2a2a3a;
+  --text: #eeeef5;
+  --muted: #6b6b82;
+  --accent: #00e5ff;
+  --accent2: #ff6b9d;
+  --accent3: #7c6ffd;
+  --accent4: #ffd166;
+  --green: #22c55e;
+  --red: #ef4444;
+  --orange: #f97316;
+  --radius: 16px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+code,pre,.mono{font-family:'JetBrains Mono',monospace}
+
+/* NAV */
+nav{display:flex;align-items:center;justify-content:space-between;padding:18px 40px;border-bottom:1px solid var(--border);position:sticky;top:0;background:rgba(10,10,15,0.92);backdrop-filter:blur(14px);z-index:100}
+.logo{font-family:'Syne',sans-serif;font-weight:900;font-size:1.5rem;background:linear-gradient(135deg,var(--accent),var(--accent3));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.nav-xp{background:var(--surface2);border:1px solid var(--border);border-radius:50px;padding:8px 20px;font-size:.85rem;display:flex;align-items:center;gap:8px}
+.xp-val{font-family:'Syne',sans-serif;font-weight:800;color:var(--accent4)}
+
+/* TABS */
+.tabs{display:flex;gap:8px;padding:22px 40px 0;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{font-family:'Syne',sans-serif;font-weight:700;font-size:.82rem;padding:10px 20px;border-radius:50px;border:1.5px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;white-space:nowrap;transition:all .2s}
+.tab:hover{border-color:var(--accent);color:var(--text)}
+.tab.active{background:var(--accent);border-color:var(--accent);color:#000}
+
+/* PAGES */
+.page{display:none;padding:32px 40px 80px}
+.page.active{display:block}
+
+/* HERO */
+.hero{text-align:center;padding:50px 0 44px;position:relative}
+.hero h1{font-family:'Syne',sans-serif;font-size:clamp(2.8rem,7vw,5.5rem);font-weight:900;line-height:1;margin-bottom:18px}
+.hero h1 span{background:linear-gradient(135deg,var(--accent),var(--accent3));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero p{color:var(--muted);font-size:1.05rem;max-width:460px;margin:0 auto 36px}
+.floating-code{position:absolute;font-family:'JetBrains Mono',monospace;font-size:.75rem;color:var(--muted);opacity:.35;pointer-events:none;animation:floatUp 8s ease-in-out infinite}
+@keyframes floatUp{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+
+/* CONCEPT CARDS */
+.concept-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px;margin-top:28px}
+.concept-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);padding:22px;transition:transform .2s,border-color .2s;cursor:default}
+.concept-card:hover{transform:translateY(-4px)}
+.concept-card.vars{border-top:3px solid var(--accent)}
+.concept-card.funcs{border-top:3px solid var(--accent2)}
+.concept-card.loops{border-top:3px solid var(--accent3)}
+.concept-card.arrays{border-top:3px solid var(--accent4)}
+.concept-card h3{font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;margin-bottom:8px}
+.concept-card .badge{display:inline-block;font-size:.68rem;font-weight:700;padding:3px 10px;border-radius:20px;margin-bottom:10px}
+.vars .badge{background:rgba(0,229,255,.12);color:var(--accent)}
+.funcs .badge{background:rgba(255,107,157,.12);color:var(--accent2)}
+.loops .badge{background:rgba(124,111,253,.12);color:var(--accent3)}
+.arrays .badge{background:rgba(255,209,102,.12);color:var(--accent4)}
+.concept-card p{color:var(--muted);font-size:.82rem;margin-bottom:12px}
+.code-snippet{background:var(--surface2);border-radius:8px;padding:10px 14px;font-family:'JetBrains Mono',monospace;font-size:.75rem;color:var(--accent);border:1px solid var(--border)}
+.code-snippet .kw{color:var(--accent3)}
+.code-snippet .str{color:var(--accent4)}
+.code-snippet .num{color:var(--accent2)}
+.code-snippet .fn{color:var(--accent2)}
+.code-snippet .cmt{color:var(--muted)}
+
+/* GAME GRID */
+.game-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:18px;margin-top:8px}
+.game-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);padding:26px}
+.game-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1.15rem;margin-bottom:6px;display:flex;align-items:center;gap:10px}
+.game-icon{font-size:1.3rem}
+.game-desc{color:var(--muted);font-size:.83rem;margin-bottom:18px;line-height:1.5}
+
+/* BUTTONS */
+.btn{font-family:'Syne',sans-serif;font-weight:700;font-size:.88rem;padding:12px 22px;border-radius:50px;border:1.5px solid transparent;cursor:pointer;transition:all .15s}
+.btn-primary{background:var(--accent);color:#000}
+.btn-primary:hover{opacity:.85;transform:scale(1.03)}
+.btn-outline{background:transparent;border-color:var(--border);color:var(--text)}
+.btn-outline:hover{border-color:var(--accent);color:var(--accent)}
+.btn-sm{padding:8px 16px;font-size:.78rem}
+.btn-danger{background:var(--red);color:#fff}
+
+/* SECTION TITLE */
+.section-title{font-family:'Syne',sans-serif;font-weight:900;font-size:1.5rem;margin-bottom:20px}
+.section-title span{color:var(--muted);font-weight:400;font-size:.95rem;margin-left:12px}
+
+/* ══════ ROBOCODE ══════ */
+#page-robo{}
+.robo-layout{display:grid;grid-template-columns:1fr 340px;gap:20px;align-items:start}
+.robo-arena-wrap{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);padding:20px}
+.robo-arena-title{font-family:'Syne',sans-serif;font-weight:800;font-size:.9rem;margin-bottom:14px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.robo-arena{display:grid;grid-template-columns:repeat(8,1fr);gap:3px;background:var(--surface2);border-radius:12px;padding:10px;position:relative}
+.robo-cell{aspect-ratio:1;background:var(--surface3);border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:.7rem;color:var(--border);transition:background .2s;position:relative}
+.robo-cell.trail{background:rgba(0,229,255,.08);border:1px solid rgba(0,229,255,.15)}
+.robo-cell.target{background:rgba(255,209,102,.12);border:1px solid rgba(255,209,102,.3);font-size:1rem}
+.robo-cell.obstacle{background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.25)}
+.robo-cell.robot{}
+.robo-bot{font-size:1.6rem;transition:all .3s cubic-bezier(.34,1.56,.64,1);display:inline-block}
+.robo-bot.moving{animation:botBounce .3s ease}
+@keyframes botBounce{0%,100%{transform:scale(1)}50%{transform:scale(1.3) rotate(10deg)}}
+
+.robo-panel{display:flex;flex-direction:column;gap:14px}
+.robo-mission{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);padding:20px}
+.robo-mission h3{font-family:'Syne',sans-serif;font-weight:800;font-size:.95rem;margin-bottom:6px;color:var(--accent4)}
+.robo-mission p{font-size:.83rem;color:var(--muted);line-height:1.5}
+.mission-progress{display:flex;gap:6px;margin-top:12px;flex-wrap:wrap}
+.mission-dot{width:24px;height:24px;border-radius:50%;background:var(--surface2);border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.7rem}
+.mission-dot.done{background:rgba(34,197,94,.2);border-color:var(--green);color:var(--green)}
+.mission-dot.active{background:rgba(0,229,255,.1);border-color:var(--accent);color:var(--accent);animation:pulse 1.5s ease infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,229,255,.4)}50%{box-shadow:0 0 0 8px rgba(0,229,255,0)}}
+
+.robo-editor{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);padding:20px}
+.editor-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.editor-title{font-family:'Syne',sans-serif;font-weight:800;font-size:.88rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.code-editor{width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:10px;padding:14px;color:var(--accent);font-family:'JetBrains Mono',monospace;font-size:.82rem;outline:none;resize:vertical;min-height:130px;transition:border-color .15s;line-height:1.6}
+.code-editor:focus{border-color:var(--accent)}
+.editor-actions{display:flex;gap:8px;margin-top:10px}
+
+.robo-log{background:var(--surface2);border-radius:10px;padding:12px 14px;min-height:60px;font-family:'JetBrains Mono',monospace;font-size:.75rem;line-height:1.7;max-height:120px;overflow-y:auto}
+.log-ok{color:var(--green)}
+.log-err{color:var(--red)}
+.log-info{color:var(--muted)}
+
+.hint-box{background:rgba(0,229,255,.05);border:1.5px solid rgba(0,229,255,.2);border-radius:10px;padding:14px 16px;font-size:.8rem;line-height:1.6}
+.hint-box strong{color:var(--accent);font-family:'Syne',sans-serif}
+
+/* ══════ DRAG BLOCKS ══════ */
+.blocks-layout{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.blocks-palette{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);padding:20px}
+.palette-title{font-family:'Syne',sans-serif;font-weight:800;font-size:.88rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:14px}
+.block-pool{display:flex;flex-direction:column;gap:8px}
+.code-block{background:var(--surface2);border:1.5px solid var(--border);border-radius:10px;padding:10px 14px;font-family:'JetBrains Mono',monospace;font-size:.8rem;cursor:grab;user-select:none;transition:all .15s;color:var(--text)}
+.code-block:hover{border-color:var(--accent3);background:rgba(124,111,253,.08);transform:translateX(3px)}
+.code-block.dragging{opacity:.4}
+.code-block.kw-block{border-left:3px solid var(--accent3);color:var(--accent3)}
+.code-block.fn-block{border-left:3px solid var(--accent2);color:var(--accent2)}
+.code-block.val-block{border-left:3px solid var(--accent4);color:var(--accent4)}
+.code-block.op-block{border-left:3px solid var(--accent);color:var(--accent)}
+
+.blocks-drop-zone{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);padding:20px}
+.drop-title{font-family:'Syne',sans-serif;font-weight:800;font-size:.88rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+.drop-challenge{font-size:.85rem;color:var(--text);margin-bottom:16px;background:var(--surface2);border-radius:8px;padding:10px 14px;border-left:3px solid var(--accent4)}
+.drop-area{background:var(--surface2);border:2px dashed var(--border);border-radius:12px;min-height:180px;padding:12px;display:flex;flex-direction:column;gap:8px;transition:border-color .15s;margin-bottom:14px}
+.drop-area.drag-over{border-color:var(--accent);background:rgba(0,229,255,.04)}
+.drop-area .code-block{cursor:pointer}
+.drop-area .code-block:hover{border-color:var(--red);color:var(--red);transform:none}
+.drop-placeholder{color:var(--muted);font-size:.83rem;font-style:italic;padding:8px;text-align:center;pointer-events:none}
+.drop-result{background:var(--surface2);border-radius:10px;padding:12px 14px;font-family:'JetBrains Mono',monospace;font-size:.78rem;min-height:40px;color:var(--muted);border:1px solid var(--border)}
+.drop-result.success{border-color:var(--green);color:var(--green)}
+.drop-result.error{border-color:var(--red);color:var(--red)}
+
+/* ══════ BUG HUNTER ══════ */
+.bug-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);padding:24px;max-width:640px}
+.bug-stats{display:flex;gap:16px;margin-bottom:16px;font-size:.83rem;color:var(--muted)}
+.bug-stats span{font-weight:700;color:var(--text);font-family:'Syne',sans-serif}
+.bug-description{font-size:.88rem;color:var(--muted);margin-bottom:14px;padding:10px 14px;background:var(--surface2);border-radius:8px;border-left:3px solid var(--accent2)}
+.bug-code{background:var(--surface2);border-radius:12px;padding:16px;font-family:'JetBrains Mono',monospace;font-size:.82rem;margin-bottom:14px;border:1.5px solid var(--border);line-height:1.8;white-space:pre}
+.bug-line{display:block;padding:2px 0}
+.bug-line.buggy{background:rgba(239,68,68,.1);border-radius:4px;padding:2px 6px;color:var(--red);text-decoration:underline wavy var(--red)}
+.bug-input{width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:10px;padding:12px 16px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:.85rem;outline:none;transition:border-color .15s;margin-bottom:10px}
+.bug-input:focus{border-color:var(--accent2)}
+.bug-input.correct{border-color:var(--green)}
+.bug-input.wrong{border-color:var(--red)}
+.bug-feedback{margin-top:12px;padding:12px 16px;border-radius:10px;font-size:.85rem;font-weight:500;display:none}
+.bug-feedback.correct{background:rgba(34,197,94,.1);color:var(--green);border:1px solid rgba(34,197,94,.25)}
+.bug-feedback.wrong{background:rgba(239,68,68,.1);color:var(--red);border:1px solid rgba(239,68,68,.25)}
+
+/* ══════ SPEED TYPING ══════ */
+.speed-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);padding:24px;max-width:580px}
+.speed-hud{display:flex;justify-content:space-between;margin-bottom:14px;font-size:.83rem;color:var(--muted)}
+.speed-hud span{font-weight:700;color:var(--text);font-family:'Syne',sans-serif}
+.speed-bar-wrap{height:5px;background:var(--border);border-radius:3px;margin-bottom:20px;overflow:hidden}
+.speed-bar{height:100%;background:var(--accent);border-radius:3px;transition:width .1s linear}
+.speed-target{background:var(--surface2);border-radius:10px;padding:18px 20px;font-family:'JetBrains Mono',monospace;font-size:.88rem;line-height:1.8;margin-bottom:14px;border:1.5px solid var(--border);position:relative;min-height:70px}
+.char{display:inline}
+.char.typed-ok{color:var(--green)}
+.char.typed-err{color:var(--red);background:rgba(239,68,68,.15);border-radius:2px}
+.char.cursor{border-left:2px solid var(--accent);animation:blink .8s step-end infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+.speed-input-field{width:100%;background:var(--surface2);border:2px solid var(--border);border-radius:10px;padding:14px 18px;font-family:'JetBrains Mono',monospace;font-size:.9rem;color:var(--text);outline:none;text-align:left;transition:border-color .15s}
+.speed-input-field:focus{border-color:var(--accent)}
+.speed-score-big{text-align:center;padding:30px 0;display:none}
+.speed-score-big .big-num{font-family:'Syne',sans-serif;font-size:4rem;font-weight:900;color:var(--accent4)}
+.speed-score-big p{color:var(--muted);margin-top:6px}
+
+/* ══════ QUIZ ══════ */
+.quiz-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);padding:24px;max-width:600px}
+.quiz-stats{display:flex;gap:14px;margin-bottom:14px;font-size:.83rem;color:var(--muted)}
+.quiz-stats span{font-weight:700;color:var(--text);font-family:'Syne',sans-serif}
+.quiz-question{background:var(--surface2);border-radius:10px;padding:18px;font-size:1rem;font-weight:500;margin-bottom:14px;line-height:1.5}
+.quiz-question code{background:var(--bg);padding:2px 6px;border-radius:4px;color:var(--accent);font-size:.9em}
+.quiz-options{display:flex;flex-direction:column;gap:8px}
+.quiz-opt{background:var(--surface2);border:1.5px solid var(--border);border-radius:10px;padding:12px 16px;text-align:left;color:var(--text);cursor:pointer;font-size:.88rem;font-family:'DM Sans',sans-serif;transition:all .15s}
+.quiz-opt:hover:not(:disabled){border-color:var(--accent);background:rgba(0,229,255,.05)}
+.quiz-opt.correct{border-color:var(--green);background:rgba(34,197,94,.1);color:var(--green)}
+.quiz-opt.wrong{border-color:var(--red);background:rgba(239,68,68,.1);color:var(--red)}
+.quiz-opt:disabled{cursor:default}
+.quiz-opt code{font-family:'JetBrains Mono',monospace;font-size:.85em;background:var(--bg);padding:1px 5px;border-radius:3px;color:var(--accent4)}
+.quiz-feedback{margin-top:12px;padding:12px 16px;border-radius:10px;font-size:.85rem;font-weight:500;display:none}
+.quiz-feedback.correct{background:rgba(34,197,94,.1);color:var(--green);border:1px solid rgba(34,197,94,.25)}
+.quiz-feedback.wrong{background:rgba(239,68,68,.1);color:var(--red);border:1px solid rgba(239,68,68,.25)}
+
+/* ══════ PROGRESS ══════ */
+.prog-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:16px;margin-bottom:28px}
+.prog-stat{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);padding:22px}
+.prog-stat .lbl{font-size:.78rem;color:var(--muted);margin-bottom:6px}
+.prog-stat .val{font-family:'Syne',sans-serif;font-size:2.6rem;font-weight:900}
+.prog-bar-item{margin-bottom:14px}
+.prog-bar-label{display:flex;justify-content:space-between;font-size:.83rem;margin-bottom:6px}
+.prog-bar-track{height:7px;background:var(--border);border-radius:4px;overflow:hidden}
+.prog-bar-fill{height:100%;border-radius:4px;transition:width 1.2s cubic-bezier(.34,1.56,.64,1)}
+
+/* TOAST */
+.toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--surface2);border:1.5px solid var(--border);border-radius:50px;padding:12px 28px;font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem;z-index:999;transition:transform .3s cubic-bezier(.34,1.56,.64,1);pointer-events:none}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.toast.xp{color:var(--accent4);border-color:var(--accent4)}
+.toast.ok{color:var(--green);border-color:var(--green)}
+.toast.err{color:var(--red);border-color:var(--red)}
+
+/* SPARKLES */
+.sparkle-container{position:fixed;inset:0;pointer-events:none;z-index:300;overflow:hidden}
+.sparkle{position:absolute;width:7px;height:7px;border-radius:50%;animation:sparkleUp 1.1s ease-out forwards}
+@keyframes sparkleUp{0%{transform:translateY(0) scale(1);opacity:1}100%{transform:translateY(-100px) scale(0);opacity:0}}
+
+@media(max-width:900px){.robo-layout,.blocks-layout{grid-template-columns:1fr}}
+@media(max-width:600px){nav,.tabs,.page{padding-left:16px;padding-right:16px}.hero h1{font-size:2.4rem}}
+</style>
+</head>
+<body>
+
+<nav>
+  <div style="display:flex;align-items:center;gap:16px">
+    <a href="../index.html" style="font-family:'Syne',sans-serif;font-weight:700;font-size:.82rem;color:var(--muted);text-decoration:none;border:1.5px solid var(--border);border-radius:50px;padding:6px 14px;transition:border-color .2s,color .2s" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">← EduQuest</a>
+    <div class="logo">JSQuest</div>
+  </div>
+  <div class="nav-xp">⚡ <span class="xp-val" id="xpDisplay">0</span> XP</div>
+</nav>
+
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('home')">🏠 Home</button>
+  <button class="tab" onclick="switchTab('robo')">🤖 RoboCode</button>
+  <button class="tab" onclick="switchTab('blocks')">🧩 Drag Blocks</button>
+  <button class="tab" onclick="switchTab('bug')">🐛 Bug Hunter</button>
+  <button class="tab" onclick="switchTab('quiz')">🎯 Quiz JS</button>
+  <button class="tab" onclick="switchTab('speed')">⚡ Speed Code</button>
+  <button class="tab" onclick="switchTab('progress')">📊 Progress</button>
+</div>
+
+<!-- ═══════════ HOME ═══════════ -->
+<div class="page active" id="page-home">
+  <div class="hero">
+    <span class="floating-code" style="top:10%;left:5%">const x = 42;</span>
+    <span class="floating-code" style="top:20%;right:8%;animation-delay:2s">function greet() {}</span>
+    <span class="floating-code" style="bottom:15%;left:10%;animation-delay:4s">for (let i=0; i&lt;5; i++)</span>
+    <span class="floating-code" style="bottom:25%;right:6%;animation-delay:1s">[1,2,3].map(n => n*2)</span>
+    <h1>Aprenda<br/><span>JavaScript</span></h1>
+    <p>5 mini-jogos interativos para dominar os fundamentos do JS. Programe um robô, caça bugs, e muito mais!</p>
+  </div>
+
+  <div class="concept-grid">
+    <div class="concept-card vars">
+      <div class="badge">Variáveis</div>
+      <h3>let, const, var</h3>
+      <p>Guardam valores que seu programa usa</p>
+      <div class="code-snippet"><span class="kw">let</span> nome = <span class="str">"Ana"</span>;<br/><span class="kw">const</span> idade = <span class="num">20</span>;<br/><span class="cmt">// nome pode mudar</span><br/><span class="cmt">// idade não muda</span></div>
+    </div>
+    <div class="concept-card funcs">
+      <div class="badge">Funções</div>
+      <h3>function / arrow</h3>
+      <p>Blocos de código reutilizáveis</p>
+      <div class="code-snippet"><span class="kw">function</span> <span class="fn">somar</span>(a, b) {<br/>  <span class="kw">return</span> a + b;<br/>}<br/><span class="fn">somar</span>(<span class="num">3</span>, <span class="num">4</span>) <span class="cmt">// → 7</span></div>
+    </div>
+    <div class="concept-card loops">
+      <div class="badge">Loops</div>
+      <h3>for, while</h3>
+      <p>Repita ações quantas vezes quiser</p>
+      <div class="code-snippet"><span class="kw">for</span> (<span class="kw">let</span> i = <span class="num">0</span>; i &lt; <span class="num">5</span>; i++) {<br/>  console.<span class="fn">log</span>(i);<br/>}<span class="cmt"> // 0,1,2,3,4</span></div>
+    </div>
+    <div class="concept-card arrays">
+      <div class="badge">Arrays</div>
+      <h3>Listas de valores</h3>
+      <p>Coleções ordenadas de elementos</p>
+      <div class="code-snippet"><span class="kw">const</span> nums = [<span class="num">1</span>,<span class="num">2</span>,<span class="num">3</span>];<br/>nums.<span class="fn">push</span>(<span class="num">4</span>);<br/>nums.<span class="fn">map</span>(n => n * <span class="num">2</span>);<br/><span class="cmt">// [2,4,6,8]</span></div>
+    </div>
+  </div>
+
+  <div style="margin-top:44px">
+    <div class="section-title">Mini Games <span>Escolha um jogo para começar</span></div>
+    <div class="game-grid">
+      <div class="game-card" style="border-color:rgba(0,229,255,.3);background:linear-gradient(135deg,rgba(0,229,255,.04),var(--surface))">
+        <div class="game-title"><span class="game-icon">🤖</span>RoboCode</div>
+        <p class="game-desc">Escreva comandos JavaScript reais para mover um robô por um labirinto animado. Veja seu código ganhando vida!</p>
+        <button class="btn btn-primary" onclick="switchTab('robo')">Jogar →</button>
+      </div>
+      <div class="game-card" style="border-color:rgba(124,111,253,.3);background:linear-gradient(135deg,rgba(124,111,253,.04),var(--surface))">
+        <div class="game-title"><span class="game-icon">🧩</span>Drag Blocks</div>
+        <p class="game-desc">Arraste blocos de código para montar funções e loops corretos. Tipo Scratch, mas com JS de verdade!</p>
+        <button class="btn btn-primary" onclick="switchTab('blocks')">Jogar →</button>
+      </div>
+      <div class="game-card" style="border-color:rgba(255,107,157,.3);background:linear-gradient(135deg,rgba(255,107,157,.04),var(--surface))">
+        <div class="game-title"><span class="game-icon">🐛</span>Bug Hunter</div>
+        <p class="game-desc">Encontre e corrija o bug escondido em cada trecho de código. Nível de dificuldade progressivo!</p>
+        <button class="btn btn-primary" onclick="switchTab('bug')">Jogar →</button>
+      </div>
+      <div class="game-card">
+        <div class="game-title"><span class="game-icon">🎯</span>Quiz JS</div>
+        <p class="game-desc">Teste seus conhecimentos com questões de múltipla escolha sobre JavaScript. Com explicações detalhadas!</p>
+        <button class="btn btn-primary" onclick="switchTab('quiz')">Jogar →</button>
+      </div>
+      <div class="game-card" style="border-color:rgba(255,209,102,.3);background:linear-gradient(135deg,rgba(255,209,102,.04),var(--surface))">
+        <div class="game-title"><span class="game-icon">⚡</span>Speed Code</div>
+        <p class="game-desc">Digite trechos de código o mais rápido possível contra o relógio. Mede palavras por minuto!</p>
+        <button class="btn btn-primary" onclick="switchTab('speed')">Jogar →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ ROBOCODE ═══════════ -->
+<div class="page" id="page-robo" style="padding:0">
+  <iframe
+    src="robotQuest.html"
+    title="RoboCode"
+    style="width:100%;height:calc(100vh - 110px);border:none;display:block;"
+    loading="lazy"
+  ></iframe>
+</div>
+
+<!-- ═══════════ DRAG BLOCKS ═══════════ -->
+<div class="page" id="page-blocks">
+  <div class="section-title">🧩 Drag Blocks <span>Monte o código arrastando os blocos</span></div>
+  <div class="blocks-layout">
+    <div class="blocks-palette">
+      <div class="palette-title">Blocos de Código</div>
+      <div class="block-pool" id="blockPool"></div>
+    </div>
+    <div class="blocks-drop-zone">
+      <div class="drop-title">Sua Solução</div>
+      <div class="drop-challenge" id="blockChallenge">Carregando desafio...</div>
+      <div class="drop-area" id="dropArea" ondragover="event.preventDefault();this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')" ondrop="onDrop(event)">
+        <span class="drop-placeholder">Arraste os blocos aqui em ordem...</span>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+        <button class="btn btn-primary btn-sm" onclick="checkBlocks()">Verificar ✓</button>
+        <button class="btn btn-outline btn-sm" onclick="clearDropArea()">Limpar</button>
+        <button class="btn btn-outline btn-sm" onclick="nextBlockChallenge()">Próximo →</button>
+      </div>
+      <div class="drop-result" id="blockResult">// resultado aparece aqui...</div>
+      <div style="margin-top:10px;font-size:.78rem;color:var(--muted)">Desafio <span id="blockNum">1</span>/6 · Acertos: <span id="blockScore">0</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ BUG HUNTER ═══════════ -->
+<div class="page" id="page-bug">
+  <div class="section-title">🐛 Bug Hunter <span>Encontre e corrija o erro!</span></div>
+  <div class="bug-card">
+    <div class="bug-stats">Desafio <span id="bugNum">1</span>/10 &nbsp;|&nbsp; Acertos: <span id="bugScore">0</span> &nbsp;|&nbsp; XP: <span id="bugXP">0</span></div>
+    <div class="bug-description" id="bugDesc">Dica: encontre o bug no código abaixo.</div>
+    <pre class="bug-code" id="bugCode"></pre>
+    <input type="text" class="bug-input" id="bugInput" placeholder="Digite a linha corrigida..."/>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-primary btn-sm" onclick="checkBug()">Verificar ✓</button>
+      <button class="btn btn-outline btn-sm" onclick="showBugHint()">💡 Dica</button>
+      <button class="btn btn-outline btn-sm" onclick="skipBug()">Pular →</button>
+      <button class="btn btn-outline btn-sm" onclick="resetBugs()">Reiniciar</button>
+    </div>
+    <div class="bug-feedback" id="bugFeedback"></div>
+  </div>
+</div>
+
+<!-- ═══════════ QUIZ ═══════════ -->
+<div class="page" id="page-quiz">
+  <div class="section-title">🎯 Quiz JavaScript</div>
+  <div class="quiz-card">
+    <div class="quiz-stats">Pergunta <span id="qNum">1</span>/15 &nbsp;|&nbsp; Acertos: <span id="qScore">0</span> &nbsp;|&nbsp; 🔥 Streak: <span id="qStreak">0</span></div>
+    <div class="quiz-question" id="quizQuestion">Carregando...</div>
+    <div class="quiz-options" id="quizOptions"></div>
+    <div class="quiz-feedback" id="quizFeedback"></div>
+    <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-primary btn-sm" id="qNextBtn" onclick="nextQuestion()" style="display:none">Próxima →</button>
+      <button class="btn btn-outline btn-sm" onclick="resetQuiz()">Reiniciar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ SPEED CODE ═══════════ -->
+<div class="page" id="page-speed">
+  <div class="section-title">⚡ Speed Code <span>Velocidade de digitação de código</span></div>
+  <div class="speed-card">
+    <div class="speed-hud">
+      <div>WPM: <span id="speedWPM">0</span></div>
+      <div>Precisão: <span id="speedAcc">100%</span></div>
+      <div>Tempo: <span id="speedTime">60</span>s</div>
+    </div>
+    <div class="speed-bar-wrap"><div class="speed-bar" id="speedBar" style="width:100%"></div></div>
+    <div class="speed-target" id="speedTarget"></div>
+    <input type="text" class="speed-input-field" id="speedInput" placeholder="Aguardando início..." disabled autocomplete="off" autocorrect="off" spellcheck="false"/>
+    <div class="speed-score-big" id="speedResult">
+      <div class="big-num" id="speedFinalWPM">0</div>
+      <p>palavras por minuto</p>
+      <p style="font-size:.82rem;color:var(--muted);margin-top:4px" id="speedFinalAcc"></p>
+    </div>
+    <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap;justify-content:center" id="speedControls">
+      <button class="btn btn-primary" id="speedStartBtn" onclick="startSpeed()">▶ Iniciar</button>
+    </div>
+    <div style="margin-top:14px;font-size:.8rem;color:var(--muted)">Digite o código exatamente como mostrado. Cada caractere conta!</div>
+  </div>
+</div>
+
+<!-- ═══════════ PROGRESS ═══════════ -->
+<div class="page" id="page-progress">
+  <div class="section-title">📊 Progresso</div>
+  <div class="prog-grid">
+    <div class="prog-stat"><div class="lbl">Total XP</div><div class="val" id="statXP" style="color:var(--accent4)">0</div></div>
+    <div class="prog-stat"><div class="lbl">Questões Respondidas</div><div class="val" id="statQ">0</div></div>
+    <div class="prog-stat"><div class="lbl">Taxa de Acerto</div><div class="val" id="statAcc">—</div></div>
+    <div class="prog-stat"><div class="lbl">Missões Robô</div><div class="val" id="statMissions" style="color:var(--accent)">0</div></div>
+  </div>
+  <div class="section-title" style="font-size:1.1rem">Desempenho por Módulo</div>
+  <div id="progressBars" style="max-width:500px"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+<div class="sparkle-container" id="sparkles"></div>
+
+<script>
+// ═══════════════════════════
+//  STATE
+// ═══════════════════════════
+const state = {
+  xp: 0,
+  questionsAnswered: 0,
+  questionsCorrect: 0,
+  missionsCompleted: 0,
+  moduleScores: { robo: 0, blocks: 0, bug: 0, quiz: 0, speed: 0 }
+};
+
+function addXP(n, label) {
+  state.xp += n;
+  document.getElementById('xpDisplay').textContent = state.xp;
+  showToast(`+${n} XP ${label || ''}`, 'xp');
+  if (n >= 30) spawnSparkles();
+}
+
+function switchTab(id) {
+  document.querySelectorAll('.tab').forEach((t,i) => {
+    const ids = ['home','robo','blocks','bug','quiz','speed','progress'];
+    t.classList.toggle('active', ids[i] === id);
+  });
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  if (id === 'progress') updateProgress();
+}
+
+function showToast(msg, cls) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show ' + (cls || '');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+function spawnSparkles() {
+  const container = document.getElementById('sparkles');
+  const colors = ['#00e5ff','#ff6b9d','#7c6ffd','#ffd166','#22c55e'];
+  for (let i = 0; i < 18; i++) {
+    const s = document.createElement('div');
+    s.className = 'sparkle';
+    s.style.cssText = `left:${20+Math.random()*60}%;bottom:${10+Math.random()*30}%;background:${colors[Math.random()*colors.length|0]};animation-delay:${Math.random()*0.5}s;animation-duration:${0.8+Math.random()*0.6}s`;
+    container.appendChild(s);
+    setTimeout(() => s.remove(), 1500);
+  }
+}
+
+// ═══════════════════════════
+//  DRAG BLOCKS
+// ═══════════════════════════
+const blockChallenges = [
+  {
+    desc: 'Monte uma variável que guarda a string "JavaScript"',
+    solution: ['let linguagem =', '"JavaScript"', ';'],
+    blocks: ['let linguagem =', '"JavaScript"', ';', 'const x =', 'function()', '=> {}'],
+    types: ['kw-block','val-block','op-block','kw-block','fn-block','fn-block']
+  },
+  {
+    desc: 'Crie um loop for que roda de 0 até 4',
+    solution: ['for (let i = 0;', 'i < 5;', 'i++)', '{ }'],
+    blocks: ['for (let i = 0;', 'i < 5;', 'i++)', '{ }', 'while (true)', 'i--'],
+    types: ['kw-block','op-block','op-block','kw-block','kw-block','op-block']
+  },
+  {
+    desc: 'Declare uma função que retorna a soma de a e b',
+    solution: ['function somar(a, b)', '{', 'return a + b;', '}'],
+    blocks: ['function somar(a, b)', '{', 'return a + b;', '}', 'console.log()', 'let a = 0;'],
+    types: ['fn-block','kw-block','op-block','kw-block','fn-block','val-block']
+  },
+  {
+    desc: 'Crie um array com os números 1, 2, 3',
+    solution: ['const numeros =', '[1, 2, 3]', ';'],
+    blocks: ['const numeros =', '[1, 2, 3]', ';', '"1, 2, 3"', 'let numeros', '(1, 2, 3)'],
+    types: ['kw-block','val-block','op-block','val-block','kw-block','op-block']
+  },
+  {
+    desc: 'Use map() para dobrar cada número do array nums',
+    solution: ['nums.map(', 'n =>',  'n * 2', ')'],
+    blocks: ['nums.map(', 'n =>', 'n * 2', ')', 'nums.filter(', 'n + 2'],
+    types: ['fn-block','kw-block','op-block','op-block','fn-block','op-block']
+  },
+  {
+    desc: 'Condição: se x for maior que 10, execute o bloco',
+    solution: ['if (x > 10)', '{', '// código aqui', '}'],
+    blocks: ['if (x > 10)', '{', '// código aqui', '}', 'else if', 'x === 10'],
+    types: ['kw-block','kw-block','val-block','kw-block','kw-block','op-block']
+  }
+];
+
+let blockIdx = 0, blockScore = 0;
+let droppedBlocks = [];
+
+function loadBlockChallenge() {
+  const ch = blockChallenges[blockIdx];
+  document.getElementById('blockChallenge').textContent = '🎯 Desafio: ' + ch.desc;
+  document.getElementById('blockNum').textContent = blockIdx + 1;
+  document.getElementById('blockScore').textContent = blockScore;
+  document.getElementById('blockResult').textContent = '// resultado aparece aqui...';
+  document.getElementById('blockResult').className = 'drop-result';
+  droppedBlocks = [];
+
+  const pool = document.getElementById('blockPool');
+  pool.innerHTML = '';
+  const shuffled = ch.blocks.map((b,i) => ({b, t: ch.types[i]})).sort(() => Math.random() - .5);
+  shuffled.forEach(({b, t}) => {
+    const el = document.createElement('div');
+    el.className = 'code-block ' + t;
+    el.textContent = b;
+    el.draggable = true;
+    el.addEventListener('dragstart', e => { e.dataTransfer.setData('text', b); el.classList.add('dragging'); });
+    el.addEventListener('dragend', () => el.classList.remove('dragging'));
+    pool.appendChild(el);
+  });
+
+  clearDropArea();
+}
+
+function onDrop(e) {
+  e.preventDefault();
+  const area = document.getElementById('dropArea');
+  area.classList.remove('drag-over');
+  const val = e.dataTransfer.getData('text');
+  if (!val || droppedBlocks.includes(val)) return;
+  droppedBlocks.push(val);
+
+  area.innerHTML = '';
+  droppedBlocks.forEach(b => {
+    const el = document.createElement('div');
+    const ch = blockChallenges[blockIdx];
+    const idx = ch.blocks.indexOf(b);
+    el.className = 'code-block ' + (idx >= 0 ? ch.types[idx] : '') + ' placed';
+    el.textContent = b;
+    el.onclick = () => { droppedBlocks = droppedBlocks.filter(x => x !== b); renderDropArea(); };
+    area.appendChild(el);
+  });
+}
+
+function renderDropArea() {
+  const area = document.getElementById('dropArea');
+  area.innerHTML = '';
+  if (droppedBlocks.length === 0) {
+    area.innerHTML = '<span class="drop-placeholder">Arraste os blocos aqui em ordem...</span>';
+    return;
+  }
+  const ch = blockChallenges[blockIdx];
+  droppedBlocks.forEach(b => {
+    const el = document.createElement('div');
+    const idx = ch.blocks.indexOf(b);
+    el.className = 'code-block ' + (idx >= 0 ? ch.types[idx] : '') + ' placed';
+    el.textContent = b;
+    el.onclick = () => { droppedBlocks = droppedBlocks.filter(x => x !== b); renderDropArea(); };
+    area.appendChild(el);
+  });
+}
+
+function clearDropArea() {
+  droppedBlocks = [];
+  const area = document.getElementById('dropArea');
+  area.innerHTML = '<span class="drop-placeholder">Arraste os blocos aqui em ordem...</span>';
+}
+
+function checkBlocks() {
+  const ch = blockChallenges[blockIdx];
+  const result = document.getElementById('blockResult');
+  if (JSON.stringify(droppedBlocks) === JSON.stringify(ch.solution)) {
+    result.textContent = '✓ Correto! ' + ch.solution.join(' ');
+    result.className = 'drop-result success';
+    blockScore++;
+    state.moduleScores.blocks++;
+    state.questionsAnswered++;
+    state.questionsCorrect++;
+    document.getElementById('blockScore').textContent = blockScore;
+    addXP(20, '🧩 Bloco!');
+    spawnSparkles();
+  } else {
+    result.textContent = '✗ Ordem incorreta. Tente novamente!';
+    result.className = 'drop-result error';
+    state.questionsAnswered++;
+    showToast('Ordem errada!', 'err');
+  }
+}
+
+function nextBlockChallenge() {
+  blockIdx = (blockIdx + 1) % blockChallenges.length;
+  loadBlockChallenge();
+}
+
+// ═══════════════════════════
+//  BUG HUNTER
+// ═══════════════════════════
+const bugs = [
+  { desc:'Erro de sintaxe: ponto e vírgula faltando.', code:`let nome = "João"\nconsole.log(nome);`, bugLine:0, buggy:'let nome = "João"', fixed:'let nome = "João";', explanation:'Faltou o ; no final da declaração.' },
+  { desc:'Erro de operador: comparação com = em vez de ==.', code:`let x = 5;\nif (x = 10) {\n  console.log("dez");\n}`, bugLine:1, buggy:'if (x = 10) {', fixed:'if (x === 10) {', explanation:'= atribui valor, === compara. Use === para comparar.' },
+  { desc:'Erro de loop: condição infinita!', code:`for (let i = 0; i > 0; i++) {\n  console.log(i);\n}`, bugLine:0, buggy:'for (let i = 0; i > 0; i++) {', fixed:'for (let i = 0; i < 5; i++) {', explanation:'i começa em 0, que não é > 0, então o loop nunca roda. Use i < 5.' },
+  { desc:'Erro em array: índice errado.', code:`const arr = [10, 20, 30];\nconsole.log(arr[3]);`, bugLine:1, buggy:'console.log(arr[3]);', fixed:'console.log(arr[2]);', explanation:'Arrays começam no índice 0. O último elemento de 3 itens é o índice 2.' },
+  { desc:'Erro de função: return fora do lugar.', code:`function dobrar(n) {\n  n * 2;\n}\nconsole.log(dobrar(5));`, bugLine:1, buggy:'  n * 2;', fixed:'  return n * 2;', explanation:'Sem return, a função retorna undefined. Adicione return.' },
+  { desc:'Erro de tipo: string sendo somada.', code:`let a = "5";\nlet b = 3;\nconsole.log(a + b);`, bugLine:0, buggy:'let a = "5";', fixed:'let a = 5;', explanation:'"5" + 3 = "53" (concatenação). Use número sem aspas: let a = 5;' },
+  { desc:'Erro de escopo: variável não declarada.', code:`function teste() {\n  resultado = 42;\n}\nteste();\nconsole.log(resultado);`, bugLine:1, buggy:'  resultado = 42;', fixed:'  let resultado = 42;', explanation:'Variável sem let/const/var vira global. Declare com let.' },
+  { desc:'Erro de método: push em string.', code:`let lista = "maçã";\nlista.push("banana");`, bugLine:0, buggy:'let lista = "maçã";', fixed:'let lista = ["maçã"];', explanation:'push() é método de Array, não de String. Use colchetes: ["maçã"].' },
+  { desc:'Erro lógico: condição invertida.', code:`let idade = 20;\nif (idade < 18) {\n  console.log("Maior de idade");\n}`, bugLine:1, buggy:'if (idade < 18) {', fixed:'if (idade >= 18) {', explanation:'Para "maior de idade" use >= 18, não < 18.' },
+  { desc:'Erro de recursão: falta condição base.', code:`function contar(n) {\n  console.log(n);\n  contar(n - 1);\n}`, bugLine:2, buggy:'  contar(n - 1);', fixed:'  if (n > 0) contar(n - 1);', explanation:'Sem condição de parada, a recursão é infinita. Adicione if (n > 0).' }
+];
+
+let bugIdx = 0, bugScore = 0, bugXPTotal = 0;
+
+function loadBug() {
+  const b = bugs[bugIdx];
+  document.getElementById('bugNum').textContent = bugIdx + 1;
+  document.getElementById('bugDesc').textContent = '💡 ' + b.desc;
+  document.getElementById('bugInput').value = '';
+  document.getElementById('bugInput').className = 'bug-input';
+  const fb = document.getElementById('bugFeedback');
+  fb.style.display = 'none';
+  fb.className = 'bug-feedback';
+
+  const lines = b.code.split('\n');
+  let html = '';
+  lines.forEach((line, i) => {
+    if (i === b.bugLine) html += `<span class="bug-line buggy">${line}</span>`;
+    else html += `<span class="bug-line">${line}</span>`;
+  });
+  document.getElementById('bugCode').innerHTML = html;
+}
+
+function checkBug() {
+  const b = bugs[bugIdx];
+  const input = document.getElementById('bugInput').value.trim();
+  const fb = document.getElementById('bugFeedback');
+  fb.style.display = 'block';
+  if (input === b.fixed) {
+    fb.className = 'bug-feedback correct';
+    fb.textContent = '✓ Correto! ' + b.explanation;
+    document.getElementById('bugInput').className = 'bug-input correct';
+    bugScore++;
+    bugXPTotal += 25;
+    state.questionsAnswered++;
+    state.questionsCorrect++;
+    state.moduleScores.bug++;
+    document.getElementById('bugScore').textContent = bugScore;
+    document.getElementById('bugXP').textContent = bugXPTotal;
+    addXP(25, '🐛 Bug encontrado!');
+    setTimeout(() => { bugIdx = (bugIdx+1) % bugs.length; loadBug(); }, 2000);
+  } else {
+    fb.className = 'bug-feedback wrong';
+    fb.textContent = '✗ Não é bem isso. Olhe com atenção a linha marcada em vermelho.';
+    document.getElementById('bugInput').className = 'bug-input wrong';
+    state.questionsAnswered++;
+    showToast('Bug não corrigido!', 'err');
+  }
+}
+
+function showBugHint() {
+  const b = bugs[bugIdx];
+  showToast('Dica: ' + b.explanation.substring(0, 40) + '...', '');
+}
+
+function skipBug() { bugIdx = (bugIdx+1) % bugs.length; loadBug(); }
+function resetBugs() { bugIdx = 0; bugScore = 0; bugXPTotal = 0; document.getElementById('bugScore').textContent = 0; document.getElementById('bugXP').textContent = 0; loadBug(); }
+
+// ═══════════════════════════
+//  QUIZ
+// ═══════════════════════════
+const quizQuestions = [
+  { q:'O que <code>typeof "hello"</code> retorna?', opts:['"string"','"text"','"char"','"object"'], ans:0, exp:'typeof retorna o tipo como string. "hello" é do tipo "string".' },
+  { q:'Qual a diferença entre <code>==</code> e <code>===</code>?', opts:['Nenhuma diferença','=== compara tipo e valor, == só valor','== é mais rápido que ===','=== é para objetos apenas'], ans:1, exp:'=== é igualdade estrita (tipo e valor). == faz coerção de tipo.' },
+  { q:'O que <code>[1,2,3].length</code> retorna?', opts:['2','3','4','undefined'], ans:1, exp:'.length retorna o número de elementos. [1,2,3] tem 3 elementos.' },
+  { q:'Qual palavra-chave cria uma variável que NÃO pode ser reatribuída?', opts:['let','var','const','final'], ans:2, exp:'const cria uma constante. Após atribuída, não pode ser reatribuída.' },
+  { q:'O que <code>console.log(0.1 + 0.2 === 0.3)</code> imprime?', opts:['true','false','undefined','NaN'], ans:1, exp:'Problema de ponto flutuante! 0.1+0.2 = 0.30000...004 em JS.' },
+  { q:'Como acessar o último elemento de um array <code>arr</code>?', opts:['arr[-1]','arr[arr.length]','arr[arr.length - 1]','arr.last()'], ans:2, exp:'Índices começam em 0. O último é arr.length - 1.' },
+  { q:'O que o método <code>push()</code> faz em um array?', opts:['Remove o último elemento','Adiciona ao início','Adiciona ao final','Ordena o array'], ans:2, exp:'push() adiciona um elemento ao final do array e retorna o novo length.' },
+  { q:'O que é <code>NaN</code> em JavaScript?', opts:['Null and Nothing','Not a Number','New Array Node','None as Null'], ans:1, exp:'NaN = "Not a Number". Resultado de operações matemáticas inválidas.' },
+  { q:'Qual o escopo de uma variável declarada com <code>var</code>?', opts:['Block scope','Function scope','Module scope','Global apenas'], ans:1, exp:'var tem function scope (ou global). let e const têm block scope.' },
+  { q:'O que <code>typeof null</code> retorna em JS?', opts:['"null"','"undefined"','"object"','"void"'], ans:2, exp:'Bug histórico do JS! typeof null retorna "object", não "null".' },
+  { q:'Qual método itera sobre um array retornando um novo array transformado?', opts:['forEach()','filter()','map()','reduce()'], ans:2, exp:'map() cria um novo array aplicando uma função a cada elemento.' },
+  { q:'O que é uma arrow function?', opts:['Função com nome de flecha','Sintaxe curta: <code>() => {}</code>','Função assíncrona','Função recursiva'], ans:1, exp:'Arrow functions: const fn = (x) => x * 2. Sintaxe mais curta e sem próprio this.' },
+  { q:'O que <code>!!0</code> retorna?', opts:['0','1','true','false'], ans:3, exp:'!0 = true (0 é falsy), !!0 = false. Dupla negação converte para boolean.' },
+  { q:'Como criar um objeto em JavaScript?', opts:['new Object[]','const obj = {}','object obj = {}','make obj {}'], ans:1, exp:'Objetos são criados com chaves: const obj = { chave: valor }.' },
+  { q:'O que <code>setTimeout(fn, 0)</code> faz?', opts:['Executa fn imediatamente','Executa fn no próximo tick da event loop','Cancela fn','Nada, 0ms não é válido'], ans:1, exp:'Mesmo com 0ms, setTimeout agenda para depois da stack atual. É assíncrono.' }
+];
+
+let qIdx = 0, qScore = 0, qStreak = 0;
+
+function loadQuestion() {
+  const q = quizQuestions[qIdx];
+  document.getElementById('qNum').textContent = qIdx + 1;
+  document.getElementById('qScore').textContent = qScore;
+  document.getElementById('qStreak').textContent = qStreak;
+  document.getElementById('qNextBtn').style.display = 'none';
+  const fb = document.getElementById('quizFeedback');
+  fb.style.display = 'none';
+  fb.className = 'quiz-feedback';
+
+  const qEl = document.getElementById('quizQuestion');
+  qEl.innerHTML = q.q;
+
+  const opts = document.getElementById('quizOptions');
+  opts.innerHTML = '';
+  q.opts.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'quiz-opt';
+    btn.innerHTML = opt;
+    btn.onclick = () => answerQuiz(i);
+    opts.appendChild(btn);
+  });
+}
+
+function answerQuiz(i) {
+  const q = quizQuestions[qIdx];
+  const opts = document.querySelectorAll('.quiz-opt');
+  opts.forEach(b => b.disabled = true);
+  const fb = document.getElementById('quizFeedback');
+  fb.style.display = 'block';
+  state.questionsAnswered++;
+
+  if (i === q.ans) {
+    opts[i].classList.add('correct');
+    fb.className = 'quiz-feedback correct';
+    fb.textContent = '✓ Correto! ' + q.exp;
+    qScore++; qStreak++;
+    state.questionsCorrect++;
+    state.moduleScores.quiz++;
+    document.getElementById('qScore').textContent = qScore;
+    document.getElementById('qStreak').textContent = qStreak;
+    addXP(qStreak >= 3 ? 20 : 10, qStreak >= 3 ? '🔥 Streak!' : '🎯');
+    if (qStreak >= 3) spawnSparkles();
+  } else {
+    opts[i].classList.add('wrong');
+    opts[q.ans].classList.add('correct');
+    fb.className = 'quiz-feedback wrong';
+    fb.textContent = '✗ Incorreto. ' + q.exp;
+    qStreak = 0;
+    document.getElementById('qStreak').textContent = 0;
+    showToast('Resposta errada!', 'err');
+  }
+
+  document.getElementById('qNextBtn').style.display = 'inline-flex';
+}
+
+function nextQuestion() {
+  qIdx = (qIdx + 1) % quizQuestions.length;
+  loadQuestion();
+}
+
+function resetQuiz() { qIdx = 0; qScore = 0; qStreak = 0; loadQuestion(); }
+
+// ═══════════════════════════
+//  SPEED CODE
+// ═══════════════════════════
+const speedSnippets = [
+  'const soma = (a, b) => a + b;',
+  'let arr = [1, 2, 3, 4, 5];',
+  'for (let i = 0; i < 10; i++) {}',
+  'const obj = { nome: "JS", versao: 2024 };',
+  'arr.filter(x => x > 2).map(x => x * 2)',
+  'function fatorial(n) { return n <= 1 ? 1 : n * fatorial(n-1); }',
+  'const promessa = new Promise((res, rej) => res(42));',
+  'document.querySelector(".btn").addEventListener("click", () => {});'
+];
+
+let speedTimer = null, speedRunning = false, speedTime = 60, speedTyped = 0, speedErrors = 0;
+let speedSnippetIdx = 0, speedSnippetTypedIdx = 0;
+
+function renderSpeedTarget() {
+  const snippet = speedSnippets[speedSnippetIdx];
+  const el = document.getElementById('speedTarget');
+  el.innerHTML = snippet.split('').map((ch, i) => {
+    let cls = 'char';
+    if (i < speedSnippetTypedIdx) cls += ' typed-ok';
+    else if (i === speedSnippetTypedIdx) cls += ' cursor';
+    return `<span class="${cls}">${ch === ' ' ? '&nbsp;' : ch.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</span>`;
+  }).join('');
+}
+
+function startSpeed() {
+  speedRunning = true;
+  speedTime = 60; speedTyped = 0; speedErrors = 0;
+  speedSnippetIdx = 0; speedSnippetTypedIdx = 0;
+  document.getElementById('speedWPM').textContent = 0;
+  document.getElementById('speedAcc').textContent = '100%';
+  document.getElementById('speedResult').style.display = 'none';
+  document.getElementById('speedControls').style.display = 'none';
+  const inp = document.getElementById('speedInput');
+  inp.value = ''; inp.disabled = false; inp.focus();
+  inp.placeholder = 'Digite o código...';
+  renderSpeedTarget();
+
+  clearInterval(speedTimer);
+  speedTimer = setInterval(() => {
+    speedTime--;
+    document.getElementById('speedTime').textContent = speedTime;
+    document.getElementById('speedBar').style.width = (speedTime/60*100) + '%';
+    const wpm = Math.round((speedTyped / 5) / ((60 - speedTime) / 60) || 0);
+    document.getElementById('speedWPM').textContent = isFinite(wpm) ? wpm : 0;
+    if (speedTime <= 0) endSpeed();
+  }, 1000);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const inp = document.getElementById('speedInput');
+  if (inp) inp.addEventListener('input', onSpeedInput);
+});
+
+function onSpeedInput(e) {
+  if (!speedRunning) return;
+  const val = e.target.value;
+  const snippet = speedSnippets[speedSnippetIdx];
+  const expected = snippet[speedSnippetTypedIdx];
+  const typed = val[val.length - 1];
+
+  if (typed === expected) {
+    speedSnippetTypedIdx++;
+    speedTyped++;
+    e.target.value = '';
+    if (speedSnippetTypedIdx >= snippet.length) {
+      speedSnippetIdx = (speedSnippetIdx + 1) % speedSnippets.length;
+      speedSnippetTypedIdx = 0;
+      showToast('Snippet completo! 🎉', 'ok');
+    }
+  } else {
+    speedErrors++;
+    e.target.value = '';
+  }
+
+  const total = speedTyped + speedErrors;
+  const acc = total > 0 ? Math.round(speedTyped / total * 100) : 100;
+  document.getElementById('speedAcc').textContent = acc + '%';
+  renderSpeedTarget();
+}
+
+function endSpeed() {
+  clearInterval(speedTimer);
+  speedRunning = false;
+  const inp = document.getElementById('speedInput');
+  inp.disabled = true; inp.placeholder = 'Fim!';
+  const wpm = Math.round(speedTyped / 5);
+  document.getElementById('speedFinalWPM').textContent = wpm;
+  const total = speedTyped + speedErrors;
+  const acc = total > 0 ? Math.round(speedTyped / total * 100) : 100;
+  document.getElementById('speedFinalAcc').textContent = 'Precisão: ' + acc + '%';
+  document.getElementById('speedResult').style.display = 'block';
+  document.getElementById('speedControls').style.display = 'flex';
+  document.getElementById('speedStartBtn').textContent = '▶ Jogar Novamente';
+  const xp = Math.min(50, wpm);
+  state.moduleScores.speed = Math.max(state.moduleScores.speed, wpm);
+  addXP(xp, '⚡ Speed!');
+  if (wpm > 20) spawnSparkles();
+}
+
+// ═══════════════════════════
+//  PROGRESS
+// ═══════════════════════════
+function updateProgress() {
+  document.getElementById('statXP').textContent = state.xp;
+  document.getElementById('statQ').textContent = state.questionsAnswered;
+  document.getElementById('statMissions').textContent = state.missionsCompleted;
+  const acc = state.questionsAnswered > 0 ? Math.round(state.questionsCorrect/state.questionsAnswered*100) + '%' : '—';
+  document.getElementById('statAcc').textContent = acc;
+
+  const bars = document.getElementById('progressBars');
+  const modules = [
+    { name: '🤖 RoboCode', key: 'robo', max: 8, color: 'var(--accent)' },
+    { name: '🧩 Drag Blocks', key: 'blocks', max: 6, color: 'var(--accent3)' },
+    { name: '🐛 Bug Hunter', key: 'bug', max: 10, color: 'var(--accent2)' },
+    { name: '🎯 Quiz JS', key: 'quiz', max: 15, color: 'var(--accent4)' },
+    { name: '⚡ Speed Code', key: 'speed', max: 50, color: 'var(--green)' },
+  ];
+  bars.innerHTML = modules.map(m => {
+    const pct = Math.min(100, Math.round(state.moduleScores[m.key] / m.max * 100));
+    return `<div class="prog-bar-item">
+      <div class="prog-bar-label"><span>${m.name}</span><span>${pct}%</span></div>
+      <div class="prog-bar-track"><div class="prog-bar-fill" style="width:${pct}%;background:${m.color}"></div></div>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════
+//  INIT
+// ═══════════════════════════
+loadBlockChallenge();
+loadBug();
+loadQuestion();
+renderSpeedTarget();
+</script>
+</body>
+</html>

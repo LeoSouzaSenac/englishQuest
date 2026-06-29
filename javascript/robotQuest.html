@@ -1,0 +1,1807 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RoboCode — Aprenda JS com o Robô</title>
+    <link rel="shortcut icon" href="https://cdn-icons-png.flaticon.com/128/5968/5968292.png" type="image/x-icon" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800;900&family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet" />
+    <style>
+        :root {
+            --bg: #08080f;
+            --surface: #111118;
+            --surface2: #181824;
+            --surface3: #1e1e2e;
+            --border: #2a2a3e;
+            --text: #eeeef5;
+            --muted: #6b6b85;
+            --cyan: #00e5ff;
+            --pink: #ff6b9d;
+            --purple: #7c6ffd;
+            --gold: #ffd166;
+            --green: #22c55e;
+            --red: #ef4444;
+            --orange: #f97316;
+            --teal: #14b8a6;
+            --radius: 14px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden
+        }
+
+        .mono {
+            font-family: 'JetBrains Mono', monospace
+        }
+
+        /* ── LAYOUT ── */
+        .app {
+            display: grid;
+            grid-template-rows: auto 1fr;
+            min-height: 100vh
+        }
+
+        /* ── TOP NAV ── */
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 32px;
+            border-bottom: 1px solid var(--border);
+            background: rgba(8, 8, 15, .94);
+            backdrop-filter: blur(14px);
+            position: sticky;
+            top: 0;
+            z-index: 200
+        }
+
+        .logo {
+            font-family: 'Syne', sans-serif;
+            font-weight: 900;
+            font-size: 1.4rem;
+            background: linear-gradient(135deg, var(--cyan), var(--purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent
+        }
+
+        .hud-pills {
+            display: flex;
+            gap: 10px;
+            align-items: center
+        }
+
+        .pill {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 50px;
+            padding: 7px 16px;
+            font-size: .8rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-family: 'Syne', sans-serif;
+            font-weight: 700
+        }
+
+        .pill .val {
+            color: var(--gold)
+        }
+
+        .pill.lives .val {
+            color: var(--red)
+        }
+
+        .pill.level .val {
+            color: var(--cyan)
+        }
+
+        /* ── MAIN ── */
+        main {
+            display: grid;
+            grid-template-columns: 1fr 360px;
+            gap: 0;
+            height: calc(100vh - 57px);
+            overflow: hidden
+        }
+
+        /* ── ARENA ── */
+        .arena-col {
+            display: flex;
+            flex-direction: column;
+            padding: 20px 16px 20px 24px;
+            gap: 14px;
+            overflow: hidden
+        }
+
+        .arena-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0
+        }
+
+        .level-badge {
+            font-family: 'Syne', sans-serif;
+            font-weight: 900;
+            font-size: 1rem;
+            color: var(--cyan)
+        }
+
+        .stars-row {
+            display: flex;
+            gap: 4px
+        }
+
+        .star {
+            font-size: 1.1rem;
+            opacity: .25;
+            transition: all .4s
+        }
+
+        .star.lit {
+            opacity: 1;
+            animation: starPop .4s cubic-bezier(.34, 1.56, .64, 1)
+        }
+
+        @keyframes starPop {
+            0% {
+                transform: scale(0)
+            }
+
+            100% {
+                transform: scale(1)
+            }
+        }
+
+        .arena-wrap {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 0;
+            position: relative
+        }
+
+        canvas#arenaCanvas {
+            border-radius: 12px;
+            border: 1.5px solid var(--border);
+            image-rendering: pixelated;
+            cursor: default;
+            max-width: 100%;
+            max-height: 100%
+        }
+
+        /* ── SIDE PANEL ── */
+        .side-col {
+            border-left: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background: var(--surface)
+        }
+
+        /* CONCEPT BOX */
+        .concept-box {
+            padding: 18px 20px;
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0
+        }
+
+        .concept-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: .7rem;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 20px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: .07em
+        }
+
+        .concept-box h3 {
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: 1rem;
+            margin-bottom: 6px
+        }
+
+        .concept-box p {
+            font-size: .82rem;
+            color: var(--muted);
+            line-height: 1.55;
+            margin-bottom: 10px
+        }
+
+        .concept-snippet {
+            background: var(--bg);
+            border-radius: 8px;
+            padding: 10px 12px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: .73rem;
+            line-height: 1.7;
+            border: 1px solid var(--border)
+        }
+
+        .kw {
+            color: var(--purple)
+        }
+
+        .str {
+            color: var(--gold)
+        }
+
+        .num {
+            color: var(--pink)
+        }
+
+        .fn {
+            color: var(--cyan)
+        }
+
+        .cmt {
+            color: var(--muted)
+        }
+
+        .op {
+            color: var(--text)
+        }
+
+        /* EDITOR */
+        .editor-box {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 16px 20px;
+            gap: 10px;
+            min-height: 0;
+            overflow: hidden
+        }
+
+        .editor-label {
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: .8rem;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: .07em;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0
+        }
+
+        .editor-wrap {
+            flex: 1;
+            position: relative;
+            min-height: 0
+        }
+
+        .editor-backdrop {
+            position: absolute;
+            inset: 0;
+            background: var(--bg);
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            padding: 12px 14px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: .78rem;
+            line-height: 1.7;
+            overflow: auto;
+            pointer-events: none;
+            white-space: pre;
+            color: transparent
+        }
+
+        textarea.code-editor {
+            position: absolute;
+            inset: 0;
+            background: transparent;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            padding: 12px 14px;
+            color: var(--text);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: .78rem;
+            outline: none;
+            resize: none;
+            line-height: 1.7;
+            overflow: auto;
+            z-index: 1;
+            caret-color: var(--cyan)
+        }
+
+        textarea.code-editor:focus {
+            border-color: var(--cyan)
+        }
+
+        textarea.code-editor::selection {
+            background: rgba(0, 229, 255, .2)
+        }
+
+        /* MISSION */
+        .mission-box {
+            padding: 12px 20px;
+            border-top: 1px solid var(--border);
+            flex-shrink: 0;
+            background: var(--surface2)
+        }
+
+        .mission-title {
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: .82rem;
+            color: var(--gold);
+            margin-bottom: 4px
+        }
+
+        .mission-desc {
+            font-size: .8rem;
+            color: var(--muted);
+            line-height: 1.45
+        }
+
+        .mission-hint {
+            font-size: .75rem;
+            color: var(--purple);
+            margin-top: 6px;
+            padding: 6px 10px;
+            background: rgba(124, 111, 253, .08);
+            border-radius: 6px;
+            border-left: 2px solid var(--purple)
+        }
+
+        /* ACTIONS */
+        .action-row {
+            padding: 12px 20px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 8px;
+            flex-shrink: 0
+        }
+
+        .btn {
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+            font-size: .82rem;
+            padding: 10px 18px;
+            border-radius: 50px;
+            border: 1.5px solid transparent;
+            cursor: pointer;
+            transition: all .15s;
+            white-space: nowrap
+        }
+
+        .btn-run {
+            background: var(--cyan);
+            color: #000;
+            flex: 1
+        }
+
+        .btn-run:hover {
+            opacity: .85;
+            transform: scale(1.03)
+        }
+
+        .btn-run:disabled {
+            opacity: .4;
+            cursor: not-allowed;
+            transform: none
+        }
+
+        .btn-reset {
+            background: transparent;
+            border-color: var(--border);
+            color: var(--muted)
+        }
+
+        .btn-reset:hover {
+            border-color: var(--text);
+            color: var(--text)
+        }
+
+        .btn-hint {
+            background: rgba(124, 111, 253, .15);
+            border-color: var(--purple);
+            color: var(--purple)
+        }
+
+        .btn-hint:hover {
+            background: rgba(124, 111, 253, .25)
+        }
+
+        /* LOG */
+        .log-box {
+            padding: 10px 20px;
+            border-top: 1px solid var(--border);
+            flex-shrink: 0
+        }
+
+        .log-line {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: .72rem;
+            line-height: 1.6;
+            padding: 2px 0
+        }
+
+        .log-ok {
+            color: var(--green)
+        }
+
+        .log-err {
+            color: var(--red)
+        }
+
+        .log-info {
+            color: var(--muted)
+        }
+
+        .log-warn {
+            color: var(--gold)
+        }
+
+        /* ── OVERLAYS ── */
+        .overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(5, 5, 12, .9);
+            z-index: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(8px)
+        }
+
+        .overlay.hidden {
+            display: none
+        }
+
+        .overlay-box {
+            background: var(--surface);
+            border: 1.5px solid var(--border);
+            border-radius: 20px;
+            padding: 40px 36px;
+            text-align: center;
+            max-width: 460px;
+            width: 90%;
+            animation: popIn .4s cubic-bezier(.34, 1.56, .64, 1)
+        }
+
+        @keyframes popIn {
+            from {
+                transform: scale(.7);
+                opacity: 0
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1
+            }
+        }
+
+        .overlay-box h2 {
+            font-family: 'Syne', sans-serif;
+            font-weight: 900;
+            font-size: 1.8rem;
+            margin-bottom: 8px
+        }
+
+        .overlay-box p {
+            color: var(--muted);
+            font-size: .9rem;
+            margin-bottom: 20px;
+            line-height: 1.5
+        }
+
+        .overlay-box .big-emoji {
+            font-size: 4rem;
+            margin-bottom: 16px;
+            display: block
+        }
+
+        .overlay-stars {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin: 16px 0;
+            font-size: 2.5rem
+        }
+
+        .overlay-stats {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 20px
+        }
+
+        .stat-chip {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 10px 16px;
+            font-size: .82rem;
+            text-align: center
+        }
+
+        .stat-chip .sv {
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: 1.3rem;
+            display: block;
+            color: var(--cyan)
+        }
+
+        .overlay-btns {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap
+        }
+
+        .obtn {
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+            padding: 12px 24px;
+            border-radius: 50px;
+            border: none;
+            cursor: pointer;
+            font-size: .9rem;
+            transition: all .15s
+        }
+
+        .obtn-primary {
+            background: var(--cyan);
+            color: #000
+        }
+
+        .obtn-primary:hover {
+            opacity: .85;
+            transform: scale(1.03)
+        }
+
+        .obtn-secondary {
+            background: var(--surface2);
+            color: var(--text);
+            border: 1.5px solid var(--border)
+        }
+
+        .obtn-secondary:hover {
+            border-color: var(--cyan)
+        }
+
+        /* ── LEVEL SELECT ── */
+        .level-select-wrap {
+            padding: 20px 24px;
+            overflow-y: auto
+        }
+
+        .level-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            margin-top: 16px
+        }
+
+        .lvl-btn {
+            background: var(--surface2);
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            padding: 12px 6px;
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: .9rem;
+            cursor: pointer;
+            transition: all .2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px
+        }
+
+        .lvl-btn:hover:not(:disabled) {
+            border-color: var(--cyan);
+            background: rgba(0, 229, 255, .07)
+        }
+
+        .lvl-btn.done {
+            border-color: rgba(34, 197, 94, .4);
+            background: rgba(34, 197, 94, .07)
+        }
+
+        .lvl-btn.locked {
+            opacity: .35;
+            cursor: not-allowed
+        }
+
+        .lvl-btn.current {
+            border-color: var(--cyan);
+            background: rgba(0, 229, 255, .1)
+        }
+
+        .lvl-btn .lvl-stars {
+            font-size: .65rem;
+            letter-spacing: 1px;
+            color: var(--gold)
+        }
+
+        .lvl-btn .lvl-icon {
+            font-size: 1.2rem
+        }
+
+        .lvl-btn .lvl-num {
+            font-size: .72rem;
+            color: var(--muted)
+        }
+
+        /* ── TOAST ── */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(80px);
+            background: var(--surface2);
+            border: 1.5px solid var(--border);
+            border-radius: 50px;
+            padding: 10px 24px;
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+            font-size: .88rem;
+            z-index: 999;
+            transition: transform .3s cubic-bezier(.34, 1.56, .64, 1);
+            pointer-events: none
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0)
+        }
+
+        .toast.xp {
+            color: var(--gold);
+            border-color: var(--gold)
+        }
+
+        .toast.ok {
+            color: var(--green);
+            border-color: var(--green)
+        }
+
+        .toast.err {
+            color: var(--red);
+            border-color: var(--red)
+        }
+
+        .toast.info {
+            color: var(--cyan);
+            border-color: var(--cyan)
+        }
+
+        /* ── SPARKLES ── */
+        .sparkle-container {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 600;
+            overflow: hidden
+        }
+
+        .sparkle {
+            position: absolute;
+            border-radius: 50%;
+            animation: spkUp 1.1s ease-out forwards
+        }
+
+        @keyframes spkUp {
+            0% {
+                transform: translateY(0) scale(1);
+                opacity: 1
+            }
+
+            100% {
+                transform: translateY(-120px) scale(0);
+                opacity: 0
+            }
+        }
+
+        /* ── WORLD MAP ── */
+        .world-tabs {
+            display: flex;
+            gap: 6px;
+            padding: 0 24px;
+            margin-bottom: -1px;
+            flex-shrink: 0
+        }
+
+        .world-tab {
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+            font-size: .78rem;
+            padding: 8px 16px;
+            border-radius: 8px 8px 0 0;
+            border: 1px solid var(--border);
+            background: var(--surface2);
+            color: var(--muted);
+            cursor: pointer;
+            transition: all .2s
+        }
+
+        .world-tab.active {
+            background: var(--surface);
+            color: var(--cyan);
+            border-bottom-color: var(--surface)
+        }
+
+        @media(max-width:900px) {
+            main {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto 1fr
+            }
+
+            .side-col {
+                border-left: none;
+                border-top: 1px solid var(--border);
+                max-height: 45vh
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="app">
+        <div class="topbar">
+            <div class="logo">🤖 RoboCode</div>
+            <div class="hud-pills">
+                <div class="pill level">Nível <span class="val" id="hudLevel">1</span></div>
+                <div class="pill">⭐ <span class="val" id="hudStars">0</span></div>
+                <div class="pill">⚡ <span class="val" id="hudXP">0</span> XP</div>
+                <div class="pill lives">❤️ <span class="val" id="hudLives">3</span></div>
+            </div>
+        </div>
+
+        <main>
+            <!-- ARENA -->
+            <div class="arena-col">
+                <div class="arena-header">
+                    <div class="level-badge" id="levelLabel">Nível 1 — Variáveis</div>
+                    <div class="stars-row">
+                        <span class="star" id="star1">⭐</span>
+                        <span class="star" id="star2">⭐</span>
+                        <span class="star" id="star3">⭐</span>
+                    </div>
+                </div>
+                <div class="arena-wrap">
+                    <canvas id="arenaCanvas"></canvas>
+                </div>
+            </div>
+
+            <!-- SIDE PANEL -->
+            <div class="side-col">
+                <!-- CONCEPT -->
+                <div class="concept-box" id="conceptBox">
+                    <div class="concept-tag" id="conceptTag">📦 Conceito</div>
+                    <h3 id="conceptTitle">Conceito JS</h3>
+                    <p id="conceptDesc">Descrição do conceito.</p>
+                    <div class="concept-snippet" id="conceptSnippet"></div>
+                </div>
+
+                <!-- MISSION -->
+                <div class="mission-box">
+                    <div class="mission-title" id="missionTitle">🎯 Missão</div>
+                    <div class="mission-desc" id="missionDesc">Descrição da missão.</div>
+                    <div class="mission-hint" id="missionHint" style="display:none"></div>
+                </div>
+
+                <!-- EDITOR -->
+                <div class="editor-box">
+                    <div class="editor-label">
+                        <span>Seu Código</span>
+                        <span id="stepCounter" style="font-size:.72rem;color:var(--muted)">Passos: 0</span>
+                    </div>
+                    <div class="editor-wrap">
+                        <textarea class="code-editor" id="codeEditor" spellcheck="false" autocorrect="off"
+                            autocapitalize="off"></textarea>
+                    </div>
+                </div>
+
+                <!-- LOG -->
+                <div class="log-box" id="logBox">
+                    <div class="log-line log-info">// aguardando código...</div>
+                </div>
+
+                <!-- ACTIONS -->
+                <div class="action-row">
+                    <button class="btn btn-reset" onclick="resetLevel()">↺</button>
+                    <button class="btn btn-hint" onclick="showHint()">💡</button>
+                    <button class="btn btn-run" id="runBtn" onclick="runCode()">▶ Executar</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- WIN OVERLAY -->
+    <div class="overlay hidden" id="winOverlay">
+        <div class="overlay-box">
+            <span class="big-emoji" id="winEmoji">🏆</span>
+            <h2 id="winTitle">Nível Completo!</h2>
+            <div class="overlay-stars" id="winStars"></div>
+            <div class="overlay-stats" id="winStats"></div>
+            <p id="winMsg"></p>
+            <div class="overlay-btns">
+                <button class="obtn obtn-secondary" onclick="hideWin();resetLevel()">↺ Repetir</button>
+                <button class="obtn obtn-primary" id="nextBtn" onclick="goNextLevel()">Próximo Nível →</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FAIL OVERLAY -->
+    <div class="overlay hidden" id="failOverlay">
+        <div class="overlay-box">
+            <span class="big-emoji" id="failEmoji">💥</span>
+            <h2 id="failTitle">Ops!</h2>
+            <p id="failMsg"></p>
+            <div class="overlay-btns">
+                <button class="obtn obtn-primary" onclick="hideFail();resetLevel()">↺ Tentar Novamente</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TUTORIAL OVERLAY -->
+    <div class="overlay" id="tutorialOverlay">
+        <div class="overlay-box" style="max-width:520px">
+            <span class="big-emoji" id="tutEmoji">🤖</span>
+            <h2 id="tutTitle">Bem-vindo ao RoboCode!</h2>
+            <p id="tutMsg"></p>
+            <div class="concept-snippet" id="tutSnippet" style="text-align:left;margin-bottom:20px"></div>
+            <div class="overlay-btns">
+                <button class="obtn obtn-primary" onclick="startTutorial()">Entendido! Vamos jogar →</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+    <div class="sparkle-container" id="sparkles"></div>
+
+    <script>
+        // ═══════════════════════════════════════════════
+        //  LEVEL DEFINITIONS
+        // ═══════════════════════════════════════════════
+        const TILE = {
+            EMPTY: 0, WALL: 1, GOAL: 2, POWERUP: 3, ENEMY: 4, HOLE: 5, KEY: 6, DOOR: 7,
+            ICE: 8, BOMB: 9, SHIELD: 10, TELEPORT: 11, ARROW_R: 12, ARROW_L: 13, ARROW_U: 14, ARROW_D: 15
+        };
+
+        const CONCEPTS = {
+            variables: {
+                tag: '📦 Variáveis', color: '#00e5ff',
+                title: 'let, const e var',
+                desc: 'Variáveis guardam valores. <b>const</b> não muda, <b>let</b> pode mudar, <b>var</b> é mais antigo.',
+                snippet: `<span class="kw">const</span> velocidade = <span class="num">3</span>;\n<span class="kw">let</span> passos = <span class="num">0</span>;\n<span class="fn">mover</span>(<span class="str">'direita'</span>, velocidade);`
+            },
+            conditionals: {
+                tag: '🔀 Condicionais', color: '#ff6b9d',
+                title: 'if / else',
+                desc: 'Execute código apenas se uma condição for verdadeira. <b>if</b> testa, <b>else</b> é o plano B.',
+                snippet: `<span class="kw">if</span> (<span class="fn">temInimigo</span>(<span class="str">'direita'</span>)) {\n  <span class="fn">mover</span>(<span class="str">'cima'</span>, <span class="num">1</span>);\n} <span class="kw">else</span> {\n  <span class="fn">mover</span>(<span class="str">'direita'</span>, <span class="num">2</span>);\n}`
+            },
+            forLoop: {
+                tag: '🔁 Loop for', color: '#7c6ffd',
+                title: 'for loop',
+                desc: 'Repita código um número específico de vezes. O contador <b>i</b> muda a cada repetição.',
+                snippet: `<span class="kw">for</span> (<span class="kw">let</span> i = <span class="num">0</span>; i < <span class="num">4</span>; i++) {\n  <span class="fn">mover</span>(<span class="str">'direita'</span>, <span class="num">1</span>);\n  <span class="fn">mover</span>(<span class="str">'baixo'</span>, <span class="num">1</span>);\n}`
+            },
+            whileLoop: {
+                tag: '♾️ Loop while', color: '#14b8a6',
+                title: 'while loop',
+                desc: 'Repita código enquanto uma condição for verdadeira. Cuidado com loops infinitos!',
+                snippet: `<span class="kw">while</span> (!<span class="fn">chegou</span>()) {\n  <span class="kw">if</span> (<span class="fn">livre</span>(<span class="str">'direita'</span>)) {\n    <span class="fn">mover</span>(<span class="str">'direita'</span>, <span class="num">1</span>);\n  } <span class="kw">else</span> {\n    <span class="fn">mover</span>(<span class="str">'baixo'</span>, <span class="num">1</span>);\n  }\n}`
+            },
+            functions: {
+                tag: '⚙️ Funções', color: '#f97316',
+                title: 'function',
+                desc: 'Funções agrupam código reutilizável. Você pode chamar a mesma função várias vezes!',
+                snippet: `<span class="kw">function</span> <span class="fn">esquivar</span>() {\n  <span class="fn">mover</span>(<span class="str">'cima'</span>, <span class="num">1</span>);\n  <span class="fn">mover</span>(<span class="str">'direita'</span>, <span class="num">2</span>);\n  <span class="fn">mover</span>(<span class="str">'baixo'</span>, <span class="num">1</span>);\n}\n<span class="fn">esquivar</span>(); <span class="fn">esquivar</span>();`
+            },
+            arrays: {
+                tag: '📋 Arrays', color: '#ffd166',
+                title: 'Arrays e loops',
+                desc: 'Arrays guardam listas de valores. Percorra com <b>for...of</b> ou <b>forEach</b>.',
+                snippet: `<span class="kw">const</span> rota = [<span class="str">'direita'</span>,<span class="str">'baixo'</span>,<span class="str">'direita'</span>];\n<span class="kw">for</span> (<span class="kw">const</span> dir <span class="kw">of</span> rota) {\n  <span class="fn">mover</span>(dir, <span class="num">1</span>);\n}`
+            }
+        };
+
+        // ─── LEVEL DATA ───────────────────────────────
+        // Grid is 10x10. r=row(top=0), c=col(left=0)
+        // enemies: [{r,c,patrol:[dirs],patrolLen,speed}]
+        // powerups: [{r,c,type:'shield'|'speed'|'key'|'bomb'}]
+        // Each level has a 'concept' key, star thresholds [3star,2star] = max steps
+        const LEVELS = [
+            // ── WORLD 1: Variáveis ──────────────────────
+            {
+                id: 1, concept: 'variables', world: '🏙️ Cidade',
+                title: 'Nível 1 — Primeiro passo',
+                mission: 'Mova o robô até a estrela. Use mover() com os parâmetros certos!',
+                hint: 'Tente: mover("direita", 3); mover("baixo", 2);',
+                starLimits: [5, 8],
+                grid: [
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
+                ],
+                start: { r: 0, c: 0 },
+                enemies: [],
+                powerups: [
+                    { r: 3, c: 3, type: 'speed' }, { r: 6, c: 6, type: 'shield' }
+                ],
+                tutorialMsg: 'Olá! Eu sou o ROBO-7. Controle-me com a função <b>mover(direção, passos)</b>. Direções: "direita", "esquerda", "cima", "baixo". Leve-me até a ⭐!',
+                tutorialSnippet: `<span class="cmt">// Exemplo básico</span>\n<span class="fn">mover</span>(<span class="str">"direita"</span>, <span class="num">3</span>);\n<span class="fn">mover</span>(<span class="str">"baixo"</span>, <span class="num">2</span>);`
+            },
+            {
+                id: 2, concept: 'variables', world: '🏙️ Cidade',
+                title: 'Nível 2 — Variáveis',
+                mission: 'Use variáveis (const/let) para guardar a quantidade de passos antes de mover!',
+                hint: 'const passos = 4; mover("direita", passos);',
+                starLimits: [5, 8],
+                grid: [
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    [0, 1, 1, 1, 1, 1, 1, 1, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 1, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 1, 0, 0],
+                    [0, 1, 1, 1, 1, 0, 0, 1, 0, 0],
+                    [0, 0, 0, 0, 1, 0, 0, 1, 0, 0],
+                    [0, 0, 0, 0, 1, 1, 1, 1, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
+                ],
+                start: { r: 0, c: 0 },
+                enemies: [],
+                powerups: [{ r: 7, c: 5, type: 'speed' }],
+                tutorialMsg: 'Neste nível aprenda a usar <b>variáveis</b>! Em vez de colocar números diretamente, guarde-os em variáveis.<br><br>Isso torna o código mais legível e fácil de mudar.',
+                tutorialSnippet: `<span class="kw">const</span> passos = <span class="num">4</span>;\n<span class="kw">let</span> dir = <span class="str">"direita"</span>;\n<span class="fn">mover</span>(dir, passos);`
+            },
+            {
+                id: 3, concept: 'variables', world: '🏙️ Cidade',
+                title: 'Nível 3 — Primeiro inimigo!',
+                mission: 'Há um guarda patrulhando! Espere o momento certo ou desvie. Colete o escudo 🛡️ para se proteger!',
+                hint: 'Colete o escudo antes de passar pelo inimigo!',
+                starLimits: [10, 16],
+                grid: [
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    [0, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    [0, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
+                ],
+                start: { r: 0, c: 0 },
+                enemies: [{ r: 3, c: 1, dir: 'direita', range: 7, speed: 1.2 }],
+                powerups: [{ r: 1, c: 5, type: 'shield' }],
+                tutorialMsg: 'Cuidado! Há um <b>inimigo</b> patrulhando. Ele se move automaticamente. Você pode:<br>• Desviar pelo caminho alternativo<br>• Coletar o 🛡️ <b>Escudo</b> para sobreviver a 1 colisão',
+                tutorialSnippet: `<span class="cmt">// Se tiver escudo, pode atravessar inimigos</span>\n<span class="cmt">// Colete o 🛡️ no caminho!</span>`
+            },
+            // ── WORLD 2: Condicionais ───────────────────
+            {
+                id: 4, concept: 'conditionals', world: '🌲 Floresta',
+                title: 'Nível 4 — if/else',
+                mission: 'Use if/else para escolher o caminho certo. A função temObstaculo(dir) retorna true/false!',
+                hint: 'if (temObstaculo("direita")) { mover("baixo",1); } else { mover("direita",1); }',
+                starLimits: [10, 16],
+                grid: [
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
+                ],
+                start: { r: 0, c: 0 },
+                enemies: [{ r: 6, c: 2, dir: 'direita', range: 5, speed: 1.0 }],
+                powerups: [{ r: 4, c: 8, type: 'speed' }, { r: 1, c: 8, type: 'shield' }],
+                tutorialMsg: 'Agora o robô pode <b>tomar decisões</b>! Use <b>if/else</b> para reagir ao ambiente.<br><br>Funções de sensor disponíveis:<br>• <code>temObstaculo(dir)</code> → true se há parede<br>• <code>temInimigo(dir)</code> → true se há inimigo<br>• <code>temPowerup(dir)</code> → true se há item',
+                tutorialSnippet: `<span class="kw">if</span> (<span class="fn">temObstaculo</span>(<span class="str">"direita"</span>)) {\n  <span class="fn">mover</span>(<span class="str">"baixo"</span>, <span class="num">1</span>);\n} <span class="kw">else</span> {\n  <span class="fn">mover</span>(<span class="str">"direita"</span>, <span class="num">1</span>);\n}`
+            },
+            {
+                id: 5, concept: 'conditionals', world: '🌲 Floresta',
+                title: 'Nível 5 — Labirinto com escolhas',
+                mission: 'Navegue pelo labirinto usando if/else. Dois caminhos, só um leva à estrela!',
+                hint: 'Teste temObstaculo() em cada direção antes de se mover.',
+                starLimits: [14, 20],
+                grid: [
+                    [0, 0, 1, 0, 0, 0, 1, 0, 0, 0],
+                    [0, 0, 1, 0, 1, 0, 1, 0, 1, 0],
+                    [0, 0, 0, 0, 1, 0, 0, 0, 1, 0],
+                    [1, 1, 1, 0, 1, 1, 1, 0, 1, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
+                    [0, 1, 1, 1, 1, 1, 0, 0, 1, 0],
+                    [0, 0, 0, 0, 0, 1, 0, 0, 0, 0],
+                    [1, 1, 1, 0, 0, 1, 1, 1, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
+                ],
+                start: { r: 0, c: 0 },
+                enemies: [{ r: 4, c: 4, dir: 'cima', range: 3, speed: 0.9 }],
+                powerups: [{ r: 2, c: 6, type: 'shield' }, { r: 6, c: 2, type: 'speed' }, { r: 8, c: 5, type: 'bomb' }],
+                tutorialMsg: 'Labirinto! Use <b>if / else if / else</b> para escolher a direção em cada cruzamento.',
+                tutorialSnippet: `<span class="kw">if</span> (!<span class="fn">temObstaculo</span>(<span class="str">"direita"</span>)) {\n  <span class="fn">mover</span>(<span class="str">"direita"</span>, <span class="num">1</span>);\n} <span class="kw">else if</span> (!<span class="fn">temObstaculo</span>(<span class="str">"baixo"</span>)) {\n  <span class="fn">mover</span>(<span class="str">"baixo"</span>, <span class="num">1</span>);\n} <span class="kw">else</span> {\n  <span class="fn">mover</span>(<span class="str">"esquerda"</span>, <span class="num">1</span>);\n}`
+            },
+            // ── WORLD 3: for loop ───────────────────────
+            {
+                id: 6, concept: 'forLoop', world: '🏭 Fábrica',
+                title: 'Nível 6 — Loop for',
+                mission: 'Use um loop for para repetir movimentos. Eficiência conta para 3 estrelas!',
+                hint: 'for (let i=0; i<5; i++) { mover("direita",1); mover("baixo",1); }',
+                starLimits: [6, 10],
+                grid: [
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
+                ],
+                start: { r: 0, c: 0 },
+                enemies: [{ r: 5, c: 3, dir: 'direita', range: 4, speed: 1.1 }, { r: 2, c: 6, dir: 'baixo', range: 4, speed: 0.9 }],
+                powerups: [{ r: 3, c: 5, type: 'speed' }, { r: 7, c: 2, type: 'shield' }],
+                tutorialMsg: 'Use o <b>loop for</b> para não repetir código desnecessariamente!<br><br>Missão diagonal: o robô precisa andar em zigue-zague. Com for fica elegante!',
+                tutorialSnippet: `<span class="kw">for</span> (<span class="kw">let</span> i = <span class="num">0</span>; i < <span class="num">9</span>; i++) {\n  <span class="fn">mover</span>(<span class="str">"direita"</span>, <span class="num">1</span>);\n  <span class="fn">mover</span>(<span class="str">"baixo"</span>, <span class="num">1</span>);\n}\n<span class="cmt">// Muito mais curto!</span>`
+            },
+            {
+                id: 7, concept: 'forLoop', world: '🏭 Fábrica',
+                title: 'Nível 7 — Corredor com guardas',
+                mission: 'Use for + if para navegar um corredor com múltiplos inimigos. Timing é tudo!',
+                hint: 'Pense em como usar o índice i do for para variar o movimento.',
+                starLimits: [12, 20],
+                grid: [
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    [1, 0, 1, 0, 1, 0, 1, 0, 1, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    [1, 0, 1, 0, 1, 0, 1, 0, 1, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    [1, 0, 1, 0, 1, 0, 1, 0, 1, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    [1, 0, 1, 0, 1, 0, 1, 0, 1, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
+                ],
+                start: { r: 0, c: 0 },
+                enemies: [
+                    { r: 0, c: 5, dir: 'direita', range: 4, speed: 1.3 },
+                    { r: 2, c: 3, dir: 'direita', range: 5, speed: 1.1 },
+                    { r: 4, c: 7, dir: 'esquerda', range: 6, speed: 1.2 },
+                ],
+                powerups: [{ r: 3, c: 9, type: 'shield' }, { r: 6, c: 4, type: 'bomb' }],
+                tutorialMsg: 'Múltiplos inimigos! Use <b>for com if</b> para adaptar o caminho dinamicamente.',
+                tutorialSnippet: `<span class="kw">for</span> (<span class="kw">let</span> i = <span class="num">0</span>; i < <span class="num">9</span>; i++) {\n  <span class="kw">if</span> (i % <span class="num">2</span> === <span class="num">0</span>) {\n    <span class="fn">mover</span>(<span class="str">"direita"</span>, <span class="num">1</span>);\n  }\n  <span class="fn">mover</span>(<span class="str">"baixo"</span>, <span class="num">1</span>);\n}`
+            },
+            // ── WORLD 4: while ──────────────────────────
+            {
+                id: 8, concept: 'whileLoop', world: '🌌 Espaço',
+                title: 'Nível 8 — Loop while',
+                mission: 'Use while(!chegou()) para mover o robô até a estrela automaticamente!',
+                hint: 'while (!chegou()) { if (!temObstaculo("direita")) mover("direita",1); else mover("baixo",1); }',
+                starLimits: [15, 25],
+                grid: [
+                    [0, 0, 0, 0, 0, 1, 0, 0, 0, 0],
+                    [0, 1, 1, 1, 0, 1, 0, 1, 1, 0],
+                    [0, 1, 0, 0, 0, 0, 0, 0, 1, 0],
+                    [0, 1, 0, 1, 1, 1, 1, 0, 1, 0],
+                    [0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
+                    [1, 1, 0, 1, 0, 1, 1, 1, 1, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
+                    [0, 1, 1, 1, 1, 1, 0, 0, 1, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
+                ],
+                start: { r: 0, c: 0 },
+                enemies: [{ r: 4, c: 5, dir: 'cima', range: 3, speed: 1.0 }],
+                powerups: [{ r: 2, c: 6, type: 'shield' }, { r: 5, c: 5, type: 'speed' }, { r: 8, c: 7, type: 'bomb' }],
+                tutorialMsg: 'O <b>while</b> continua executando enquanto a condição for verdadeira!<br><br>Use as funções sensor para que o robô decida sozinho o caminho.',
+                tutorialSnippet: `<span class="kw">while</span> (!<span class="fn">chegou</span>()) {\n  <span class="kw">if</span> (!<span class="fn">temObstaculo</span>(<span class="str">"direita"</span>)) {\n    <span class="fn">mover</span>(<span class="str">"direita"</span>, <span class="num">1</span>);\n  } <span class="kw">else</span> {\n    <span class="fn">mover</span>(<span class="str">"baixo"</span>, <span class="num">1</span>);\n  }\n}`
+            },
+            {
+                id: 9, concept: 'whileLoop', world: '🌌 Espaço',
+                title: 'Nível 9 — Inimigos dinâmicos',
+                mission: 'Use while + temInimigo() para evitar inimigos em tempo real!',
+                hint: 'while(!chegou()) { if(temInimigo("direita")) mover("cima",1); ... }',
+                starLimits: [20, 30],
+                grid: [
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    [0, 1, 0, 1, 0, 1, 0, 1, 0, 0],
+                    [0, 1, 0, 1, 0, 1, 0, 1, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    [0, 1, 0, 1, 0, 1, 0, 1, 0, 0],
+                    [0, 1, 0, 1, 0, 1, 0, 1, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    [0, 1, 0, 1, 0, 1, 0, 1, 0, 0],
+                    [0, 1, 0, 1, 0, 1, 0, 1, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
+                ],
+                start: { r: 0, c: 0 },
+                enemies: [
+                    { r: 3, c: 0, dir: 'direita', range: 8, speed: 1.4 },
+                    { r: 6, c: 8, dir: 'esquerda', range: 8, speed: 1.2 },
+                ],
+                powerups: [{ r: 0, c: 9, type: 'shield' }, { r: 5, c: 4, type: 'bomb' }, { r: 9, c: 0, type: 'speed' }],
+                tutorialMsg: 'Combine <b>while + if + temInimigo()</b> para um robô totalmente autônomo!',
+                tutorialSnippet: `<span class="kw">while</span> (!<span class="fn">chegou</span>()) {\n  <span class="kw">if</span> (<span class="fn">temInimigo</span>(<span class="str">"direita"</span>)) {\n    <span class="fn">mover</span>(<span class="str">"baixo"</span>, <span class="num">1</span>);\n  } <span class="kw">else</span> {\n    <span class="fn">mover</span>(<span class="str">"direita"</span>, <span class="num">1</span>);\n  }\n}`
+            },
+            // ── WORLD 5: Functions ──────────────────────
+            {
+                id: 10, concept: 'functions', world: '🔬 Lab',
+                title: 'Nível 10 — Funções',
+                mission: 'Crie funções reutilizáveis para resolver o desafio! Código limpo vale estrela extra.',
+                hint: 'function virarDireita() { mover("direita",2); mover("baixo",1); }',
+                starLimits: [10, 16],
+                grid: [
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    [1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 1, 1, 1, 1, 1, 1, 1, 1],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    [1, 1, 1, 1, 1, 1, 1, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
+                ],
+                start: { r: 0, c: 0 },
+                enemies: [{ r: 3, c: 6, dir: 'esquerda', range: 5, speed: 1.0 }, { r: 6, c: 3, dir: 'direita', range: 4, speed: 1.1 }],
+                powerups: [{ r: 4, c: 9, type: 'shield' }, { r: 7, c: 8, type: 'speed' }],
+                tutorialMsg: '<b>Funções</b> permitem nomear e reutilizar blocos de código. Crie funções com nomes descritivos para cada manobra!',
+                tutorialSnippet: `<span class="kw">function</span> <span class="fn">subir</span>() {\n  <span class="fn">mover</span>(<span class="str">"cima"</span>, <span class="num">2</span>);\n}\n<span class="kw">function</span> <span class="fn">esquivar</span>() {\n  <span class="fn">mover</span>(<span class="str">"direita"</span>, <span class="num">1</span>);\n  <span class="fn">mover</span>(<span class="str">"baixo"</span>, <span class="num">1</span>);\n}\n<span class="fn">subir</span>(); <span class="fn">esquivar</span>();`
+            },
+            {
+                id: 11, concept: 'functions', world: '🔬 Lab',
+                title: 'Nível 11 — Funções com parâmetros',
+                mission: 'Use funções com parâmetros para movimentos configuráveis!',
+                hint: 'function zigzag(n) { for(let i=0;i<n;i++){mover("direita",1);mover("baixo",1);} }',
+                starLimits: [8, 14],
+                grid: [
+                    [0, 0, 1, 0, 0, 1, 0, 0, 1, 0],
+                    [0, 0, 1, 0, 0, 1, 0, 0, 1, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    [0, 1, 0, 0, 1, 0, 0, 1, 0, 0],
+                    [0, 1, 0, 0, 1, 0, 0, 1, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 1, 0, 0, 1, 0, 0, 1, 0],
+                    [0, 0, 1, 0, 0, 1, 0, 0, 1, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
+                ],
+                start: { r: 0, c: 0 },
+                enemies: [{ r: 2, c: 5, dir: 'direita', range: 4, speed: 1.2 }, { r: 5, c: 3, dir: 'cima', range: 3, speed: 1.0 }],
+                powerups: [{ r: 5, c: 9, type: 'shield' }, { r: 0, c: 5, type: 'bomb' }],
+                tutorialMsg: 'Funções com <b>parâmetros</b> são ainda mais poderosas — você passa valores diferentes em cada chamada!',
+                tutorialSnippet: `<span class="kw">function</span> <span class="fn">andar</span>(dir, passos) {\n  <span class="fn">mover</span>(dir, passos);\n}\n<span class="fn">andar</span>(<span class="str">"direita"</span>, <span class="num">3</span>);\n<span class="fn">andar</span>(<span class="str">"baixo"</span>, <span class="num">2</span>);`
+            },
+            // ── WORLD 6: Arrays ─────────────────────────
+            {
+                id: 12, concept: 'arrays', world: '💾 Matrix',
+                title: 'Nível 12 — Arrays',
+                mission: 'Guarde a rota em um array e percorra com for...of!',
+                hint: 'const rota=["direita","baixo",...]; for(const d of rota) mover(d,1);',
+                starLimits: [12, 18],
+                grid: [
+                    [0, 0, 0, 1, 0, 0, 0, 1, 0, 0],
+                    [0, 1, 0, 1, 0, 1, 0, 1, 0, 0],
+                    [0, 1, 0, 0, 0, 1, 0, 0, 0, 0],
+                    [0, 1, 1, 1, 0, 1, 1, 1, 1, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    [0, 1, 1, 1, 1, 0, 1, 1, 1, 0],
+                    [0, 0, 0, 0, 1, 0, 0, 0, 1, 0],
+                    [0, 0, 1, 0, 1, 0, 0, 0, 1, 0],
+                    [1, 0, 1, 0, 0, 0, 1, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
+                ],
+                start: { r: 0, c: 0 },
+                enemies: [{ r: 4, c: 3, dir: 'direita', range: 5, speed: 1.2 }, { r: 7, c: 7, dir: 'cima', range: 4, speed: 1.0 }],
+                powerups: [{ r: 2, c: 4, type: 'shield' }, { r: 6, c: 3, type: 'speed' }, { r: 9, c: 5, type: 'bomb' }],
+                tutorialMsg: '<b>Arrays</b> são listas ordenadas. Você pode guardar uma sequência de direções e percorrê-las com um loop!',
+                tutorialSnippet: `<span class="kw">const</span> rota = [\n  <span class="str">"direita"</span>, <span class="str">"baixo"</span>, <span class="str">"direita"</span>\n];\n<span class="kw">for</span> (<span class="kw">const</span> dir <span class="kw">of</span> rota) {\n  <span class="fn">mover</span>(dir, <span class="num">1</span>);\n}`
+            },
+            {
+                id: 13, concept: 'arrays', world: '💾 Matrix',
+                title: 'Nível 13 — forEach e map',
+                mission: 'Use array.forEach() com uma função callback para executar movimentos!',
+                hint: '[3,1,4,2].forEach(n => mover("direita",n));',
+                starLimits: [10, 16],
+                grid: [
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    [1, 1, 0, 1, 1, 0, 1, 1, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    [0, 1, 1, 0, 1, 1, 0, 1, 1, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    [1, 0, 1, 1, 0, 1, 1, 0, 1, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    [0, 1, 0, 1, 0, 1, 0, 1, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
+                ],
+                start: { r: 0, c: 0 },
+                enemies: [
+                    { r: 2, c: 4, dir: 'direita', range: 5, speed: 1.3 },
+                    { r: 4, c: 2, dir: 'cima', range: 3, speed: 1.0 },
+                    { r: 6, c: 7, dir: 'esquerda', range: 4, speed: 1.1 },
+                ],
+                powerups: [{ r: 1, c: 8, type: 'shield' }, { r: 5, c: 0, type: 'bomb' }, { r: 7, c: 4, type: 'speed' }],
+                tutorialMsg: '<b>forEach</b> executa uma função para cada item do array. É como um for...of mais funcional!',
+                tutorialSnippet: `<span class="kw">const</span> passos = [<span class="num">2</span>,<span class="num">1</span>,<span class="num">3</span>];\npassos.<span class="fn">forEach</span>(n => {\n  <span class="fn">mover</span>(<span class="str">"direita"</span>, n);\n  <span class="fn">mover</span>(<span class="str">"baixo"</span>, <span class="num">1</span>);\n});`
+            },
+            // ── BOSS LEVELS ─────────────────────────────
+            {
+                id: 14, concept: 'functions', world: '☠️ Boss',
+                title: 'Nível 14 — Boss: Labirinto Total',
+                mission: 'BOSS! Use TUDO que aprendeu: variáveis, if/else, for, while, funções e arrays. Múltiplos inimigos!',
+                hint: 'Explore o mapa devagar. Use funções para organizar. Colete powerups!',
+                starLimits: [25, 40],
+                grid: [
+                    [0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
+                    [1, 1, 0, 1, 0, 1, 1, 1, 0, 0],
+                    [0, 1, 0, 0, 0, 1, 0, 0, 0, 1],
+                    [0, 1, 1, 1, 0, 1, 0, 1, 1, 1],
+                    [0, 0, 0, 0, 0, 0, 0, 1, 0, 0],
+                    [1, 1, 1, 0, 1, 1, 0, 1, 0, 1],
+                    [0, 0, 1, 0, 1, 0, 0, 0, 0, 0],
+                    [0, 0, 1, 0, 1, 0, 1, 1, 1, 0],
+                    [0, 1, 1, 0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 1, 1, 1, 0, 0, 2],
+                ],
+                start: { r: 0, c: 0 },
+                enemies: [
+                    { r: 2, c: 4, dir: 'cima', range: 2, speed: 1.1 },
+                    { r: 5, c: 3, dir: 'direita', range: 2, speed: 1.3 },
+                    { r: 8, c: 6, dir: 'esquerda', range: 3, speed: 1.2 },
+                    { r: 4, c: 8, dir: 'cima', range: 3, speed: 0.9 },
+                ],
+                powerups: [{ r: 0, c: 8, type: 'shield' }, { r: 3, c: 0, type: 'speed' }, { r: 6, c: 8, type: 'bomb' }, { r: 7, c: 3, type: 'shield' }],
+                tutorialMsg: '🔥 <b>BOSS LEVEL!</b> Este é o labirinto supremo. Vai precisar de tudo: loops, condicionais, funções. Boa sorte!',
+                tutorialSnippet: `<span class="cmt">// Dica: crie funções para cada manobra!</span>\n<span class="kw">function</span> <span class="fn">navegarBoss</span>() {\n  <span class="kw">while</span> (!<span class="fn">chegou</span>()) {\n    <span class="cmt">// sua lógica aqui</span>\n  }\n}\n<span class="fn">navegarBoss</span>();`
+            },
+            {
+                id: 15, concept: 'arrays', world: '🏆 Final',
+                title: 'Nível 15 — FINAL: O Gauntlet',
+                mission: 'NÍVEL FINAL! Mapa máximo, 5 inimigos, armadilhas. Use toda a sua criatividade!',
+                hint: 'Colete escudos e bombas. Pense no caminho antes de codar.',
+                starLimits: [30, 50],
+                grid: [
+                    [0, 0, 1, 0, 0, 0, 1, 0, 0, 0],
+                    [0, 1, 1, 0, 1, 0, 1, 0, 1, 1],
+                    [0, 0, 0, 0, 1, 0, 0, 0, 1, 0],
+                    [1, 1, 1, 0, 1, 1, 1, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 1, 1, 1, 0],
+                    [0, 1, 1, 1, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 1, 0, 1, 1, 0, 1, 1],
+                    [1, 1, 0, 1, 0, 0, 1, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 1, 1, 1, 0],
+                    [0, 0, 1, 1, 0, 0, 0, 0, 0, 2],
+                ],
+                start: { r: 0, c: 0 },
+                enemies: [
+                    { r: 1, c: 3, dir: 'direita', range: 3, speed: 1.2 },
+                    { r: 3, c: 8, dir: 'baixo', range: 5, speed: 1.3 },
+                    { r: 5, c: 5, dir: 'esquerda', range: 4, speed: 1.1 },
+                    { r: 7, c: 1, dir: 'cima', range: 2, speed: 1.4 },
+                    { r: 8, c: 5, dir: 'direita', range: 3, speed: 1.0 },
+                ],
+                powerups: [{ r: 0, c: 5, type: 'shield' }, { r: 2, c: 8, type: 'bomb' }, { r: 4, c: 0, type: 'shield' }, { r: 6, c: 5, type: 'speed' }, { r: 9, c: 2, type: 'bomb' }],
+                tutorialMsg: '🏆 <b>NÍVEL FINAL!</b> Você chegou até aqui. Mostre tudo que aprendeu sobre JavaScript!',
+                tutorialSnippet: `<span class="cmt">// Você tem: mover, temObstaculo,</span>\n<span class="cmt">// temInimigo, temPowerup, chegou</span>\n<span class="cmt">// let, const, if, for, while, function</span>\n<span class="cmt">// arrays, forEach, for...of</span>\n<span class="cmt">// Boa sorte, programador!</span>`
+            }
+        ];
+
+        // ═══════════════════════════════════════════════
+        //  ENGINE
+        // ═══════════════════════════════════════════════
+        const GRID_SIZE = 10;
+        let CELL_SIZE = 48;
+        const canvas = document.getElementById('arenaCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let currentLevelIdx = 0;
+        let totalXP = 0, totalStars = 0, lives = 3;
+        let levelStars = new Array(15).fill(0);
+
+        let roboPos, roboDir, roboShield, roboSpeed;
+        let enemies, powerupsLeft, trailCells;
+        let stepCount, running, animQueue;
+        let gridState;
+        let goalPos;
+
+        // Resize canvas
+        function resizeCanvas() {
+            const wrap = canvas.parentElement;
+            const maxW = wrap.clientWidth - 10;
+            const maxH = wrap.clientHeight - 10;
+            const sz = Math.floor(Math.min(maxW, maxH) / GRID_SIZE);
+            CELL_SIZE = Math.max(30, Math.min(52, sz));
+            canvas.width = GRID_SIZE * CELL_SIZE;
+            canvas.height = GRID_SIZE * CELL_SIZE;
+        }
+        window.addEventListener('resize', () => { resizeCanvas(); renderFrame(); });
+
+        // ── COLORS ──────────────────────────────────
+        function worldColors(world) {
+            if (world.includes('🏙')) return { bg: '#0d0d1a', wall: '#1e3a5f', wallTop: '#2a5285', floor: '#0a0a14', floorAlt: '#0c0c1a' };
+            if (world.includes('🌲')) return { bg: '#060f08', wall: '#1a3a1a', wallTop: '#2a5a2a', floor: '#040c06', floorAlt: '#060e08' };
+            if (world.includes('🏭')) return { bg: '#100a00', wall: '#3a2a10', wallTop: '#5a4020', floor: '#0a0800', floorAlt: '#0c0a02' };
+            if (world.includes('🌌')) return { bg: '#04040f', wall: '#0d0d2a', wallTop: '#1515a0', floor: '#020208', floorAlt: '#040410' };
+            if (world.includes('🔬')) return { bg: '#080014', wall: '#200030', wallTop: '#500080', floor: '#040008', floorAlt: '#08000e' };
+            if (world.includes('💾')) return { bg: '#001a00', wall: '#003300', wallTop: '#007700', floor: '#000e00', floorAlt: '#001400' };
+            if (world.includes('☠')) return { bg: '#100000', wall: '#300000', wallTop: '#700000', floor: '#0a0000', floorAlt: '#0e0000' };
+            return { bg: '#0a0a14', wall: '#1a1a3a', wallTop: '#2a2a6a', floor: '#060610', floorAlt: '#080812' };
+        }
+
+        // ── INIT LEVEL ──────────────────────────────
+        function initLevel(idx) {
+            currentLevelIdx = idx;
+            const lvl = LEVELS[idx];
+            resizeCanvas();
+
+            // Build grid
+            gridState = lvl.grid.map(row => [...row]);
+            goalPos = null;
+            for (let r = 0; r < GRID_SIZE; r++) for (let c = 0; c < GRID_SIZE; c++) {
+                if (gridState[r][c] === TILE.GOAL) goalPos = { r, c };
+            }
+            if (!goalPos) {
+                // find '2' manually
+                for (let r = 0; r < GRID_SIZE; r++) for (let c = 0; c < GRID_SIZE; c++) {
+                    if (gridState[r][c] === 2) { goalPos = { r, c }; gridState[r][c] = TILE.GOAL; }
+                }
+            }
+
+            roboPos = { ...lvl.start };
+            roboDir = 'direita';
+            roboShield = 0;
+            roboSpeed = false;
+            stepCount = 0;
+            trailCells = [];
+            running = false;
+            animQueue = [];
+
+            // Enemies
+            enemies = lvl.enemies.map((e, i) => ({
+                r: e.r, c: e.c, baseR: e.r, baseC: e.c,
+                dir: e.dir, range: e.range, speed: e.speed,
+                steps: 0, alive: true, id: i,
+                animFrac: 0
+            }));
+
+            // Powerups
+            powerupsLeft = lvl.powerups.map(p => ({ ...p, collected: false }));
+            // Place in grid
+            powerupsLeft.forEach(p => {
+                if (gridState[p.r][p.c] === TILE.EMPTY) gridState[p.r][p.c] = TILE.POWERUP;
+            });
+
+            // UI
+            document.getElementById('levelLabel').textContent = lvl.title;
+            document.getElementById('hudLevel').textContent = lvl.id;
+            ['star1', 'star2', 'star3'].forEach(id => document.getElementById(id).classList.remove('lit'));
+
+            const concept = CONCEPTS[lvl.concept];
+            const ctag = document.getElementById('conceptTag');
+            ctag.textContent = concept.tag;
+            ctag.style.background = concept.color + '20';
+            ctag.style.color = concept.color;
+            ctag.style.border = '1px solid ' + concept.color + '40';
+            document.getElementById('conceptTitle').textContent = concept.title;
+            document.getElementById('conceptDesc').innerHTML = concept.desc;
+            document.getElementById('conceptSnippet').innerHTML = concept.snippet;
+            document.getElementById('missionTitle').textContent = '🎯 Missão ' + lvl.id;
+            document.getElementById('missionDesc').textContent = lvl.mission;
+            document.getElementById('missionHint').style.display = 'none';
+            document.getElementById('stepCounter').textContent = 'Passos: 0';
+
+            setLog('// Nível ' + lvl.id + ' carregado. Escreva seu código!', 'info');
+            renderFrame();
+        }
+
+        // ── RENDER ──────────────────────────────────
+        function renderFrame() {
+            if (!canvas || canvas.width === 0) return;
+            const lvl = LEVELS[currentLevelIdx];
+            const pal = worldColors(lvl.world);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Floor
+            for (let r = 0; r < GRID_SIZE; r++) for (let c = 0; c < GRID_SIZE; c++) {
+                const x = c * CELL_SIZE, y = r * CELL_SIZE;
+                ctx.fillStyle = (r + c) % 2 === 0 ? pal.floor : pal.floorAlt;
+                ctx.fillRect(x, y, CELL_SIZE, CELL_SIZE);
+            }
+
+            // Trail
+            trailCells.forEach(t => {
+                ctx.fillStyle = 'rgba(0,229,255,0.07)';
+                ctx.fillRect(t.c * CELL_SIZE, t.r * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+                ctx.strokeStyle = 'rgba(0,229,255,0.15)'; ctx.lineWidth = 1;
+                ctx.strokeRect(t.c * CELL_SIZE + .5, t.r * CELL_SIZE + .5, CELL_SIZE - 1, CELL_SIZE - 1);
+            });
+
+            // Tiles
+            for (let r = 0; r < GRID_SIZE; r++) for (let c = 0; c < GRID_SIZE; c++) {
+                const x = c * CELL_SIZE, y = r * CELL_SIZE, t = gridState[r][c];
+                const cs = CELL_SIZE;
+                if (t === TILE.WALL) {
+                    ctx.fillStyle = pal.wall; ctx.fillRect(x, y, cs, cs);
+                    ctx.fillStyle = pal.wallTop; ctx.fillRect(x, y, cs, cs * 0.18);
+                    ctx.strokeStyle = 'rgba(255,255,255,0.04)'; ctx.lineWidth = .5;
+                    ctx.strokeRect(x + .5, y + .5, cs - 1, cs - 1);
+                }
+                else if (t === TILE.GOAL) {
+                    // Glow
+                    const grd = ctx.createRadialGradient(x + cs / 2, y + cs / 2, 2, x + cs / 2, y + cs / 2, cs / 2);
+                    grd.addColorStop(0, 'rgba(255,209,102,0.35)'); grd.addColorStop(1, 'rgba(255,209,102,0)');
+                    ctx.fillStyle = grd; ctx.fillRect(x, y, cs, cs);
+                    ctx.font = `${cs * 0.58}px serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                    ctx.fillText('⭐', x + cs / 2, y + cs / 2);
+                }
+                else if (t === TILE.POWERUP) {
+                    const pu = powerupsLeft.find(p => p.r === r && p.c === c && !p.collected);
+                    if (pu) {
+                        const grd = ctx.createRadialGradient(x + cs / 2, y + cs / 2, 2, x + cs / 2, y + cs / 2, cs / 2.5);
+                        const col = pu.type === 'shield' ? 'rgba(0,229,255,0.3)' : pu.type === 'bomb' ? 'rgba(255,107,157,0.3)' : 'rgba(255,209,102,0.3)';
+                        grd.addColorStop(0, col); grd.addColorStop(1, 'rgba(0,0,0,0)');
+                        ctx.fillStyle = grd; ctx.fillRect(x, y, cs, cs);
+                        ctx.font = `${cs * 0.46}px serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                        const em = pu.type === 'shield' ? '🛡️' : pu.type === 'bomb' ? '💣' : '⚡';
+                        ctx.fillText(em, x + cs / 2, y + cs / 2);
+                    }
+                }
+            }
+
+            // Enemies
+            enemies.forEach(e => {
+                if (!e.alive) return;
+                const ex = e.c * CELL_SIZE, ey = e.r * CELL_SIZE, cs = CELL_SIZE;
+                const grd = ctx.createRadialGradient(ex + cs / 2, ey + cs / 2, 2, ex + cs / 2, ey + cs / 2, cs / 2.2);
+                grd.addColorStop(0, 'rgba(239,68,68,0.25)'); grd.addColorStop(1, 'rgba(239,68,68,0)');
+                ctx.fillStyle = grd; ctx.fillRect(ex, ey, cs, cs);
+                ctx.font = `${cs * 0.52}px serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                ctx.fillText('👾', ex + cs / 2, ey + cs / 2);
+            });
+
+            // Robot
+            const rx = roboPos.c * CELL_SIZE, ry = roboPos.r * CELL_SIZE, cs = CELL_SIZE;
+            if (roboShield > 0) {
+                ctx.beginPath(); ctx.arc(rx + cs / 2, ry + cs / 2, cs / 2 - 2, 0, Math.PI * 2);
+                ctx.strokeStyle = 'rgba(0,229,255,0.7)'; ctx.lineWidth = 2; ctx.stroke();
+            }
+            ctx.font = `${cs * 0.56}px serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.fillText('🤖', rx + cs / 2, ry + cs / 2);
+
+            // Grid border
+            ctx.strokeStyle = 'rgba(255,255,255,0.04)'; ctx.lineWidth = .5;
+            ctx.strokeRect(.25, .25, canvas.width - .5, canvas.height - .5);
+        }
+
+        // ── ANIMATION ───────────────────────────────
+        function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+        const STEP_DELAY = 280;
+
+        async function animateSteps(steps) {
+            running = true;
+            document.getElementById('runBtn').disabled = true;
+            const lvl = LEVELS[currentLevelIdx];
+            let died = false, won = false, dieMsg = '';
+
+            for (let s = 0; s < steps.length; s++) {
+                const step = steps[s];
+                if (step.type === 'move') {
+                    trailCells.push({ ...roboPos });
+                    if (trailCells.length > 20) trailCells.shift();
+                    roboPos = { r: step.r, c: step.c };
+                    stepCount++;
+                    document.getElementById('stepCounter').textContent = 'Passos: ' + stepCount;
+
+                    // Check powerup
+                    const pu = powerupsLeft.find(p => p.r === roboPos.r && p.c === roboPos.c && !p.collected);
+                    if (pu) {
+                        pu.collected = true;
+                        gridState[pu.r][pu.c] = TILE.EMPTY;
+                        if (pu.type === 'shield') { roboShield++; showToast('🛡️ Escudo coletado!', 'info'); }
+                        else if (pu.type === 'speed') { roboSpeed = true; showToast('⚡ Speed boost!', 'info'); }
+                        else if (pu.type === 'bomb') {
+                            // Kill nearby enemies
+                            enemies.forEach(e => {
+                                if (e.alive && Math.abs(e.r - roboPos.r) <= 1 && Math.abs(e.c - roboPos.c) <= 1) {
+                                    e.alive = false; showToast('💥 Inimigo destruído!', 'ok');
+                                }
+                            });
+                        }
+                    }
+
+                    // Advance enemies
+                    enemies.forEach(e => { if (e.alive) advanceEnemy(e); });
+
+                    renderFrame();
+                    await sleep(roboSpeed ? STEP_DELAY * 0.5 : STEP_DELAY);
+
+                    // Check enemy collision
+                    const hitEnemy = enemies.find(e => e.alive && e.r === roboPos.r && e.c === roboPos.c);
+                    if (hitEnemy) {
+                        if (roboShield > 0) {
+                            roboShield--;
+                            showToast('🛡️ Escudo absorbeu o golpe!', 'info');
+                            hitEnemy.alive = false; // enemy dies too
+                        } else {
+                            died = true; dieMsg = '👾 Você foi capturado por um inimigo!'; break;
+                        }
+                    }
+
+                    // Check goal
+                    if (roboPos.r === goalPos.r && roboPos.c === goalPos.c) { won = true; break; }
+                }
+            }
+
+            running = false;
+            document.getElementById('runBtn').disabled = false;
+
+            if (died) {
+                lives = Math.max(0, lives - 1);
+                document.getElementById('hudLives').textContent = lives;
+                showFail(died ? dieMsg : 'Erro de execução');
+            } else if (won) {
+                handleWin();
+            } else {
+                setLog('⚠ Robô não chegou à estrela. Tente novamente!', 'warn');
+                showToast('Cheque sua rota!', 'err');
+            }
+        }
+
+        function advanceEnemy(e) {
+            const dirs = {
+                'direita': { dr: 0, dc: 1 }, 'esquerda': { dr: 0, dc: -1 },
+                'cima': { dr: -1, dc: 0 }, 'baixo': { dr: 1, dc: 0 }
+            };
+            const opp = { 'direita': 'esquerda', 'esquerda': 'direita', 'cima': 'baixo', 'baixo': 'cima' };
+            const d = dirs[e.dir];
+            const nr = e.r + d.dr, nc = e.c + d.dc;
+            const lvl = LEVELS[currentLevelIdx];
+            e.steps = (e.steps || 0) + 1;
+            const blocked = nr < 0 || nr >= GRID_SIZE || nc < 0 || nc >= GRID_SIZE || gridState[nr][nc] === TILE.WALL || e.steps > e.range;
+            if (blocked) { e.dir = opp[e.dir]; e.steps = 0; return; }
+            e.r = nr; e.c = nc;
+        }
+
+        // ── HANDLE WIN ──────────────────────────────
+        function handleWin() {
+            const lvl = LEVELS[currentLevelIdx];
+            const earned = stepCount <= lvl.starLimits[0] ? 3 : stepCount <= lvl.starLimits[1] ? 2 : 1;
+            levelStars[currentLevelIdx] = Math.max(levelStars[currentLevelIdx], earned);
+            totalStars = levelStars.reduce((a, b) => a + b, 0);
+            totalXP += earned * 30 + (roboShield > 0 ? 20 : 0);
+            document.getElementById('hudStars').textContent = totalStars;
+            document.getElementById('hudXP').textContent = totalXP;
+
+            // UI stars
+            ['star1', 'star2', 'star3'].forEach((id, i) => {
+                const el = document.getElementById(id);
+                setTimeout(() => { if (i < earned) el.classList.add('lit'); }, i * 300);
+            });
+
+            const ws = document.getElementById('winStars');
+            ws.innerHTML = '⭐'.repeat(earned) + '☆'.repeat(3 - earned);
+            document.getElementById('winTitle').textContent = earned === 3 ? 'Perfeito! 🏆' : earned === 2 ? 'Ótimo trabalho! 🎉' : 'Nível completo! ✅';
+            document.getElementById('winMsg').textContent = earned === 3 ? 'Código eficiente! 3 estrelas!' : earned === 2 ? 'Bom trabalho! Tente fazer com menos passos para 3 estrelas.' : 'Complete com menos passos para mais estrelas!';
+            const stats = document.getElementById('winStats');
+            stats.innerHTML = `<div class="stat-chip"><span class="sv">${stepCount}</span>passos</div><div class="stat-chip"><span class="sv" style="color:var(--gold)">${earned * 30}</span>XP ganho</div><div class="stat-chip"><span class="sv" style="color:var(--pink)">${lvl.starLimits[0]}</span>passos p/ 3⭐</div>`;
+            document.getElementById('nextBtn').style.display = currentLevelIdx < LEVELS.length - 1 ? '' : 'none';
+            document.getElementById('winOverlay').classList.remove('hidden');
+            spawnSparkles();
+        }
+
+        function showFail(msg) {
+            const emojis = ['💥', '😵', '🤖💀', '⚡💀', '👾'];
+            document.getElementById('failEmoji').textContent = emojis[Math.floor(Math.random() * emojis.length)];
+            document.getElementById('failTitle').textContent = lives > 0 ? 'Ops!' : 'Game Over!';
+            document.getElementById('failMsg').textContent = msg + (lives > 0 ? ` Vidas restantes: ${lives}` : " Você ficou sem vidas!");
+            document.getElementById('failOverlay').classList.remove('hidden');
+        }
+
+        // ── RUN CODE ────────────────────────────────
+        function runCode() {
+            if (running) return;
+            const code = document.getElementById('codeEditor').value.trim();
+            if (!code) { setLog('// Escreva algum código primeiro!', 'info'); return; }
+
+            // Reset position
+            const lvl = LEVELS[currentLevelIdx];
+            roboPos = { ...lvl.start };
+            roboDir = 'direita';
+            trailCells = [];
+            stepCount = 0;
+            roboShield = 0; roboSpeed = false;
+            // Reset enemies
+            enemies = lvl.enemies.map((e, i) => ({ r: e.r, c: e.c, baseR: e.r, baseC: e.c, dir: e.dir, range: e.range, speed: e.speed, steps: 0, alive: true, id: i }));
+            // Reset powerups
+            powerupsLeft = lvl.powerups.map(p => ({ ...p, collected: false }));
+            gridState = lvl.grid.map(row => [...row]);
+            powerupsLeft.forEach(p => { if (gridState[p.r][p.c] === TILE.EMPTY) gridState[p.r][p.c] = TILE.POWERUP; });
+            renderFrame();
+
+            const steps = [];
+            let hasError = false, errMsg = '';
+            let safetyCount = 0;
+
+            // API
+            function mover(dir, n) {
+                n = parseInt(n) || 1;
+                const ds = { 'direita': { dr: 0, dc: 1 }, 'esquerda': { dr: 0, dc: -1 }, 'cima': { dr: -1, dc: 0 }, 'baixo': { dr: 1, dc: 0 } };
+                if (!ds[dir]) throw new Error(`Direção inválida: "${dir}". Use: direita, esquerda, cima, baixo`);
+                const d = ds[dir];
+                for (let i = 0; i < n; i++) {
+                    safetyCount++;
+                    if (safetyCount > 500) throw new Error('Limite de 500 passos atingido!');
+                    const nr = roboPos.r + d.dr, nc = roboPos.c + d.dc;
+                    if (nr < 0 || nr >= GRID_SIZE || nc < 0 || nc >= GRID_SIZE) throw new Error(`Fora do mapa em (${nr},${nc})!`);
+                    const tile = gridState[nr][nc];
+                    if (tile === TILE.WALL) throw new Error(`Colisão com parede em (${nr},${nc})!`);
+                    roboPos = { r: nr, c: nc };
+                    steps.push({ type: 'move', r: nr, c: nc });
+                }
+            }
+
+            function temObstaculo(dir) {
+                const ds = { 'direita': { dr: 0, dc: 1 }, 'esquerda': { dr: 0, dc: -1 }, 'cima': { dr: -1, dc: 0 }, 'baixo': { dr: 1, dc: 0 } };
+                if (!ds[dir]) return true;
+                const d = ds[dir], nr = roboPos.r + d.dr, nc = roboPos.c + d.dc;
+                if (nr < 0 || nr >= GRID_SIZE || nc < 0 || nc >= GRID_SIZE) return true;
+                return gridState[nr][nc] === TILE.WALL;
+            }
+
+            function temInimigo(dir) {
+                const ds = { 'direita': { dr: 0, dc: 1 }, 'esquerda': { dr: 0, dc: -1 }, 'cima': { dr: -1, dc: 0 }, 'baixo': { dr: 1, dc: 0 } };
+                if (!ds[dir]) return false;
+                const d = ds[dir], nr = roboPos.r + d.dr, nc = roboPos.c + d.dc;
+                return enemies.some(e => e.alive && e.r === nr && e.c === nc);
+            }
+
+            function temPowerup(dir) {
+                const ds = { 'direita': { dr: 0, dc: 1 }, 'esquerda': { dr: 0, dc: -1 }, 'cima': { dr: -1, dc: 0 }, 'baixo': { dr: 1, dc: 0 } };
+                if (!ds[dir]) return false;
+                const d = ds[dir], nr = roboPos.r + d.dr, nc = roboPos.c + d.dc;
+                return powerupsLeft.some(p => !p.collected && p.r === nr && p.c === nc);
+            }
+
+            function chegou() {
+                return roboPos.r === goalPos.r && roboPos.c === goalPos.c;
+            }
+
+            // Wrap sensor calls to simulate enemy movement
+            const simPos = { ...LEVELS[currentLevelIdx].start };
+            let simSteps = 0;
+
+            try {
+                // Execute in sandbox
+                const fn = new Function('mover', 'temObstaculo', 'temInimigo', 'temPowerup', 'chegou', code);
+                fn(mover, temObstaculo, temInimigo, temPowerup, chegou);
+                setLog(`✓ Código compilado! ${steps.length} passo(s). Executando...`, 'ok');
+            } catch (e) {
+                hasError = true; errMsg = e.message;
+                setLog('✗ Erro: ' + errMsg, 'err');
+                showToast('Erro no código!', 'err');
+                return;
+            }
+
+            // Animate
+            // Reset roboPos for animation
+            roboPos = { ...LEVELS[currentLevelIdx].start };
+            animateSteps(steps);
+        }
+
+        function resetLevel() { initLevel(currentLevelIdx); }
+        function hideWin() { document.getElementById('winOverlay').classList.add('hidden'); }
+        function hideFail() { document.getElementById('failOverlay').classList.add('hidden'); }
+        function goNextLevel() {
+            hideWin();
+            if (currentLevelIdx < LEVELS.length - 1) {
+                currentLevelIdx++;
+                initLevel(currentLevelIdx);
+                showTutorial();
+            }
+        }
+
+        function showHint() {
+            const lvl = LEVELS[currentLevelIdx];
+            const box = document.getElementById('missionHint');
+            box.style.display = 'block';
+            box.textContent = '💡 ' + lvl.hint;
+        }
+
+        function setLog(msg, type) {
+            const log = document.getElementById('logBox');
+            log.innerHTML = `<div class="log-line log-${type}">${msg}</div>`;
+        }
+
+        // ── TUTORIAL ────────────────────────────────
+        function showTutorial() {
+            const lvl = LEVELS[currentLevelIdx];
+            document.getElementById('tutEmoji').textContent = lvl.id === 1 ? '🤖' : CONCEPTS[lvl.concept].tag.split(' ')[0];
+            document.getElementById('tutTitle').textContent = lvl.title;
+            document.getElementById('tutMsg').innerHTML = lvl.tutorialMsg;
+            document.getElementById('tutSnippet').innerHTML = lvl.tutorialSnippet;
+            document.getElementById('tutorialOverlay').classList.remove('hidden');
+        }
+        function startTutorial() {
+            document.getElementById('tutorialOverlay').classList.add('hidden');
+        }
+
+        // ── TOAST & SPARKLES ────────────────────────
+        function showToast(msg, cls) {
+            const t = document.getElementById('toast');
+            t.textContent = msg; t.className = 'toast show ' + (cls || '');
+            clearTimeout(t._t);
+            t._t = setTimeout(() => t.classList.remove('show'), 2200);
+        }
+
+        function spawnSparkles() {
+            const c = document.getElementById('sparkles');
+            const cols = ['#00e5ff', '#ff6b9d', '#7c6ffd', '#ffd166', '#22c55e'];
+            for (let i = 0; i < 22; i++) {
+                const s = document.createElement('div');
+                s.className = 'sparkle';
+                const sz = 4 + Math.random() * 8;
+                s.style.cssText = `left:${10 + Math.random() * 80}%;bottom:${10 + Math.random() * 40}%;width:${sz}px;height:${sz}px;background:${cols[Math.random() * cols.length | 0]};animation-delay:${Math.random() * .6}s;animation-duration:${.8 + Math.random() * .7}s`;
+                c.appendChild(s);
+                setTimeout(() => s.remove(), 1600);
+            }
+        }
+
+        // ═══════════════════════════════════════════════
+        //  INIT
+        // ═══════════════════════════════════════════════
+        document.addEventListener('DOMContentLoaded', () => {
+            resizeCanvas();
+            initLevel(0);
+            showTutorial();
+            // Tab key in editor
+            document.getElementById('codeEditor').addEventListener('keydown', e => {
+                if (e.key === 'Tab') {
+                    e.preventDefault();
+                    const s = e.target.selectionStart, en = e.target.selectionEnd;
+                    e.target.value = e.target.value.substring(0, s) + '  ' + e.target.value.substring(en);
+                    e.target.selectionStart = e.target.selectionEnd = s + 2;
+                }
+                if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) runCode();
+            });
+        });
+    </script>
+</body>
+
+</html>
