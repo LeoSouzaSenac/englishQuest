@@ -1,534 +1,59 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>EnglishQuest</title>
-    <link
-      rel="shortcut icon"
-      href="https://cdn-icons-png.flaticon.com/128/10855/10855296.png"
-      type="image/x-icon"
-    />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800;900&family=DM+Sans:wght@300;400;500&display=swap"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="assets/styles/main.css">
-    <link rel="stylesheet" href="assets/styles/pm-chat-simulator.css">
-    <link rel="stylesheet" href="assets/styles/passive-arena.css">
-  </head>
-  <body>
-    <nav>
-      <div class="logo">EnglishQuest</div>
-      <div class="nav-xp">
-        ⚡ <span class="xp-val" id="xpDisplay">0</span> XP
-      </div>
-    </nav>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EduQuest</title>
+  <link rel="shortcut icon" href="https://cdn-icons-png.flaticon.com/128/10855/10855296.png" type="image/x-icon" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/styles/portal.css" />
+</head>
+<body>
 
-    <div class="tabs">
-      <button class="tab active" onclick="switchTab('home')">🏠 Home</button>
-      <button class="tab" onclick="switchTab('quiz')">🎯 Quiz Game</button>
-      <button class="tab" onclick="switchTab('error')">🔍 Error Detector</button>
-      <button class="tab" onclick="switchTab('build')">🧩 Build Sentence</button>
-      <button class="tab" onclick="switchTab('story')">📖 Story Mode</button>
-      <button class="tab" onclick="switchTab('speed')">⚡ Speed Round</button>
-      <button class="tab" onclick="switchTab('milhao')">💰 Millionaire?</button>
-      <button class="tab" onclick="switchTab('hangman')">🪢 Hangman</button>
-      <button class="tab" onclick="switchTab('modal')">🛠️ Modal Mission</button>
-      <button class="tab" onclick="switchTab('pmchat')">💬 PM Chat</button>
-      <button class="tab" onclick="switchTab('passive')">🔄 Passive Voice</button>
-      <button class="tab" onclick="switchTab('progress')">📊 Progress</button>
+  <header class="portal-header">
+    <div class="portal-logo">EduQuest</div>
+    <p class="portal-tagline">Escolha uma trilha de aprendizado</p>
+  </header>
+
+  <main class="track-grid">
+
+    <!-- ENGLISH -->
+    <a href="english/index.html" class="track-card active" data-color="en">
+      <div class="track-icon">🇺🇸</div>
+      <div class="track-body">
+        <h2 class="track-name">English</h2>
+        <p class="track-desc">Verb Tenses, Verb To Be, Modal Verbs e Passive Voice — jogos interativos para dominar a gramática.</p>
+        <div class="track-pills">
+          <span class="track-pill">Verb To Be</span>
+          <span class="track-pill">Verb Tenses</span>
+          <span class="track-pill">Modals</span>
+          <span class="track-pill">Passive Voice</span>
+        </div>
+        <span class="track-badge available">Disponível</span>
+      </div>
+      <div class="track-arrow en">→</div>
+    </a>
+
+    <!-- JAVASCRIPT (em produção) -->
+    <div class="track-card disabled" data-color="js" aria-disabled="true">
+      <div class="track-icon">⚙️</div>
+      <div class="track-body">
+        <h2 class="track-name">JavaScript</h2>
+        <p class="track-desc">Fundamentos, DOM, funções e projetos práticos — aprenda programando de verdade.</p>
+        <div class="track-pills">
+          <span class="track-pill">Fundamentos</span>
+          <span class="track-pill">DOM</span>
+          <span class="track-pill">Funções</span>
+          <span class="track-pill">Projetos</span>
+        </div>
+        <span class="track-badge wip">Em produção</span>
+      </div>
+      <div class="track-arrow muted">→</div>
     </div>
 
-    <!-- ══════════ HOME ══════════ -->
-    <div class="page active" id="page-home">
-      <div class="hero">
-        <h1>Master<br /><span>Verb Tenses</span></h1>
-        <p>
-          13 jogos interativos para dominar tempos verbais, modal verbs e
-          passive voice em inglês. Aprenda brincando!
-        </p>
-      </div>
+  </main>
 
-      <div class="tense-cards">
-        <div class="tense-card present">
-          <div class="badge">Simple Present</div>
-          <h3>I work every day</h3>
-          <p>Rotina, hábitos e fatos gerais</p>
-          <ul>
-            <li>She studies math</li>
-            <li>They play soccer</li>
-            <li>It rains a lot here</li>
-          </ul>
-          <div class="formula">Subject + V(s/es) + complement</div>
-        </div>
-        <div class="tense-card cont">
-          <div class="badge">Present Continuous</div>
-          <h3>I am working now</h3>
-          <p>Ações acontecendo agora mesmo</p>
-          <ul>
-            <li>She is studying now</li>
-            <li>They are playing</li>
-            <li>It is raining</li>
-          </ul>
-          <div class="formula">Subject + am/is/are + V-ing</div>
-        </div>
-        <div class="tense-card past">
-          <div class="badge">Simple Past</div>
-          <h3>I worked yesterday</h3>
-          <p>Ações finalizadas no passado</p>
-          <ul>
-            <li>She studied last night</li>
-            <li>They played yesterday</li>
-            <li>It rained all day</li>
-          </ul>
-          <div class="formula">Subject + V(ed/irreg) + complement</div>
-        </div>
-        <div class="tense-card future">
-          <div class="badge">Future (will)</div>
-          <h3>I will work tomorrow</h3>
-          <p>Ações e planos futuros</p>
-          <ul>
-            <li>She will study later</li>
-            <li>They will play tonight</li>
-            <li>It will rain tomorrow</li>
-          </ul>
-          <div class="formula">Subject + will + V (base form)</div>
-        </div>
-      </div>
+  <footer class="portal-footer">EduQuest · Senac RS</footer>
 
-      <!-- Modal Verbs Reference Card -->
-      <div style="margin-top: 24px;">
-        <div class="tense-card" style="border-top: 3px solid var(--accent-cont); max-width: 100%;">
-          <div class="badge" style="background: rgba(124,111,253,.15); color: var(--accent-cont);">Modal Verbs</div>
-          <h3>Modals in Tech Context</h3>
-          <p>Comunicação profissional em inglês</p>
-          <ul>
-            <li><strong style="color:var(--accent-cont)">can</strong> — The system can validate data.</li>
-            <li><strong style="color:var(--accent-present)">should</strong> — Developers should document the API.</li>
-            <li><strong style="color:var(--accent-past)">must</strong> — Users must authenticate first.</li>
-            <li><strong style="color:var(--accent-future)">could</strong> — We could redesign the interface.</li>
-          </ul>
-          <div class="formula">Subject + Modal + Base Verb (no "to", no -s/-ing)</div>
-        </div>
-      </div>
-
-      <!-- Passive Voice Reference Card -->
-      <div style="margin-top: 24px;">
-        <div class="tense-card" style="border-top: 3px solid #b794f6; max-width: 100%;">
-          <div class="badge" style="background: rgba(183,148,246,.15); color: #b794f6;">Passive Voice</div>
-          <h3>Passive Voice in Tech Context</h3>
-          <p>Changelogs, bug reports e documentação</p>
-          <ul>
-            <li><strong style="color:#b794f6">is/are + V3</strong> — User data is encrypted.</li>
-            <li><strong style="color:var(--accent-present)">was/were + V3</strong> — The bug was fixed.</li>
-            <li><strong style="color:var(--accent-past)">has been + V3</strong> — A new version has been released.</li>
-            <li><strong style="color:var(--accent-future)">will be + V3</strong> — The update will be installed.</li>
-          </ul>
-          <div class="formula">Subject + be (am/is/are/was/were/been) + Past Participle</div>
-        </div>
-      </div>
-
-      <div style="margin-top: 40px">
-        <div class="section-title">
-          Mini Games <span>Escolha um jogo para começar</span>
-        </div>
-        <div class="game-grid">
-          <div class="game-card">
-            <div class="game-title"><span class="game-icon">🎯</span>Quiz Game</div>
-            <p class="game-desc">Escolha a opção correta para completar a frase. 20 questões com explicações!</p>
-            <button class="btn btn-primary" onclick="switchTab('quiz')">Jogar →</button>
-          </div>
-          <div class="game-card">
-            <div class="game-title"><span class="game-icon">🔍</span>Error Detector</div>
-            <p class="game-desc">Encontre e corrija o erro gramatical em cada frase.</p>
-            <button class="btn btn-primary" onclick="switchTab('error')">Jogar →</button>
-          </div>
-          <div class="game-card">
-            <div class="game-title"><span class="game-icon">🧩</span>Build Sentence</div>
-            <p class="game-desc">Arraste as palavras para montar frases corretas.</p>
-            <button class="btn btn-primary" onclick="switchTab('build')">Jogar →</button>
-          </div>
-          <div class="game-card">
-            <div class="game-title"><span class="game-icon">📖</span>Story Mode</div>
-            <p class="game-desc">Complete a história escolhendo o tempo verbal certo em cada situação.</p>
-            <button class="btn btn-primary" onclick="switchTab('story')">Jogar →</button>
-          </div>
-          <div class="game-card" style="border-color: #c8930a; background: linear-gradient(135deg, rgba(255,209,102,0.07), var(--surface));">
-            <div class="game-title"><span class="game-icon">💰</span>Who wants to be a millionaire?</div>
-            <p class="game-desc">15 perguntas, 3 ajudas, prêmios até R$ 1.000.000! Responda certo e vá longe.</p>
-            <button class="btn" style="background: var(--accent-future); color: #000; font-family: 'Syne', sans-serif; font-weight: 700; padding: 12px 24px; border-radius: 50px; border: none; cursor: pointer;" onclick="switchTab('milhao')">Jogar →</button>
-          </div>
-          <div class="game-card">
-            <div class="game-title"><span class="game-icon">🪢</span>Hangman</div>
-            <p class="game-desc">Adivinhe a palavra em inglês antes do boneco ser completado.</p>
-            <button class="btn btn-primary" onclick="switchTab('hangman')">Jogar →</button>
-          </div>
-          <!-- MODAL MISSION CARD -->
-          <div class="game-card" style="border-color: var(--accent-present); background: linear-gradient(135deg, rgba(0,212,170,0.05), var(--surface));">
-            <div class="game-title"><span class="game-icon">🛠️</span>Modal Mission</div>
-            <p class="game-desc">Leia tickets de suporte técnico e complete as frases com o modal verb correto. 3 níveis de dificuldade!</p>
-            <button class="btn" style="background: var(--accent-present); color: #000; font-family: 'Syne', sans-serif; font-weight: 700; padding: 12px 24px; border-radius: 50px; border: none; cursor: pointer;" onclick="switchTab('modal')">Jogar →</button>
-          </div>
-          <!-- PM CHAT CARD -->
-          <div class="game-card" style="border-color: var(--accent-cont); background: linear-gradient(135deg, rgba(124,111,253,0.07), var(--surface));">
-            <div class="game-title"><span class="game-icon">💬</span>PM Chat Simulator</div>
-            <p class="game-desc">Simule um chat com seu Project Manager! Escolha o assunto (Modal Verbs ou Passive Voice) e responda usando a gramática certa.</p>
-            <button class="btn" style="background: var(--accent-cont); color: #fff; font-family: 'Syne', sans-serif; font-weight: 700; padding: 12px 24px; border-radius: 50px; border: none; cursor: pointer;" onclick="switchTab('pmchat')">Jogar →</button>
-          </div>
-          <!-- PASSIVE VOICE ARENA CARD -->
-          <div class="game-card" style="border-color: #b794f6; background: linear-gradient(135deg, rgba(183,148,246,0.08), var(--surface));">
-            <div class="game-title"><span class="game-icon">🔄</span>Passive Voice Arena</div>
-            <p class="game-desc">5 jogos diferentes pra praticar passive voice: drill, corrida, leitura, detetive e mystery feature.</p>
-            <button class="btn" style="background: #b794f6; color: #000; font-family: 'Syne', sans-serif; font-weight: 700; padding: 12px 24px; border-radius: 50px; border: none; cursor: pointer;" onclick="switchTab('passive')">Jogar →</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ══════════ QUIZ ══════════ -->
-    <div class="page" id="page-quiz">
-      <div class="section-title">🎯 Quiz Game</div>
-      <div class="game-card" style="max-width: 600px">
-        <div class="quiz-stats">
-          Pergunta <span id="qNum">1</span>/20 &nbsp;|&nbsp; Acertos:
-          <span id="qScore">0</span> &nbsp;|&nbsp; 🔥 Streak:
-          <span id="qStreak">0</span>
-        </div>
-        <div class="quiz-question" id="quizQuestion">Loading...</div>
-        <div class="quiz-options" id="quizOptions"></div>
-        <div class="quiz-feedback" id="quizFeedback"></div>
-        <div style="margin-top: 16px; display: flex; gap: 10px; flex-wrap: wrap" id="quizControls">
-          <button class="btn btn-primary" id="nextBtn" onclick="nextQuestion()" style="display: none">Próxima →</button>
-          <button class="btn btn-outline btn-sm" onclick="resetQuiz()">Reiniciar</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- ══════════ ERROR DETECTOR ══════════ -->
-    <div class="page" id="page-error">
-      <div class="section-title">🔍 Error Detector</div>
-      <div class="game-card" style="max-width: 600px">
-        <div class="quiz-stats">
-          Frase <span id="errNum">1</span>/10 &nbsp;|&nbsp; Acertos:
-          <span id="errScore">0</span>
-        </div>
-        <p class="game-desc">Reescreva a frase corrigindo o erro gramatical.</p>
-        <div class="error-sentence" id="errSentence"></div>
-        <input type="text" class="error-input" id="errInput" placeholder="Digite a frase corrigida..." />
-        <div style="display: flex; gap: 10px; flex-wrap: wrap">
-          <button class="btn btn-primary" onclick="checkError()">Verificar</button>
-          <button class="btn btn-outline btn-sm" onclick="skipError()">Pular →</button>
-          <button class="btn btn-outline btn-sm" onclick="resetError()">Reiniciar</button>
-        </div>
-        <div class="quiz-feedback" id="errFeedback" style="margin-top: 14px"></div>
-      </div>
-    </div>
-
-    <!-- ══════════ BUILD SENTENCE ══════════ -->
-    <div class="page" id="page-build">
-      <div class="section-title">🧩 Build Sentence</div>
-      <div class="game-card" style="max-width: 620px">
-        <div class="quiz-stats">
-          Frase <span id="buildNum">1</span>/8 &nbsp;|&nbsp; Acertos:
-          <span id="buildScore">0</span>
-        </div>
-        <p class="game-desc" id="buildHint"></p>
-        <div class="sentence-slots" id="buildSlots">
-          <span class="slot-placeholder">Arraste as palavras aqui em ordem...</span>
-        </div>
-        <div class="drag-words" id="buildWords"></div>
-        <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px">
-          <button class="btn btn-primary" onclick="checkBuild()">Verificar ✓</button>
-          <button class="btn btn-outline btn-sm" onclick="clearBuild()">Limpar</button>
-          <button class="btn btn-outline btn-sm" onclick="resetBuild()">Reiniciar</button>
-        </div>
-        <div class="quiz-feedback" id="buildFeedback" style="margin-top: 14px"></div>
-      </div>
-    </div>
-
-    <!-- ══════════ STORY MODE ══════════ -->
-    <div class="page" id="page-story">
-      <div class="section-title">📖 Story Mode</div>
-      <div class="game-card" style="max-width: 620px">
-        <div class="quiz-stats">
-          Cena <span id="storyNum">1</span>/6 &nbsp;|&nbsp; Acertos:
-          <span id="storyScore">0</span>
-        </div>
-        <div id="storyContent"></div>
-        <div class="quiz-feedback" id="storyFeedback" style="margin-top: 14px"></div>
-        <button class="btn btn-outline btn-sm" onclick="resetStory()" style="margin-top: 12px">Reiniciar</button>
-      </div>
-    </div>
-
-    <!-- ══════════ HANGMAN ══════════ -->
-    <div class="page" id="page-hangman">
-      <div class="section-title">🪢 Hangman</div>
-      <div class="game-card">
-        <div class="hangman-info">
-          <div><small>Word</small><span id="hangmanRound">1</span>/10</div>
-          <div><small>Mistakes</small><span id="hangmanLives">0</span>/6</div>
-          <div><small>Score</small><span id="hangmanScore">0</span></div>
-        </div>
-        <div class="hangman-wrap">
-          <div class="hangman-visual">
-            <svg class="hangman-svg" viewBox="0 0 240 240">
-              <line class="gallows" x1="30" y1="220" x2="170" y2="220"/>
-              <line class="gallows" x1="60" y1="220" x2="60" y2="20"/>
-              <line class="gallows" x1="60" y1="20" x2="150" y2="20"/>
-              <line class="gallows" x1="150" y1="20" x2="150" y2="50"/>
-              <circle class="hm-body" id="hm0" cx="150" cy="72" r="22"/>
-              <line class="hm-body" id="hm1" x1="150" y1="94" x2="150" y2="145"/>
-              <line class="hm-body" id="hm2" x1="150" y1="110" x2="122" y2="130"/>
-              <line class="hm-body" id="hm3" x1="150" y1="110" x2="178" y2="130"/>
-              <line class="hm-body" id="hm4" x1="150" y1="145" x2="128" y2="178"/>
-              <line class="hm-body" id="hm5" x1="150" y1="145" x2="172" y2="178"/>
-            </svg>
-          </div>
-          <div class="hangman-game">
-            <div class="hangman-category" id="hangmanCategory">📚 Animals</div>
-            <div id="hangmanWord"></div>
-            <div id="hangmanKeyboard"></div>
-            <div class="hangman-result" id="hangmanResult"></div>
-            <div class="hangman-actions">
-              <button class="hangman-btn" onclick="nextHangmanWord()">Próxima Palavra →</button>
-              <button class="hangman-btn" onclick="resetHangman()">Reiniciar</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ══════════ MODAL MISSION ══════════ -->
-    <div class="page" id="page-modal">
-      <!-- renderizado dinamicamente por modalMission.js -->
-    </div>
-
-    <!-- ══════════ PM CHAT SIMULATOR ══════════ -->
-    <div class="page" id="page-pmchat">
-      <!-- renderizado dinamicamente por pmChat.js -->
-    </div>
-
-    <!-- ══════════ PASSIVE VOICE ARENA ══════════ -->
-    <div class="page" id="page-passive">
-      <!-- renderizado dinamicamente por passiveArena.js -->
-    </div>
-
-    <!-- ══════════ SPEED ROUND ══════════ -->
-    <div class="page" id="page-speed">
-      <div class="section-title">⚡ Speed Round</div>
-      <div class="game-card" style="max-width: 520px">
-        <div class="speed-score-row">
-          <div>Pontos: <span id="speedScore">0</span></div>
-          <div>Tempo: <span id="speedTime">60</span>s</div>
-        </div>
-        <div class="speed-timer">
-          <div class="speed-timer-bar" id="speedBar" style="width: 100%"></div>
-        </div>
-        <div class="speed-prompt" id="speedPrompt">
-          <div class="tense-label" id="speedTenseLabel" style="color: var(--accent-present)">Simple Present</div>
-          <div class="verb" id="speedVerb">work</div>
-          <div class="subject" id="speedSubject">She ___</div>
-        </div>
-        <input type="text" class="speed-input" id="speedInput" placeholder="Type your answer..." autocomplete="off" />
-        <div style="display: flex; gap: 10px; margin-top: 14px; justify-content: center; flex-wrap: wrap;" id="speedControls">
-          <button class="btn btn-primary" id="speedStartBtn" onclick="startSpeed()">▶ Iniciar</button>
-        </div>
-        <div style="margin-top: 16px; font-size: 0.85rem; color: var(--muted)">
-          <strong style="color: var(--text)">Como jogar:</strong> Conjugue o verbo para o sujeito e tempo indicados. Pressione Enter para confirmar.
-        </div>
-      </div>
-    </div>
-
-    <!-- ══════════ PROGRESS ══════════ -->
-    <div class="page" id="page-progress">
-      <div class="section-title">📊 Progress</div>
-      <div class="progress-grid">
-        <div class="progress-stat">
-          <div class="label">Total XP</div>
-          <div class="value" id="statXP" style="color: var(--accent-future)">0</div>
-        </div>
-        <div class="progress-stat">
-          <div class="label">Questões Respondidas</div>
-          <div class="value" id="statQ">0</div>
-        </div>
-        <div class="progress-stat">
-          <div class="label">Taxa de Acerto</div>
-          <div class="value" id="statAcc">—</div>
-        </div>
-        <div class="progress-stat">
-          <div class="label">Maior Streak</div>
-          <div class="value" id="statStreak" style="color: var(--accent-past)">0</div>
-        </div>
-      </div>
-
-      <div class="section-title" style="font-size: 1.2rem">Desempenho por Tempo Verbal</div>
-      <div id="progressBars" style="max-width: 500px; margin-bottom: 36px"></div>
-
-      <div class="section-title" style="font-size: 1.2rem">Teacher Dashboard</div>
-      <div style="background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius); overflow: auto;">
-        <table>
-          <thead>
-            <tr>
-              <th>Aluno</th>
-              <th>Simple Present</th>
-              <th>Present Cont.</th>
-              <th>Simple Past</th>
-              <th>Future</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Lucas</td>
-              <td><span class="score-pill score-high">90%</span></td>
-              <td><span class="score-pill score-mid">82%</span></td>
-              <td><span class="score-pill score-high">95%</span></td>
-              <td><span class="score-pill score-mid">88%</span></td>
-            </tr>
-            <tr>
-              <td>Ana</td>
-              <td><span class="score-pill score-high">98%</span></td>
-              <td><span class="score-pill score-high">91%</span></td>
-              <td><span class="score-pill score-mid">85%</span></td>
-              <td><span class="score-pill score-high">93%</span></td>
-            </tr>
-            <tr>
-              <td>Carlos</td>
-              <td><span class="score-pill score-mid">70%</span></td>
-              <td><span class="score-pill score-low">66%</span></td>
-              <td><span class="score-pill score-mid">80%</span></td>
-              <td><span class="score-pill score-mid">72%</span></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <div class="toast" id="toast"></div>
-
-    <!-- ══════════ SHOW DO MILHÃO ══════════ -->
-    <div class="page" id="page-milhao">
-      <div class="milhao-stage">
-        <div class="milhao-header">
-          <div class="milhao-logo">💰 Who wants to be a millionaire?</div>
-          <div class="milhao-subtitle">Tempos Verbais em Inglês • 15 perguntas • 3 ajudas</div>
-        </div>
-
-        <div id="milhaoStart" style="text-align: center; padding: 40px 20px">
-          <div style="font-size: 5rem; margin-bottom: 20px">🎬</div>
-          <h2 style="font-family: 'Syne', sans-serif; font-size: 1.8rem; font-weight: 900; margin-bottom: 12px;">Você está pronto?</h2>
-          <p style="color: var(--muted); margin-bottom: 32px; max-width: 400px; margin-left: auto; margin-right: auto;">
-            Responda 15 perguntas sobre tempos verbais em inglês. Use as 3 ajudas com sabedoria. Boa sorte!
-          </p>
-          <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 24px;">
-            <div style="background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 14px 20px; font-size: 0.85rem;">
-              <div style="font-size: 1.5rem">📞</div>
-              <div style="font-family: 'Syne', sans-serif; font-weight: 700; margin-top: 4px;">Ligar para um amigo</div>
-            </div>
-            <div style="background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 14px 20px; font-size: 0.85rem;">
-              <div style="font-size: 1.5rem">👥</div>
-              <div style="font-family: 'Syne', sans-serif; font-weight: 700; margin-top: 4px;">Ajuda da plateia</div>
-            </div>
-            <div style="background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 14px 20px; font-size: 0.85rem;">
-              <div style="font-size: 1.5rem">✂️</div>
-              <div style="font-family: 'Syne', sans-serif; font-weight: 700; margin-top: 4px;">Eliminar 2 respostas</div>
-            </div>
-          </div>
-          <button class="btn-confirm" onclick="startMilhao()">▶ Começar o Jogo</button>
-        </div>
-
-        <div id="milhaoGame" style="display: none">
-          <div class="milhao-question-box" id="mQBox">
-            <div class="milhao-q-num" id="mQNum">Pergunta 1 de 15</div>
-            <div class="milhao-q-text" id="mQText"></div>
-          </div>
-          <div class="milhao-options" id="mOptions"></div>
-          <div id="phonePopup" class="phone-popup">
-            <div class="friend-name" id="friendName"></div>
-            <div id="friendSpeech"></div>
-          </div>
-          <div id="audienceResult" style="display: none; background: var(--surface); border: 1.5px solid var(--border); border-radius: 14px; padding: 16px 20px; margin-bottom: 16px;">
-            <div style="font-size: 0.8rem; font-weight: 700; color: var(--muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.08em;">Resultado da Plateia</div>
-            <div class="audience-chart" id="audienceChart"></div>
-          </div>
-          <div class="milhao-controls">
-            <button class="lifeline-btn" id="llPhone" onclick="usePhone()"><span class="ll-icon">📞</span><span>Amigo</span></button>
-            <button class="lifeline-btn" id="llAudience" onclick="useAudience()"><span class="ll-icon">👥</span><span>Plateia</span></button>
-            <button class="lifeline-btn" id="llFifty" onclick="useFifty()"><span class="ll-icon">✂️</span><span>50/50</span></button>
-            <button class="btn-stop" onclick="stopGame()">🚪 Parar e Guardar</button>
-            <button class="btn-confirm" id="mConfirmBtn" onclick="confirmAnswer()" disabled>Confirmar ✓</button>
-          </div>
-          <div style="margin-top: 14px" id="mFeedback"></div>
-        </div>
-      </div>
-      <div class="prize-ladder" id="prizeLadder"></div>
-    </div>
-
-    <!-- WIN OVERLAY -->
-    <div class="milhao-overlay" id="winOverlay">
-      <div class="overlay-box win">
-        <div class="overlay-emoji" id="winEmoji">🏆</div>
-        <div class="overlay-title" id="winTitle">Parabéns!</div>
-        <div class="overlay-prize" id="winPrize"></div>
-        <div class="overlay-msg" id="winMsg"></div>
-        <button class="btn-confirm" onclick="resetMilhao()">🔄 Jogar Novamente</button>
-      </div>
-    </div>
-
-    <!-- LOSE OVERLAY -->
-    <div class="milhao-overlay" id="loseOverlay">
-      <div class="overlay-box lose">
-        <div class="overlay-emoji">😬</div>
-        <div class="overlay-title">Resposta Errada!</div>
-        <div class="overlay-prize" id="losePrize" style="color: var(--muted); font-size: 1rem"></div>
-        <div class="overlay-msg" id="loseMsg"></div>
-        <button class="btn-confirm" onclick="resetMilhao()">🔄 Jogar Novamente</button>
-      </div>
-    </div>
-
-    <!-- Sparkle container -->
-    <div class="sparkle-container" id="sparkles"></div>
-
-    <script src="assets/scripts/state.js"></script>
-    <script src="assets/scripts/quiz.js"></script>
-    <script src="assets/scripts/errorDetector.js"></script>
-    <script src="assets/scripts/buildSentences.js"></script>
-    <script src="assets/scripts/storyMode.js"></script>
-    <script src="assets/scripts/millionaire.js"></script>
-    <script src="assets/scripts/hangman.js"></script>
-    <script src="assets/scripts/progress.js"></script>
-    <script src="assets/scripts/speedMode.js"></script>
-    <script src="assets/scripts/modalMission.js"></script>
-    <script src="assets/scripts/pmChat.js"></script>
-    <script src="assets/scripts/passiveArena.js"></script>
-    <script>
-      // ══════════════════════════════
-      //  INIT
-      // ══════════════════════════════
-
-      // Patch switchTab to handle all 12 tabs
-      const _origSwitch = switchTab;
-      function switchTab(id) {
-        const allIds = ['home','quiz','error','build','story','speed','milhao','hangman','modal','pmchat','passive','progress'];
-        document.querySelectorAll('.tab').forEach((t, i) => {
-          t.classList.toggle('active', allIds[i] === id);
-        });
-        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-        const pg = document.getElementById('page-' + id);
-        if (pg) pg.classList.add('active');
-        if (id === 'progress') updateProgress();
-      }
-
-      loadQuiz();
-      loadError();
-      loadBuild();
-      loadStory();
-      loadHangmanWord();
-      updateProgress();
-      buildPrizeLadder();
-      loadModalMission();
-      loadPMChat();
-      loadPassiveArena();
-    </script>
-  </body>
+</body>
 </html>

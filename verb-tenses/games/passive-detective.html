@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bug Report Detective</title>
+<style>
+  :root{
+    --bg:#0a0c10;--panel:#13161d;--panel-2:#181c26;--border:#2a2f3a;
+    --text:#e9edf4;--muted:#8a93a3;--accent:#5eead4;--amber:#f5b349;
+    --success:#56e08a;--error:#ff6b6b;
+    --mono:'JetBrains Mono','Fira Code',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    --sans:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;min-height:100vh;background:repeating-linear-gradient(0deg, rgba(255,255,255,0.012) 0px, rgba(255,255,255,0.012) 1px, transparent 1px, transparent 3px), var(--bg);color:var(--text);font-family:var(--sans);display:flex;align-items:center;justify-content:center;padding:20px;}
+  .case-file{width:100%;max-width:680px;background:var(--panel);border:1px solid var(--border);border-radius:8px;box-shadow:0 30px 80px -30px rgba(0,0,0,.8);overflow:hidden;}
+  .case-header{background:#0f1217;border-bottom:2px solid var(--amber);padding:18px 26px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;}
+  .case-title{font-family:var(--mono);font-size:13px;letter-spacing:.08em;color:var(--amber);}
+  .case-num{font-family:var(--mono);font-size:12px;color:var(--muted);}
+  .body{padding:26px 26px 24px;}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin:0 0 6px;}
+  h1{margin:0 0 18px;font-size:20px;font-weight:700;}
+  .badge-row{display:flex;justify-content:flex-end;margin-bottom:8px;}
+  .badge{font-family:var(--mono);font-size:10.5px;font-weight:700;letter-spacing:.06em;padding:3px 9px;border-radius:20px;text-transform:uppercase;}
+  .badge.easy{background:rgba(86,224,138,.12);color:var(--success);border:1px solid rgba(86,224,138,.4);}
+  .badge.medium{background:rgba(245,179,73,.12);color:var(--amber);border:1px solid rgba(245,179,73,.4);}
+  .badge.hard{background:rgba(255,107,107,.12);color:var(--error);border:1px solid rgba(255,107,107,.4);}
+  .clue-box{background:var(--panel-2);border:1px solid var(--border);border-radius:8px;padding:20px;margin-bottom:18px;font-family:var(--mono);font-size:16px;line-height:2;}
+  .word{display:inline-block;padding:2px 4px;margin:2px 1px;border-radius:4px;cursor:pointer;transition:background .12s ease, color .12s ease;}
+  .word:hover{background:rgba(255,255,255,.06);}
+  .word.sel-subject{background:rgba(94,234,212,.22);color:var(--accent);font-weight:700;}
+  .word.sel-verb{background:rgba(245,179,73,.22);color:var(--amber);font-weight:700;}
+  .word.locked{cursor:default;}
+  .mode-row{display:flex;gap:10px;margin-bottom:16px;}
+  .mode-btn{flex:1;font-family:var(--mono);font-size:12.5px;font-weight:600;border:1px solid var(--border);background:var(--panel-2);color:var(--muted);border-radius:6px;padding:11px 10px;cursor:pointer;}
+  .mode-btn.active.subject{border-color:var(--accent);color:var(--accent);background:rgba(94,234,212,.08);}
+  .mode-btn.active.verb{border-color:var(--amber);color:var(--amber);background:rgba(245,179,73,.08);}
+  .hint{font-family:var(--mono);font-size:11.5px;color:var(--muted);margin:0 0 18px;}
+  button.action{font-family:var(--mono);font-weight:700;font-size:13px;border:none;border-radius:6px;padding:13px 18px;cursor:pointer;width:100%;background:var(--amber);color:#1a1305;}
+  button.action:hover{opacity:.9;}
+  button.action:disabled{opacity:.35;cursor:not-allowed;}
+  button.ghost{font-family:var(--mono);font-weight:600;font-size:13px;background:transparent;color:var(--text);border:1px solid var(--border);border-radius:6px;padding:13px 18px;cursor:pointer;width:100%;margin-top:10px;}
+  button.ghost:hover{border-color:var(--accent);}
+  .result-row{display:flex;gap:10px;margin-top:16px;}
+  .result-chip{flex:1;text-align:center;font-family:var(--mono);font-size:12.5px;padding:10px;border-radius:6px;border:1px solid var(--border);}
+  .result-chip.ok{border-color:var(--success);color:var(--success);background:rgba(86,224,138,.08);}
+  .result-chip.bad{border-color:var(--error);color:var(--error);background:rgba(255,107,107,.08);}
+  .reveal{font-family:var(--mono);font-size:12.5px;color:var(--muted);margin-top:12px;line-height:1.6;display:none;}
+  .reveal.show{display:block;}
+  .reveal b{color:var(--text);}
+  .progress-label{font-family:var(--mono);font-size:11.5px;color:var(--muted);margin-bottom:8px;}
+  .end-screen{display:none;text-align:center;}
+  .end-screen.show{display:block;}
+  .score-big{font-family:var(--mono);font-size:46px;font-weight:700;color:var(--amber);margin:6px 0 2px;}
+  .score-label{font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;}
+  .verdict{margin:16px 0 22px;font-size:14.5px;}
+</style>
+</head>
+<body>
+
+<div class="case-file">
+  <div class="case-header">
+    <span class="case-title">🔍 CASE FILE</span>
+    <span class="case-num" id="caseNum">#01/08</span>
+  </div>
+
+  <div class="body" id="game">
+    <p class="eyebrow">Aula 8 · Passive Voice</p>
+    <h1>Bug Report Detective</h1>
+    <p class="progress-label" id="progressLabel">Sentence 1 of 8</p>
+    <div class="badge-row"><span class="badge" id="diffBadge">easy</span></div>
+
+    <div class="clue-box" id="sentenceBox"></div>
+
+    <div class="mode-row">
+      <button class="mode-btn subject active" id="modeSubjectBtn">🔵 select SUBJECT</button>
+      <button class="mode-btn verb" id="modeVerbBtn">🟠 select PASSIVE VERB</button>
+    </div>
+    <p class="hint">clique nas palavras para marcar. Troque o modo para marcar a outra parte.</p>
+
+    <button class="action" id="checkBtn">🔍 submit evidence</button>
+    <button class="ghost" id="clearBtn">clear selection</button>
+
+    <div class="result-row" id="resultRow" style="display:none;"></div>
+    <div class="reveal" id="revealBox"></div>
+
+    <button class="ghost" id="nextBtn" style="display:none;margin-top:16px;">next case →</button>
+  </div>
+
+  <div class="body end-screen" id="endScreen">
+    <p class="eyebrow">case closed</p>
+    <p class="score-label">evidence found</p>
+    <div class="score-big" id="finalScore">0/16</div>
+    <p class="verdict" id="verdictText"></p>
+    <button class="action" id="restartBtn">↻ new investigation</button>
+  </div>
+</div>
+
+<script>
+const pool = [
+  // EASY
+  { text:"A critical error was found in the system.", subject:[0,1,2], verb:[3,4], difficulty:"easy" },
+  { text:"The bug was reported by a user.", subject:[0,1], verb:[2,3], difficulty:"easy" },
+  { text:"The file was deleted by mistake.", subject:[0,1], verb:[2,3], difficulty:"easy" },
+  { text:"The server was restarted this morning.", subject:[0,1], verb:[2,3], difficulty:"easy" },
+  { text:"The password was changed yesterday.", subject:[0,1], verb:[2,3], difficulty:"easy" },
+  { text:"The website was updated last night.", subject:[0,1], verb:[2,3], difficulty:"easy" },
+  { text:"Three emails were sent this afternoon.", subject:[0,1], verb:[2,3], difficulty:"easy" },
+  // MEDIUM
+  { text:"The new feature must be tested before launch.", subject:[0,1,2], verb:[3,4,5], difficulty:"medium" },
+  { text:"This bug should be fixed today.", subject:[0,1], verb:[2,3,4], difficulty:"medium" },
+  { text:"The update will be installed automatically.", subject:[0,1], verb:[2,3,4], difficulty:"medium" },
+  { text:"User data can be exported as a CSV file.", subject:[0,1], verb:[2,3,4], difficulty:"medium" },
+  { text:"The old version will not be supported anymore.", subject:[0,1,2], verb:[3,4,5,6], difficulty:"medium" },
+  { text:"A temporary password was sent by email.", subject:[0,1,2], verb:[3,4], difficulty:"medium" },
+  { text:"The new design was approved by the manager.", subject:[0,1,2], verb:[3,4], difficulty:"medium" },
+  // HARD
+  { text:"The issue has been escalated to the development team.", subject:[0,1], verb:[2,3,4], difficulty:"hard" },
+  { text:"The laptop was stolen from the office last week.", subject:[0,1], verb:[2,3], difficulty:"hard" },
+  { text:"A new version has been released this morning.", subject:[0,1,2], verb:[3,4,5], difficulty:"hard" },
+  { text:"The best design was chosen by the committee.", subject:[0,1,2], verb:[3,4], difficulty:"hard" },
+  { text:"The payment bug is currently being investigated.", subject:[0,1,2], verb:[3,4,5,6], difficulty:"hard" },
+  { text:"Three critical bugs have not been fixed yet.", subject:[0,1,2], verb:[3,4,5,6], difficulty:"hard" }
+];
+
+const SET_SIZE_COUNTS = { easy:3, medium:3, hard:2 };
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let k=a.length-1;k>0;k--){ const j=Math.floor(Math.random()*(k+1)); [a[k],a[j]]=[a[j],a[k]]; }
+  return a;
+}
+function drawMixedSet(){
+  const buckets = { easy:[], medium:[], hard:[] };
+  pool.forEach(item => buckets[item.difficulty].push(item));
+  let result = [];
+  Object.keys(SET_SIZE_COUNTS).forEach(diff=>{
+    result = result.concat(shuffle(buckets[diff]).slice(0, SET_SIZE_COUNTS[diff]));
+  });
+  return shuffle(result);
+}
+
+let cases = [], i = 0, mode = 'subject', selSubject = new Set(), selVerb = new Set(), answered = false;
+let totalPoints = 0, maxPoints = 0;
+
+const elSentenceBox = document.getElementById('sentenceBox');
+const elProgressLabel = document.getElementById('progressLabel');
+const elCaseNum = document.getElementById('caseNum');
+const elModeSubjectBtn = document.getElementById('modeSubjectBtn');
+const elModeVerbBtn = document.getElementById('modeVerbBtn');
+const elCheckBtn = document.getElementById('checkBtn');
+const elClearBtn = document.getElementById('clearBtn');
+const elResultRow = document.getElementById('resultRow');
+const elRevealBox = document.getElementById('revealBox');
+const elNextBtn = document.getElementById('nextBtn');
+const elGame = document.getElementById('game');
+const elEnd = document.getElementById('endScreen');
+const elFinalScore = document.getElementById('finalScore');
+const elVerdict = document.getElementById('verdictText');
+const elDiffBadge = document.getElementById('diffBadge');
+
+function words(text){ return text.split(' '); }
+
+function renderSentence(){
+  const w = words(cases[i].text);
+  let html = '';
+  w.forEach((word, idx)=>{ html += '<span class="word" data-idx="'+idx+'">'+word+'</span> '; });
+  elSentenceBox.innerHTML = html;
+  document.querySelectorAll('.word').forEach(span=>{
+    span.addEventListener('click', ()=>toggleWord(span));
+  });
+}
+
+function toggleWord(span){
+  if(answered) return;
+  const idx = parseInt(span.dataset.idx);
+  if(mode === 'subject'){
+    if(selSubject.has(idx)){ selSubject.delete(idx); span.classList.remove('sel-subject'); }
+    else { selSubject.add(idx); selVerb.delete(idx); span.classList.add('sel-subject'); span.classList.remove('sel-verb'); }
+  } else {
+    if(selVerb.has(idx)){ selVerb.delete(idx); span.classList.remove('sel-verb'); }
+    else { selVerb.add(idx); selSubject.delete(idx); span.classList.add('sel-verb'); span.classList.remove('sel-subject'); }
+  }
+}
+
+function setMode(m){
+  mode = m;
+  elModeSubjectBtn.classList.toggle('active', m==='subject');
+  elModeVerbBtn.classList.toggle('active', m==='verb');
+}
+
+function clearSelection(){
+  if(answered) return;
+  selSubject.clear(); selVerb.clear();
+  document.querySelectorAll('.word').forEach(s=>s.classList.remove('sel-subject','sel-verb'));
+}
+
+function setsEqual(a, b){ if(a.size !== b.length) return false; return b.every(idx => a.has(idx)); }
+
+function checkAnswer(){
+  if(answered) return;
+  if(selSubject.size === 0 || selVerb.size === 0) return;
+  answered = true;
+  document.querySelectorAll('.word').forEach(s=>s.classList.add('locked'));
+
+  const c = cases[i];
+  const subjectOk = setsEqual(selSubject, c.subject);
+  const verbOk = setsEqual(selVerb, c.verb);
+  if(subjectOk) totalPoints++;
+  if(verbOk) totalPoints++;
+
+  elResultRow.style.display = 'flex';
+  elResultRow.innerHTML =
+    '<div class="result-chip '+(subjectOk?'ok':'bad')+'">SUBJECT '+(subjectOk?'✓':'✗')+'</div>' +
+    '<div class="result-chip '+(verbOk?'ok':'bad')+'">PASSIVE VERB '+(verbOk?'✓':'✗')+'</div>';
+
+  const w = words(c.text);
+  const subjPhrase = c.subject.map(idx=>w[idx]).join(' ');
+  const verbPhrase = c.verb.map(idx=>w[idx]).join(' ');
+  elRevealBox.classList.add('show');
+  elRevealBox.innerHTML = 'Subject: <b>'+subjPhrase+'</b><br>Passive verb: <b>'+verbPhrase+'</b>';
+
+  elCheckBtn.style.display = 'none';
+  elClearBtn.style.display = 'none';
+  elNextBtn.style.display = 'block';
+}
+
+function nextCase(){
+  i++;
+  if(i >= cases.length){ showEnd(); } else { loadCase(); }
+}
+
+function loadCase(){
+  answered = false;
+  selSubject = new Set(); selVerb = new Set();
+  setMode('subject');
+  elCaseNum.textContent = '#'+String(i+1).padStart(2,'0')+'/'+String(cases.length).padStart(2,'0');
+  elProgressLabel.textContent = 'Sentence '+(i+1)+' of '+cases.length;
+  elDiffBadge.textContent = cases[i].difficulty;
+  elDiffBadge.className = 'badge '+cases[i].difficulty;
+  elResultRow.style.display = 'none';
+  elRevealBox.classList.remove('show');
+  elCheckBtn.style.display = 'block';
+  elClearBtn.style.display = 'block';
+  elNextBtn.style.display = 'none';
+  renderSentence();
+}
+
+function showEnd(){
+  elGame.style.display = 'none';
+  elEnd.classList.add('show');
+  elFinalScore.textContent = totalPoints+'/'+maxPoints;
+  let msg = '';
+  const pct = totalPoints/maxPoints;
+  if(pct === 1) msg = "Case fully solved! You spotted every subject and every passive verb. 🕵️";
+  else if(pct >= 0.7) msg = "Sharp eye, detective. Just a couple of clues you missed.";
+  else msg = "Some clues slipped by. Review: subject = who/what receives the action; passive verb = be + participle.";
+  elVerdict.textContent = msg;
+}
+
+function restart(){
+  cases = drawMixedSet();
+  maxPoints = cases.length * 2;
+  i = 0; totalPoints = 0;
+  elGame.style.display = 'block';
+  elEnd.classList.remove('show');
+  loadCase();
+}
+
+elModeSubjectBtn.addEventListener('click', ()=>setMode('subject'));
+elModeVerbBtn.addEventListener('click', ()=>setMode('verb'));
+elCheckBtn.addEventListener('click', checkAnswer);
+elClearBtn.addEventListener('click', clearSelection);
+elNextBtn.addEventListener('click', nextCase);
+document.getElementById('restartBtn').addEventListener('click', restart);
+
+restart();
+</script>
+</body>
+</html>

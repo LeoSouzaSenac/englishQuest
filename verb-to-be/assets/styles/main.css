@@ -1,0 +1,62 @@
+@import 'hangman.css';
+@import 'index.css';
+@import 'modal.css';
+
+/* ══════════════════════════════════════
+   VERB TO BE — theme overrides
+   Mantém o design system do EnglishQuest
+   mas com identidade visual própria (roxo)
+══════════════════════════════════════ */
+
+/* Accent principal: roxo/índigo para diferenciar de Verb Tenses */
+:root {
+  --accent-present: #7c6ffd;   /* roxo  — am/is/are */
+  --accent-cont:    #00d4aa;   /* verde — questions  */
+  --accent-past:    #ff6b35;   /* laranja — was/were */
+  --accent-future:  #ffd166;   /* amarelo — negations */
+}
+
+/* Logo gradient adaptado */
+.logo {
+  background: linear-gradient(135deg, var(--accent-present), #b794f6) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+}
+
+/* Tab active color */
+.tab.active {
+  background: var(--accent-present) !important;
+  border-color: var(--accent-present) !important;
+  color: #fff !important;
+}
+
+/* Reference cards */
+.tense-card.present { border-top-color: var(--accent-present); }
+.tense-card.past    { border-top-color: var(--accent-past); }
+.tense-card.cont    { border-top-color: var(--accent-cont); }
+.tense-card.future  { border-top-color: var(--accent-future); }
+
+/* Nav back link */
+.nav-back {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 0.82rem;
+  color: var(--muted);
+  text-decoration: none;
+  border: 1.5px solid var(--border);
+  border-radius: 50px;
+  padding: 6px 14px;
+  transition: border-color 0.2s, color 0.2s;
+  white-space: nowrap;
+}
+.nav-back:hover {
+  border-color: var(--accent-present);
+  color: var(--accent-present);
+}
+
+nav {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  justify-content: space-between;
+}

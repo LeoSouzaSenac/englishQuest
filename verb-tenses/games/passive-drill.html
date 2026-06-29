@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Passive Voice Drill</title>
+<style>
+  :root{
+    --bg:#0b0e14;--panel:#11151c;--panel-2:#161b24;--border:#252c38;
+    --text:#e7ecf3;--muted:#828ea0;--accent:#5eead4;--accent-dim:#1d3b38;
+    --amber:#f5b349;--success:#56e08a;--error:#ff6b6b;
+    --mono:'JetBrains Mono','Fira Code',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    --sans:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;min-height:100vh;
+    background:radial-gradient(circle at 20% 0%, #11202050 0%, transparent 60%), var(--bg);
+    color:var(--text);font-family:var(--sans);
+    display:flex;align-items:center;justify-content:center;padding:24px;
+  }
+  .terminal{
+    width:100%;max-width:640px;background:var(--panel);
+    border:1px solid var(--border);border-radius:10px;
+    box-shadow:0 30px 80px -30px rgba(0,0,0,0.7);overflow:hidden;
+  }
+  .bar{display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--panel-2);border-bottom:1px solid var(--border);}
+  .dot{width:10px;height:10px;border-radius:50%;}
+  .dot.red{background:#ff5f57;}.dot.yellow{background:#febc2e;}.dot.green{background:#28c840;}
+  .filename{margin-left:8px;font-family:var(--mono);font-size:12.5px;color:var(--muted);}
+  .body{padding:28px 26px 24px;}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin:0 0 6px;}
+  h1{font-size:22px;margin:0 0 18px;font-weight:700;letter-spacing:-.01em;}
+  .meta-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;font-family:var(--mono);font-size:12.5px;color:var(--muted);}
+  .meta-row span.hi{color:var(--text);}
+  .badge-row{display:flex;justify-content:flex-end;margin-bottom:10px;}
+  .badge{font-family:var(--mono);font-size:10.5px;font-weight:700;letter-spacing:.06em;padding:3px 9px;border-radius:20px;text-transform:uppercase;}
+  .badge.easy{background:rgba(86,224,138,.12);color:var(--success);border:1px solid rgba(86,224,138,.4);}
+  .badge.medium{background:rgba(245,179,73,.12);color:var(--amber);border:1px solid rgba(245,179,73,.4);}
+  .badge.hard{background:rgba(255,107,107,.12);color:var(--error);border:1px solid rgba(255,107,107,.4);}
+  .progress-track{height:6px;background:var(--panel-2);border-radius:4px;overflow:hidden;margin-bottom:20px;border:1px solid var(--border);}
+  .progress-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--accent),#3fc4b3);transition:width .35s ease;}
+  .prompt-line{display:flex;gap:10px;align-items:flex-start;font-family:var(--mono);font-size:13px;color:var(--muted);margin-bottom:8px;}
+  .prompt-line .tag{color:var(--amber);flex-shrink:0;}
+  .active-box{background:var(--panel-2);border:1px solid var(--border);border-left:3px solid var(--amber);border-radius:6px;padding:14px 16px;font-family:var(--mono);font-size:15px;line-height:1.5;margin-bottom:22px;}
+  .input-row{display:flex;gap:10px;align-items:center;font-family:var(--mono);margin-bottom:6px;}
+  .input-row .tag{color:var(--accent);}
+  input[type=text]{flex:1;background:var(--panel-2);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:15px;padding:12px 14px;border-radius:6px;outline:none;}
+  input[type=text]:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(94,234,212,.15);}
+  .hint{font-family:var(--mono);font-size:11.5px;color:var(--muted);margin:0 0 20px;padding-left:2px;}
+  button{font-family:var(--mono);font-weight:600;font-size:13.5px;letter-spacing:.02em;border:none;border-radius:6px;padding:13px 20px;cursor:pointer;transition:transform .12s ease, opacity .12s ease;}
+  button:active{transform:scale(.97);}
+  .btn-primary{width:100%;background:var(--accent);color:#06231f;}
+  .btn-primary:hover{opacity:.9;}
+  .btn-primary:disabled{opacity:.4;cursor:not-allowed;}
+  .btn-ghost{width:100%;background:transparent;color:var(--text);border:1px solid var(--border);}
+  .btn-ghost:hover{border-color:var(--accent);}
+  .feedback{margin-top:18px;border-radius:6px;padding:14px 16px;font-size:14px;line-height:1.55;display:none;}
+  .feedback.show{display:block;}
+  .feedback.correct{background:rgba(86,224,138,.08);border:1px solid rgba(86,224,138,.35);color:var(--success);}
+  .feedback.wrong{background:rgba(255,107,107,.08);border:1px solid rgba(255,107,107,.35);color:var(--error);}
+  .feedback .answer{font-family:var(--mono);color:var(--text);margin-top:6px;display:block;}
+  .footer-row{display:flex;gap:10px;margin-top:18px;}
+  .streak{font-family:var(--mono);font-size:12px;color:var(--amber);text-align:center;margin-top:10px;min-height:16px;}
+  .end-screen{display:none;text-align:center;}
+  .end-screen.show{display:block;}
+  .score-big{font-family:var(--mono);font-size:48px;font-weight:700;color:var(--accent);margin:6px 0 4px;}
+  .score-label{font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;}
+  .verdict{margin:18px 0 24px;font-size:15px;color:var(--text);}
+  .breakdown{display:flex;justify-content:center;gap:14px;margin-bottom:20px;font-family:var(--mono);font-size:11.5px;color:var(--muted);}
+  @media (prefers-reduced-motion: reduce){.progress-fill{transition:none;}}
+  @media (max-width:480px){.body{padding:22px 18px;}h1{font-size:19px;}}
+</style>
+</head>
+<body>
+
+<div class="terminal">
+  <div class="bar">
+    <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+    <span class="filename">passive-drill.js</span>
+  </div>
+
+  <div class="body" id="game">
+    <p class="eyebrow">Aula 8 · Passive Voice</p>
+    <h1>Active → Passive Drill</h1>
+
+    <div class="meta-row">
+      <span>Sentence <span class="hi" id="qIndex">1</span>/<span id="qTotal">12</span></span>
+      <span>Score: <span class="hi" id="scoreLabel">0</span></span>
+    </div>
+    <div class="badge-row"><span class="badge" id="diffBadge">easy</span></div>
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+
+    <div class="prompt-line"><span class="tag">$</span><span>active voice:</span></div>
+    <div class="active-box" id="activeSentence"></div>
+
+    <div class="input-row">
+      <span class="tag">&gt;</span>
+      <input type="text" id="answerInput" placeholder="type the passive version..." autocomplete="off" />
+    </div>
+    <p class="hint">dica: sujeito + was/were/has been/will be + participle. Pressione Enter para checar.</p>
+
+    <button class="btn-primary" id="checkBtn">RUN ▶ check answer</button>
+
+    <div class="feedback" id="feedback"></div>
+    <p class="streak" id="streak"></p>
+
+    <div class="footer-row" id="nextRow" style="display:none;">
+      <button class="btn-ghost" id="nextBtn">next sentence →</button>
+    </div>
+  </div>
+
+  <div class="body end-screen" id="endScreen">
+    <p class="eyebrow">drill complete</p>
+    <p class="score-label">final score</p>
+    <div class="score-big" id="finalScore">0/12</div>
+    <div class="breakdown" id="breakdown"></div>
+    <p class="verdict" id="verdictText"></p>
+    <button class="btn-primary" id="restartBtn">↻ new drill (random mix)</button>
+  </div>
+</div>
+
+<script>
+const pool = [
+  // EASY
+  { active:"We fixed three bugs.", accepted:["three bugs were fixed","three bugs were fixed by us"], difficulty:"easy" },
+  { active:"We added a new feature.", accepted:["a new feature was added","a new feature was added by us"], difficulty:"easy" },
+  { active:"We removed the old menu.", accepted:["the old menu was removed","the old menu was removed by us"], difficulty:"easy" },
+  { active:"We tested the new version.", accepted:["the new version was tested","the new version was tested by us"], difficulty:"easy" },
+  { active:"We updated the security system.", accepted:["the security system was updated","the security system was updated by us"], difficulty:"easy" },
+  { active:"We improved the loading speed.", accepted:["the loading speed was improved","the loading speed was improved by us"], difficulty:"easy" },
+  { active:"The team designs the interface.", accepted:["the interface is designed","the interface is designed by the team"], difficulty:"easy" },
+  { active:"The company stores user data.", accepted:["user data is stored","user data is stored by the company"], difficulty:"easy" },
+  // MEDIUM
+  { active:"Developers must test the application.", accepted:["the application must be tested","the application must be tested by developers"], difficulty:"medium" },
+  { active:"The team will release the update tomorrow.", accepted:["the update will be released tomorrow","the update will be released tomorrow by the team"], difficulty:"medium" },
+  { active:"The manager should review the code.", accepted:["the code should be reviewed","the code should be reviewed by the manager"], difficulty:"medium" },
+  { active:"Users cannot access this page.", accepted:["this page cannot be accessed","this page cannot be accessed by users"], difficulty:"medium" },
+  { active:"The company will launch a new feature next month.", accepted:["a new feature will be launched next month","a new feature will be launched next month by the company"], difficulty:"medium" },
+  { active:"The support team can solve this issue quickly.", accepted:["this issue can be solved quickly","this issue can be solved quickly by the support team"], difficulty:"medium" },
+  { active:"We didn't update the database.", accepted:["the database wasn't updated","the database was not updated","the database wasn't updated by us"], difficulty:"medium" },
+  // HARD
+  { active:"The company has launched a new app.", accepted:["a new app has been launched","a new app has been launched by the company"], difficulty:"hard" },
+  { active:"Engineers have fixed three critical bugs this week.", accepted:["three critical bugs have been fixed this week","three critical bugs have been fixed this week by engineers"], difficulty:"hard" },
+  { active:"The team has not finished the project yet.", accepted:["the project has not been finished yet","the project hasn't been finished yet"], difficulty:"hard" },
+  { active:"Someone stole the laptop from the office.", accepted:["the laptop was stolen from the office","the laptop was stolen from the office by someone"], difficulty:"hard" },
+  { active:"The committee has chosen the best design.", accepted:["the best design has been chosen","the best design has been chosen by the committee"], difficulty:"hard" }
+];
+
+const SET_SIZE_COUNTS = { easy:5, medium:4, hard:3 };
+
+let order = [];
+let i = 0;
+let score = 0;
+let streak = 0;
+let answered = false;
+
+function normalize(s){ return s.toLowerCase().replace(/[.!?]+$/,'').replace(/\s+/g,' ').trim(); }
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let k=a.length-1;k>0;k--){ const j=Math.floor(Math.random()*(k+1)); [a[k],a[j]]=[a[j],a[k]]; }
+  return a;
+}
+
+function drawMixedSet(){
+  const buckets = { easy:[], medium:[], hard:[] };
+  pool.forEach(item => buckets[item.difficulty].push(item));
+  let result = [];
+  Object.keys(SET_SIZE_COUNTS).forEach(diff=>{
+    result = result.concat(shuffle(buckets[diff]).slice(0, SET_SIZE_COUNTS[diff]));
+  });
+  return shuffle(result);
+}
+
+const elActive = document.getElementById('activeSentence');
+const elInput = document.getElementById('answerInput');
+const elCheck = document.getElementById('checkBtn');
+const elFeedback = document.getElementById('feedback');
+const elQIndex = document.getElementById('qIndex');
+const elQTotal = document.getElementById('qTotal');
+const elScore = document.getElementById('scoreLabel');
+const elProgress = document.getElementById('progressFill');
+const elNextRow = document.getElementById('nextRow');
+const elNextBtn = document.getElementById('nextBtn');
+const elStreak = document.getElementById('streak');
+const elGame = document.getElementById('game');
+const elEnd = document.getElementById('endScreen');
+const elFinalScore = document.getElementById('finalScore');
+const elVerdict = document.getElementById('verdictText');
+const elRestart = document.getElementById('restartBtn');
+const elDiffBadge = document.getElementById('diffBadge');
+const elBreakdown = document.getElementById('breakdown');
+
+let correctByDiff = { easy:0, medium:0, hard:0 };
+let totalByDiff = { easy:0, medium:0, hard:0 };
+
+function loadQuestion(){
+  answered = false;
+  elInput.value = '';
+  elInput.disabled = false;
+  elFeedback.className = 'feedback';
+  elFeedback.innerHTML = '';
+  elNextRow.style.display = 'none';
+  elCheck.style.display = 'block';
+  elQIndex.textContent = i+1;
+  elQTotal.textContent = order.length;
+  elScore.textContent = score;
+  elProgress.style.width = (i/order.length*100)+'%';
+  elActive.textContent = order[i].active;
+  elDiffBadge.textContent = order[i].difficulty;
+  elDiffBadge.className = 'badge '+order[i].difficulty;
+  elInput.focus();
+}
+
+function checkAnswer(){
+  if(answered) return;
+  const val = elInput.value.trim();
+  if(!val) return;
+  answered = true;
+  const diff = order[i].difficulty;
+  totalByDiff[diff]++;
+  const correct = order[i].accepted.some(a => normalize(a) === normalize(val));
+  elInput.disabled = true;
+  elCheck.style.display = 'none';
+  elNextRow.style.display = 'flex';
+
+  if(correct){
+    score++; streak++; correctByDiff[diff]++;
+    elFeedback.className = 'feedback correct show';
+    elFeedback.innerHTML = '✓ Correct! Great use of passive voice.';
+    elStreak.textContent = streak >= 2 ? '🔥 '+streak+' in a row!' : '';
+  } else {
+    streak = 0;
+    elFeedback.className = 'feedback wrong show';
+    elFeedback.innerHTML = '✗ Not quite. Expected:<span class="answer">'+order[i].accepted[0]+'</span>';
+    elStreak.textContent = '';
+  }
+  elScore.textContent = score;
+}
+
+function nextQuestion(){
+  i++;
+  if(i >= order.length){ showEnd(); } else { loadQuestion(); }
+}
+
+function showEnd(){
+  elGame.style.display = 'none';
+  elEnd.classList.add('show');
+  elFinalScore.textContent = score+'/'+order.length;
+  elBreakdown.innerHTML =
+    '<span>easy '+correctByDiff.easy+'/'+totalByDiff.easy+'</span>'+
+    '<span>medium '+correctByDiff.medium+'/'+totalByDiff.medium+'</span>'+
+    '<span>hard '+correctByDiff.hard+'/'+totalByDiff.hard+'</span>';
+  let msg = '';
+  const pct = score/order.length;
+  if(pct === 1) msg = "Perfect run! You're ready to write any changelog in passive voice. 🚀";
+  else if(pct >= 0.75) msg = "Great job! Just a small review and you've got it.";
+  else msg = "Good attempt — review the structure (was/were/has been/will be + participle) and try again.";
+  elVerdict.textContent = msg;
+}
+
+function restart(){
+  order = drawMixedSet();
+  i = 0; score = 0; streak = 0;
+  correctByDiff = { easy:0, medium:0, hard:0 };
+  totalByDiff = { easy:0, medium:0, hard:0 };
+  elGame.style.display = 'block';
+  elEnd.classList.remove('show');
+  loadQuestion();
+}
+
+elCheck.addEventListener('click', checkAnswer);
+elInput.addEventListener('keydown', e => { if(e.key === 'Enter') checkAnswer(); });
+elNextBtn.addEventListener('click', nextQuestion);
+elRestart.addEventListener('click', restart);
+
+restart();
+</script>
+</body>
+</html>

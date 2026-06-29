@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Verb To Be — EnglishQuest</title>
+  <link rel="shortcut icon" href="https://cdn-icons-png.flaticon.com/128/10855/10855296.png" type="image/x-icon" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/styles/main.css" />
+</head>
+<body>
+
+  <nav>
+    <a href="../english/index.html" class="nav-back">← English</a>
+    <div class="logo">Verb To Be</div>
+    <div class="nav-xp">⚡ <span class="xp-val" id="xpDisplay">0</span> XP</div>
+  </nav>
+
+  <div class="tabs">
+    <button class="tab active"  onclick="switchTab('home')">🏠 Home</button>
+    <button class="tab"         onclick="switchTab('quiz')">🎯 Quiz</button>
+    <button class="tab"         onclick="switchTab('error')">🔍 Error Detector</button>
+    <button class="tab"         onclick="switchTab('build')">🧩 Build Sentence</button>
+    <button class="tab"         onclick="switchTab('story')">📖 Story Mode</button>
+    <button class="tab"         onclick="switchTab('speed')">⚡ Speed Round</button>
+    <button class="tab"         onclick="switchTab('milhao')">💰 Millionaire?</button>
+    <button class="tab"         onclick="switchTab('hangman')">🪢 Hangman</button>
+    <button class="tab"         onclick="switchTab('progress')">📊 Progress</button>
+  </div>
+
+  <!-- ══════════ HOME ══════════ -->
+  <div class="page active" id="page-home">
+    <div class="hero">
+      <h1>Master<br /><span>Verb To Be</span></h1>
+      <p>8 jogos interativos para dominar am, is, are, was e were — presente, passado, perguntas e negações.</p>
+    </div>
+
+    <div class="tense-cards">
+      <div class="tense-card present">
+        <div class="badge">Present — am / is / are</div>
+        <h3>I am a student</h3>
+        <p>Identidade, profissão, estado atual</p>
+        <ul>
+          <li>She <strong>is</strong> a teacher</li>
+          <li>We <strong>are</strong> from Brazil</li>
+          <li>It <strong>is</strong> cold today</li>
+        </ul>
+        <div class="formula">I → am &nbsp;|&nbsp; He/She/It → is &nbsp;|&nbsp; We/You/They → are</div>
+      </div>
+
+      <div class="tense-card past">
+        <div class="badge">Past — was / were</div>
+        <h3>She was tired yesterday</h3>
+        <p>Estados e condições no passado</p>
+        <ul>
+          <li>He <strong>was</strong> late</li>
+          <li>They <strong>were</strong> happy</li>
+          <li>I <strong>was</strong> at home</li>
+        </ul>
+        <div class="formula">I/He/She/It → was &nbsp;|&nbsp; We/You/They → were</div>
+      </div>
+
+      <div class="tense-card cont">
+        <div class="badge">Questions</div>
+        <h3>Are you ready?</h3>
+        <p>Inverta o verbo e o sujeito</p>
+        <ul>
+          <li><strong>Is</strong> she a doctor?</li>
+          <li><strong>Were</strong> they late?</li>
+          <li><strong>Am</strong> I wrong?</li>
+        </ul>
+        <div class="formula">Am/Is/Are/Was/Were + Subject + complement?</div>
+      </div>
+
+      <div class="tense-card future">
+        <div class="badge">Negations</div>
+        <h3>I am not hungry</h3>
+        <p>Adicione "not" após o verbo</p>
+        <ul>
+          <li>She <strong>isn't</strong> ready</li>
+          <li>They <strong>weren't</strong> home</li>
+          <li>He <strong>wasn't</strong> happy</li>
+        </ul>
+        <div class="formula">Subject + am/is/are/was/were + not + complement</div>
+      </div>
+    </div>
+
+    <div style="margin-top: 40px">
+      <div class="section-title">Mini Games <span>Escolha um jogo para começar</span></div>
+      <div class="game-grid">
+
+        <div class="game-card">
+          <div class="game-title"><span class="game-icon">🎯</span>Quiz Game</div>
+          <p class="game-desc">20 questões sobre am/is/are, was/were, perguntas e negações. Com explicações!</p>
+          <button class="btn btn-primary" onclick="switchTab('quiz')">Jogar →</button>
+        </div>
+
+        <div class="game-card">
+          <div class="game-title"><span class="game-icon">🔍</span>Error Detector</div>
+          <p class="game-desc">Encontre e corrija os erros com o verb to be em cada frase.</p>
+          <button class="btn btn-primary" onclick="switchTab('error')">Jogar →</button>
+        </div>
+
+        <div class="game-card">
+          <div class="game-title"><span class="game-icon">🧩</span>Build Sentence</div>
+          <p class="game-desc">Monte frases corretas com am, is, are, was e were clicando nas palavras.</p>
+          <button class="btn btn-primary" onclick="switchTab('build')">Jogar →</button>
+        </div>
+
+        <div class="game-card">
+          <div class="game-title"><span class="game-icon">📖</span>Story Mode</div>
+          <p class="game-desc">Complete a história escolhendo a forma correta do verb to be em cada situação.</p>
+          <button class="btn btn-primary" onclick="switchTab('story')">Jogar →</button>
+        </div>
+
+        <div class="game-card">
+          <div class="game-title"><span class="game-icon">⚡</span>Speed Round</div>
+          <p class="game-desc">60 segundos para conjugar o verb to be o máximo de vezes! Digite e pressione Enter.</p>
+          <button class="btn btn-primary" onclick="switchTab('speed')">Jogar →</button>
+        </div>
+
+        <div class="game-card" style="border-color: #c8930a; background: linear-gradient(135deg, rgba(255,209,102,0.07), var(--surface));">
+          <div class="game-title"><span class="game-icon">💰</span>Who wants to be a millionaire?</div>
+          <p class="game-desc">15 perguntas sobre o verb to be, 3 ajudas, prêmios até R$ 1.000.000!</p>
+          <button class="btn" style="background:var(--accent-future);color:#000;font-family:'Syne',sans-serif;font-weight:700;padding:12px 24px;border-radius:50px;border:none;cursor:pointer;" onclick="switchTab('milhao')">Jogar →</button>
+        </div>
+
+        <div class="game-card">
+          <div class="game-title"><span class="game-icon">🪢</span>Hangman</div>
+          <p class="game-desc">Adivinhe palavras relacionadas a identidades, profissões e estados — temas do verb to be.</p>
+          <button class="btn btn-primary" onclick="switchTab('hangman')">Jogar →</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ QUIZ ══════════ -->
+  <div class="page" id="page-quiz">
+    <div class="section-title">🎯 Quiz Game</div>
+    <div class="game-card" style="max-width:600px">
+      <div class="quiz-stats">
+        Pergunta <span id="qNum">1</span>/20 &nbsp;|&nbsp; Acertos: <span id="qScore">0</span> &nbsp;|&nbsp; 🔥 Streak: <span id="qStreak">0</span>
+      </div>
+      <div class="quiz-question" id="quizQuestion">Loading...</div>
+      <div class="quiz-options" id="quizOptions"></div>
+      <div class="quiz-feedback" id="quizFeedback"></div>
+      <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap" id="quizControls">
+        <button class="btn btn-primary" id="nextBtn" onclick="nextQuestion()" style="display:none">Próxima →</button>
+        <button class="btn btn-outline btn-sm" onclick="resetQuiz()">Reiniciar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ ERROR DETECTOR ══════════ -->
+  <div class="page" id="page-error">
+    <div class="section-title">🔍 Error Detector</div>
+    <div class="game-card" style="max-width:600px">
+      <div class="quiz-stats">
+        Frase <span id="errNum">1</span>/10 &nbsp;|&nbsp; Acertos: <span id="errScore">0</span>
+      </div>
+      <p class="game-desc">Reescreva a frase corrigindo o erro com o verb to be.</p>
+      <div class="error-sentence" id="errSentence"></div>
+      <input type="text" class="error-input" id="errInput" placeholder="Digite a frase corrigida..." />
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn btn-primary" onclick="checkError()">Verificar</button>
+        <button class="btn btn-outline btn-sm" onclick="skipError()">Pular →</button>
+        <button class="btn btn-outline btn-sm" onclick="resetError()">Reiniciar</button>
+      </div>
+      <div class="quiz-feedback" id="errFeedback" style="margin-top:14px"></div>
+    </div>
+  </div>
+
+  <!-- ══════════ BUILD SENTENCE ══════════ -->
+  <div class="page" id="page-build">
+    <div class="section-title">🧩 Build Sentence</div>
+    <div class="game-card" style="max-width:620px">
+      <div class="quiz-stats">
+        Frase <span id="buildNum">1</span>/8 &nbsp;|&nbsp; Acertos: <span id="buildScore">0</span>
+      </div>
+      <p class="game-desc" id="buildHint"></p>
+      <div class="sentence-slots" id="buildSlots">
+        <span class="slot-placeholder">Clique nas palavras para montar a frase...</span>
+      </div>
+      <div class="drag-words" id="buildWords"></div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px">
+        <button class="btn btn-primary" onclick="checkBuild()">Verificar ✓</button>
+        <button class="btn btn-outline btn-sm" onclick="clearBuild()">Limpar</button>
+        <button class="btn btn-outline btn-sm" onclick="resetBuild()">Reiniciar</button>
+      </div>
+      <div class="quiz-feedback" id="buildFeedback" style="margin-top:14px"></div>
+    </div>
+  </div>
+
+  <!-- ══════════ STORY MODE ══════════ -->
+  <div class="page" id="page-story">
+    <div class="section-title">📖 Story Mode</div>
+    <div class="game-card" style="max-width:620px">
+      <div class="quiz-stats">
+        Cena <span id="storyNum">1</span>/6 &nbsp;|&nbsp; Acertos: <span id="storyScore">0</span>
+      </div>
+      <div id="storyContent"></div>
+      <div class="quiz-feedback" id="storyFeedback" style="margin-top:14px"></div>
+      <button class="btn btn-outline btn-sm" onclick="resetStory()" style="margin-top:12px">Reiniciar</button>
+    </div>
+  </div>
+
+  <!-- ══════════ SPEED ROUND ══════════ -->
+  <div class="page" id="page-speed">
+    <div class="section-title">⚡ Speed Round</div>
+    <div class="game-card" style="max-width:520px">
+      <div class="speed-score-row">
+        <div>Pontos: <span id="speedScore">0</span></div>
+        <div>Tempo: <span id="speedTime">60</span>s</div>
+      </div>
+      <div class="speed-timer">
+        <div class="speed-timer-bar" id="speedBar" style="width:100%"></div>
+      </div>
+      <div class="speed-prompt" id="speedPrompt">
+        <div class="tense-label" id="speedTenseLabel" style="color:var(--accent-present)">Present</div>
+        <div class="verb" id="speedVerb">be</div>
+        <div class="subject" id="speedSubject">She ___</div>
+      </div>
+      <input type="text" class="speed-input" id="speedInput" placeholder="Digite a forma correta..." autocomplete="off" />
+      <div style="display:flex;gap:10px;margin-top:14px;justify-content:center;flex-wrap:wrap;" id="speedControls">
+        <button class="btn btn-primary" id="speedStartBtn" onclick="startSpeed()">▶ Iniciar</button>
+      </div>
+      <div style="margin-top:16px;font-size:0.85rem;color:var(--muted)">
+        <strong style="color:var(--text)">Como jogar:</strong> Digite a forma correta do verb to be para o sujeito e tempo indicados. Pressione Enter para confirmar.
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ HANGMAN ══════════ -->
+  <div class="page" id="page-hangman">
+    <div class="section-title">🪢 Hangman</div>
+    <div class="game-card">
+      <div class="hangman-info">
+        <div><small>Word</small><span id="hangmanRound">1</span>/10</div>
+        <div><small>Mistakes</small><span id="hangmanLives">0</span>/6</div>
+        <div><small>Score</small><span id="hangmanScore">0</span></div>
+      </div>
+      <div class="hangman-wrap">
+        <div class="hangman-visual">
+          <svg class="hangman-svg" viewBox="0 0 240 240">
+            <line class="gallows" x1="30" y1="220" x2="170" y2="220"/>
+            <line class="gallows" x1="60" y1="220" x2="60" y2="20"/>
+            <line class="gallows" x1="60" y1="20" x2="150" y2="20"/>
+            <line class="gallows" x1="150" y1="20" x2="150" y2="50"/>
+            <circle class="hm-body" id="hm0" cx="150" cy="72" r="22"/>
+            <line class="hm-body" id="hm1" x1="150" y1="94" x2="150" y2="145"/>
+            <line class="hm-body" id="hm2" x1="150" y1="110" x2="122" y2="130"/>
+            <line class="hm-body" id="hm3" x1="150" y1="110" x2="178" y2="130"/>
+            <line class="hm-body" id="hm4" x1="150" y1="145" x2="128" y2="178"/>
+            <line class="hm-body" id="hm5" x1="150" y1="145" x2="172" y2="178"/>
+          </svg>
+        </div>
+        <div class="hangman-game">
+          <div class="hangman-category" id="hangmanCategory">To Be — Identities</div>
+          <div id="hangmanWord"></div>
+          <div id="hangmanKeyboard"></div>
+          <div class="hangman-result" id="hangmanResult"></div>
+          <div class="hangman-actions">
+            <button class="hangman-btn" onclick="nextHangmanWord()">Próxima Palavra →</button>
+            <button class="hangman-btn" onclick="resetHangman()">Reiniciar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ SHOW DO MILHÃO ══════════ -->
+  <div class="page" id="page-milhao">
+    <div class="milhao-stage">
+      <div class="milhao-header">
+        <div class="milhao-logo">💰 Who wants to be a millionaire?</div>
+        <div class="milhao-subtitle">Verb To Be • 15 perguntas • 3 ajudas</div>
+      </div>
+
+      <div id="milhaoStart" style="text-align:center;padding:40px 20px">
+        <div style="font-size:5rem;margin-bottom:20px">🎬</div>
+        <h2 style="font-family:'Syne',sans-serif;font-size:1.8rem;font-weight:900;margin-bottom:12px;">Você está pronto?</h2>
+        <p style="color:var(--muted);margin-bottom:32px;max-width:400px;margin-left:auto;margin-right:auto;">
+          Responda 15 perguntas sobre o Verb To Be. Use as 3 ajudas com sabedoria. Boa sorte!
+        </p>
+        <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:24px;">
+          <div style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:14px 20px;font-size:0.85rem;">
+            <div style="font-size:1.5rem">📞</div>
+            <div style="font-family:'Syne',sans-serif;font-weight:700;margin-top:4px;">Ligar para um amigo</div>
+          </div>
+          <div style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:14px 20px;font-size:0.85rem;">
+            <div style="font-size:1.5rem">👥</div>
+            <div style="font-family:'Syne',sans-serif;font-weight:700;margin-top:4px;">Ajuda da plateia</div>
+          </div>
+          <div style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:14px 20px;font-size:0.85rem;">
+            <div style="font-size:1.5rem">✂️</div>
+            <div style="font-family:'Syne',sans-serif;font-weight:700;margin-top:4px;">Eliminar 2 respostas</div>
+          </div>
+        </div>
+        <button class="btn-confirm" onclick="startMilhao()">▶ Começar o Jogo</button>
+      </div>
+
+      <div id="milhaoGame" style="display:none">
+        <div class="milhao-question-box" id="mQBox">
+          <div class="milhao-q-num" id="mQNum">Pergunta 1 de 15</div>
+          <div class="milhao-q-text" id="mQText"></div>
+        </div>
+        <div class="milhao-options" id="mOptions"></div>
+
+        <div id="phonePopup" class="phone-popup">
+          <div class="friend-name" id="friendName"></div>
+          <div id="friendSpeech"></div>
+        </div>
+
+        <div id="audienceResult" style="display:none;background:var(--surface);border:1.5px solid var(--border);border-radius:14px;padding:16px 20px;margin-bottom:16px;">
+          <div style="font-size:0.8rem;font-weight:700;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.08em;">Resultado da Plateia</div>
+          <div class="audience-chart" id="audienceChart"></div>
+        </div>
+
+        <div class="milhao-controls">
+          <button class="lifeline-btn" id="llPhone" onclick="usePhone()"><span class="ll-icon">📞</span><span>Amigo</span></button>
+          <button class="lifeline-btn" id="llAudience" onclick="useAudience()"><span class="ll-icon">👥</span><span>Plateia</span></button>
+          <button class="lifeline-btn" id="llFifty" onclick="useFifty()"><span class="ll-icon">✂️</span><span>50/50</span></button>
+          <button class="btn-stop" onclick="stopGame()">🚪 Parar e Guardar</button>
+          <button class="btn-confirm" id="mConfirmBtn" onclick="confirmAnswer()" disabled>Confirmar ✓</button>
+        </div>
+        <div style="margin-top:14px" id="mFeedback"></div>
+      </div>
+    </div>
+
+    <div class="prize-ladder" id="prizeLadder"></div>
+  </div>
+
+  <!-- WIN / LOSE OVERLAYS -->
+  <div class="milhao-overlay" id="winOverlay">
+    <div class="overlay-box win">
+      <div class="overlay-emoji" id="winEmoji">🏆</div>
+      <div class="overlay-title" id="winTitle">Parabéns!</div>
+      <div class="overlay-prize" id="winPrize"></div>
+      <div class="overlay-msg" id="winMsg"></div>
+      <button class="btn-confirm" onclick="resetMilhao()">🔄 Jogar Novamente</button>
+    </div>
+  </div>
+  <div class="milhao-overlay" id="loseOverlay">
+    <div class="overlay-box lose">
+      <div class="overlay-emoji">😬</div>
+      <div class="overlay-title">Resposta Errada!</div>
+      <div class="overlay-prize" id="losePrize" style="color:var(--muted);font-size:1rem"></div>
+      <div class="overlay-msg" id="loseMsg"></div>
+      <button class="btn-confirm" onclick="resetMilhao()">🔄 Jogar Novamente</button>
+    </div>
+  </div>
+
+  <div class="sparkle-container" id="sparkles"></div>
+
+  <!-- ══════════ PROGRESS ══════════ -->
+  <div class="page" id="page-progress">
+    <div class="section-title">📊 Progress</div>
+    <div class="progress-grid">
+      <div class="progress-stat">
+        <div class="label">Total XP</div>
+        <div class="value" id="statXP" style="color:var(--accent-future)">0</div>
+      </div>
+      <div class="progress-stat">
+        <div class="label">Questões Respondidas</div>
+        <div class="value" id="statQ">0</div>
+      </div>
+      <div class="progress-stat">
+        <div class="label">Taxa de Acerto</div>
+        <div class="value" id="statAcc">—</div>
+      </div>
+      <div class="progress-stat">
+        <div class="label">Maior Streak</div>
+        <div class="value" id="statStreak" style="color:var(--accent-past)">0</div>
+      </div>
+    </div>
+    <div class="section-title" style="font-size:1.2rem">Desempenho por Tópico</div>
+    <div id="progressBars" style="max-width:500px;margin-bottom:36px"></div>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast"></div>
+
+  <!-- SCRIPTS -->
+  <script src="assets/scripts/state.js"></script>
+  <script src="assets/scripts/quiz.js"></script>
+  <script src="assets/scripts/errorDetector.js"></script>
+  <script src="assets/scripts/buildSentences.js"></script>
+  <script src="assets/scripts/storyMode.js"></script>
+  <script src="assets/scripts/speedMode.js"></script>
+  <script src="assets/scripts/hangman.js"></script>
+  <script src="assets/scripts/millionaire.js"></script>
+  <script src="assets/scripts/progress.js"></script>
+
+  <script>
+    loadQuiz();
+    loadError();
+    loadBuild();
+    loadStory();
+    loadHangmanWord();
+    updateProgress();
+    buildPrizeLadder();
+  </script>
+
+</body>
+</html>
